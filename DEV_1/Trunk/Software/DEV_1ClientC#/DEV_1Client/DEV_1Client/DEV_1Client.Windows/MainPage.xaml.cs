@@ -13,10 +13,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Windows.Devices.Enumeration;
-using System.Threading.Tasks;
-using Windows.Devices.HumanInterfaceDevice;
-
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace DEV_1Client
@@ -26,36 +22,22 @@ namespace DEV_1Client
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        public static MainPage currentMainPage;
+        private static DeviceManager deviceMngr = new DeviceManager();
+
         public MainPage()
         {
             this.InitializeComponent();
-            EnumerateDevices();
+            currentMainPage = this;
+
+            InitializeModules();
         }
 
-        static async Task EnumerateDevices()
+        public void InitializeModules()
         {
-            ushort vId, pId, uPage, uId;
-
-            vId = 0x6969;
-            pId = 0x0001;
-            uPage = 0xFFFF;
-            uId = 0x00FF;
-
-            try
-            {
-                string selector = HidDevice.GetDeviceSelector(uPage, uId, vId, pId);
-                var devices = await DeviceInformation.FindAllAsync(selector);
-                
-                if (devices.Count > 0)
-                {
-                    string deviceIdStr = devices.ElementAt(0).Id;
-                    HidDevice device = await HidDevice.FromIdAsync(devices.ElementAt(0).Id, Windows.Storage.FileAccessMode.ReadWrite);
-                }
-            }
-            catch (Exception e0)
-            {
-                var ex = e0;
-            }
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            deviceMngr.EnumerateDEV_1();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
     }
 }
