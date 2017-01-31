@@ -39,8 +39,8 @@
     <Capability Name="internetClient" />
     <m2:DeviceCapability Name="humaninterfacedevice">
       <!--IR_Sensor Device-->
-      <m2:Device Id="vidpid:6969 0001">
-        <m2:Function Type="usage:FFFF 00FF" />
+      <m2:Device Id="vidpid:6969 0002">
+        <m2:Function Type="usage:0003 0002" />
       </m2:Device>
     </m2:DeviceCapability>
   </Capabilities>

@@ -45,11 +45,11 @@
 
 uint16_t const report_desc_size[HID_NUM_INTERFACES] =
 {
-		22
+		26
 };
 uint8_t const report_len_input[HID_NUM_INTERFACES] =
 {
-		144
+		18
 };
 
 /*-----------------------------------------------------------------------------+
@@ -188,15 +188,18 @@ uint8_t const abromStringDescriptor[] = {
 
 uint8_t const report_desc_HID0[]=
 {
-		0x06, 0xFF, 0xFF, // Usage Page (Generic Desktop)
-		0x09, 0xFF, // Usage (GamePad)
-		0xA1, 0x01, // Collection (Application)
-		0x09, 0xFF,	// Usage vendor defined
+		0x05, 0x03,			// Usage Page (VR Controls)
+		0x09, 0x02,			// Usage (Body Suit)
+		0xA1, 0x01,			// Collection (Application)
+		0xA1, 0x00,			// Collection (Physical)
+		0x05 ,0x01,       	// Usage Page (Generic Desktop)
+		0x09, 0x30,       	// Usage (X)
 		0x16, 0x00, 0x00, // Logical Minimum (0)
 		0x26, 0x10, 0x00, // Logical Maximum (4096)
 		0x75, 0x10,       // Report Size (16)
-		0x95, 0x05,       // Report Count (9)
+		0x95, 0x09,       // Report Count (9)
 		0x81, 0x02,       // Input (Data, Variable, Absolute)
+		0xC0,
 		0xC0
 };
 

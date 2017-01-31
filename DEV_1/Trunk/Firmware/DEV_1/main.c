@@ -52,7 +52,7 @@ typedef struct {
     uint16_t padValuesInCnts[9];
 } t_DEV_1_Rpt;
 
-t_DEV_1_Rpt dev1Rpt = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };          // HID report, to be sent to the PC.
+t_DEV_1_Rpt dev1Rpt;        // HID report, to be sent to the PC.
 const int16_t tableSinCosLookUp[93][2];                 // Lookup table for mouse data;
 #if defined(__TI_COMPILER_VERSION__) || (__IAR_SYSTEMS_ICC__)
 uint8_t index = 1;                                     // Index for lookup table
@@ -100,9 +100,11 @@ uint8_t index = 1;
 
                 // Timer has awakened the CPU.  Proceed with main loop...
                 if (sendNewMousePosition){
-                
+                	int i;
                     // Build the report
                 	// TODO:
+                	for (i = 0; i < 9; i++)
+                		dev1Rpt.padValuesInCnts[i] = i;
 
                     // Send the report
                     USBHID_sendReport((void *)&dev1Rpt, HID0_INTFNUM);

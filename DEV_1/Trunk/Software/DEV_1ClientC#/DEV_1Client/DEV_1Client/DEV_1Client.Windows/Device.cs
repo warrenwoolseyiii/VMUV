@@ -9,9 +9,9 @@ namespace DEV_1Client
         public Device()
         {
             vendorId = 0x6969;
-            productId = 0x0001;
-            usagePage = 0xFFFF;
-            usage = 0x00FF;
+            productId = 0x0002;
+            usagePage = 0x0003;
+            usage = 0x0002;
         }
 
         public string GetSelector()

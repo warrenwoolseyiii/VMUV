@@ -63,7 +63,7 @@ extern "C"
 // Configuration Constants that can change
 // #define that relates to Device Descriptor
 #define USB_VID               0x6969    // Vendor ID (VID)
-#define USB_PID               0x0001        // Product ID (PID)
+#define USB_PID               0x0002        // Product ID (PID)
 
 /*----------------------------------------------------------------------------+
 | Firmware Version                                                            |
@@ -141,7 +141,7 @@ extern "C"
 //***********************************************************************************************
 #define SIZEOF_DEVICE_DESCRIPTOR  0x12
 #define MAX_STRING_DESCRIPTOR_INDEX 5
-#define report_desc_size_HID0 22
+#define report_desc_size_HID0 26
 //#define SIZEOF_REPORT_DESCRIPTOR  36
 //#define USBHID_REPORT_LENGTH      64  // length of whole HID report (including Report ID)
 #define CONFIG_STRING_INDEX       4

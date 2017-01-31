@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Storage;
+using Windows.Foundation;
 
 namespace DEV_1Client
 {
@@ -14,12 +15,12 @@ namespace DEV_1Client
     {
         private static Device dev_1 = new Device();
         private static HidDevice hidDevice = null;
-        private static bool isEnum = false;
+        private static bool deviceIsEnum = false;
         private static bool enumInProgress = false;
 
-        public bool IsEnumerated()
+        public bool IsDeviceEnumerated()
         {
-            return isEnum;
+            return deviceIsEnum;
         }
 
         public bool EnumerationInProgress()
@@ -31,16 +32,14 @@ namespace DEV_1Client
         {
             enumInProgress = true;
 
-            if (!isEnum)
+            if (!deviceIsEnum)
             {
                 try
                 {
                     var deviceInfo = await DeviceInformation.FindAllAsync(dev_1.GetSelector());
 
                     if (deviceInfo.Count > 0)
-                    {
                         hidDevice = await HidDevice.FromIdAsync(deviceInfo.ElementAt(0).Id, FileAccessMode.ReadWrite);
-                    }
                 }
                 catch (Exception e0)
                 {
@@ -49,9 +48,17 @@ namespace DEV_1Client
             }
 
             if (hidDevice != null)
-                isEnum = true;
+            {
+                deviceIsEnum = true;
+                hidDevice.InputReportReceived += new TypedEventHandler<HidDevice, HidInputReportReceivedEventArgs>(this.InterruptHandler);
+            }
 
             enumInProgress = false;
+        }
+
+        private void InterruptHandler(HidDevice sender, HidInputReportReceivedEventArgs args)
+        {
+            var data = args.Report;
         }
     }
 }
