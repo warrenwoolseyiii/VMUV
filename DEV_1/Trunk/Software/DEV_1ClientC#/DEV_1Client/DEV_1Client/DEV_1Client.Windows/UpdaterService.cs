@@ -8,9 +8,23 @@ namespace DEV_1Client
 {
     class UpdaterService
     {
+        MainPage parent = null;
+
+        public UpdaterService(MainPage mainPage)
+        {
+            parent = mainPage;
+        }
+
+        public void OnDeviceEnumerationComplete()
+        {
+            if (parent == null)
+                return;
+            parent.SetEnumerationStatusText("DEV1 Enumeration Success!");
+        }
+
         public void OnDataReceived(DeviceData data)
         {
-            // TODO: Update all modules from here?
+
         }
     }
 }

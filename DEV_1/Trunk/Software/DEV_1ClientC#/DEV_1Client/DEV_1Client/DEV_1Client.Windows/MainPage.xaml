@@ -9,6 +9,7 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Image x:Name="DEV_1Pad" Source="Assets\DEV_1Sample.PNG" HorizontalAlignment="Left" Height="748" Margin="0,10,0,0" VerticalAlignment="Top" Width="757"/>
+        <TextBlock x:Name="ConnectionStatus" HorizontalAlignment="Left" Margin="762,468,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="338" Height="290"/>
 
     </Grid>
 </Page>

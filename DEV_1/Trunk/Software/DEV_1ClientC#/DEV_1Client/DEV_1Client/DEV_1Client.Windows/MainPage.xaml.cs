@@ -24,13 +24,15 @@ namespace DEV_1Client
     public sealed partial class MainPage : Page
     {
         public static MainPage currentMainPage;
-        private static UpdaterService updater = new UpdaterService();
-        private static DeviceManager deviceMngr = new DeviceManager(updater);
+        private static UpdaterService updater = null;// new UpdaterService(currentMainPage);
+        private static DeviceManager deviceMngr = null;// new DeviceManager(updater);
 
         public MainPage()
         {
             this.InitializeComponent();
             currentMainPage = this;
+            updater = new UpdaterService(currentMainPage);
+            deviceMngr = new DeviceManager(updater);
 
             InitializeModules();
         }
@@ -48,6 +50,17 @@ namespace DEV_1Client
             BitmapImage bitmapImage = new BitmapImage();
             bitmapImage.UriSource = new Uri(this.BaseUri, "Assets/DEV_1Sample.PNG");
             DEV_1Pad.Source = bitmapImage;
+        }
+
+        public void SetEnumerationStatusText(String s)
+        {
+            if (s != null)
+                ConnectionStatus.Text = s;
+        }
+
+        public void UpdateWindow()
+        {
+
         }
     }
 }
