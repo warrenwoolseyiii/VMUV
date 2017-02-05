@@ -8,15 +8,23 @@ using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Storage;
 using Windows.Foundation;
+using Windows.Storage.Streams;
 
 namespace DEV_1Client
 {
     class DeviceManager
     {
         private static Device dev_1 = new Device();
+        private static DeviceData currentDeviceData = new DeviceData();
+        private static UpdaterService updaterService = null;
         private static HidDevice hidDevice = null;
         private static bool deviceIsEnum = false;
         private static bool enumInProgress = false;
+
+        public DeviceManager(UpdaterService updater)
+        {
+            updaterService = updater;
+        }
 
         public bool IsDeviceEnumerated()
         {
@@ -58,7 +66,12 @@ namespace DEV_1Client
 
         private void InterruptHandler(HidDevice sender, HidInputReportReceivedEventArgs args)
         {
-            var data = args.Report;
+            HidInputReport inputReport = args.Report;
+            IBuffer buffer = inputReport.Data;
+            DataReader dr = DataReader.FromBuffer(buffer);
+            byte[] bytes = new byte[inputReport.Data.Length];
+            dr.ReadBytes(bytes);
+            currentDeviceData.SetRawDataInCnts(bytes);
         }
     }
 }
