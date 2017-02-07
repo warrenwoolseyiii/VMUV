@@ -5,7 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
@@ -56,6 +58,17 @@ namespace DEV_1Client
         {
             if (s != null)
                 ConnectionStatus.Text = s;
+        }
+
+        public void SetRawDataDisplay(String s)
+        {
+            if (s != null)
+                RawDataDisplay.Text = s;
+        }
+
+        public void SetPadHeatMapsInRGB(byte[] rgbVals)
+        {
+            Pad0HeatMap.Fill = new SolidColorBrush(Color.FromArgb(64, rgbVals[0], rgbVals[1], rgbVals[2]));
         }
 
         public void UpdateWindow()

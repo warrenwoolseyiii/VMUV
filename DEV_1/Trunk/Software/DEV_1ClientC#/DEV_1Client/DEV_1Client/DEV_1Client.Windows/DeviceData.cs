@@ -9,6 +9,7 @@ namespace DEV_1Client
     class DeviceData
     {
         const Int16 rawDataLengthInBytes = 18;
+        const Int16 rawDataLengthInInts = rawDataLengthInBytes / 2;
         private Int16[] rawDataInCnts = new Int16[9];
 
         public void SetRawDataInCnts(byte[] bytes)
@@ -19,11 +20,24 @@ namespace DEV_1Client
             }
             else
             {
-                int i, j;
-                int len = rawDataLengthInBytes / 2;
-                for (i = j = 0; i < len; i++,j+=2)
+                int i, j = 1;
+                int len = rawDataLengthInInts;
+                for (i = 0; i < len; i++,j+=2)
                     rawDataInCnts[i] = ConvertBytesToInt16(bytes, j);
             }
+        }
+
+        public String ToStringRawDisplayFormat()
+        {
+            String rtn = "";
+
+            for (Int16 i = 0; i < rawDataLengthInInts; i++)
+            {
+                String val = "Pad " + i.ToString() + ": " + rawDataInCnts[i].ToString() + "\n";
+                rtn += val;
+            }
+
+            return rtn;
         }
 
         public Int16[] GetRawDataInCnts()
@@ -35,9 +49,9 @@ namespace DEV_1Client
         {
             try
             {
-                Int16 val = bytes[ndx];
+                Int16 val = bytes[ndx + 1];
                 val <<= 8;
-                val |= bytes[ndx + 1];
+                val |= bytes[ndx];
                 return val;
             }
             catch (Exception e0)

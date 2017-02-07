@@ -8,8 +8,13 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Image x:Name="DEV_1Pad" Source="Assets\DEV_1Sample.PNG" HorizontalAlignment="Left" Height="748" Margin="0,10,0,0" VerticalAlignment="Top" Width="757"/>
-        <TextBlock x:Name="ConnectionStatus" HorizontalAlignment="Left" Margin="762,468,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="338" Height="290"/>
-
+        <Image x:Name="DEV_1Pad" Source="Assets\DEV_1Sample.PNG" HorizontalAlignment="Left" Width="755" Height="720" VerticalAlignment="Top"/>
+        <TextBlock x:Name="ConnectionStatus" HorizontalAlignment="Left" Margin="760,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="335" Height="55"/>
+        <TextBlock x:Name="RawDataDisplay" HorizontalAlignment="Left" Margin="760,70,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="335" Height="255"/>
+        <Polygon x:Name="Pad0HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="263.034,92.763,869.047,497.07" RenderTransformOrigin="0.5,0.5" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="0"/>
+            </Polygon.RenderTransform>
+        </Polygon>
     </Grid>
 </Page>

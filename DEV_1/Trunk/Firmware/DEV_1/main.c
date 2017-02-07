@@ -49,7 +49,7 @@
 #define LED_PIN     GPIO_PIN0
 
 typedef struct {
-    uint16_t padValuesInCnts[9];
+	uint16_t padValuesInCnts[9];
 } t_DEV_1_Rpt;
 
 t_DEV_1_Rpt dev1Rpt;        // HID report, to be sent to the PC.
@@ -58,7 +58,8 @@ const int16_t tableSinCosLookUp[93][2];                 // Lookup table for mous
 uint8_t index = 1;                                     // Index for lookup table
 #endif
 volatile uint8_t sendNewMousePosition = FALSE;        // Flag by which timer tells main
-                                                    // loop to send a new report
+uint16_t gTestPadVal = 0;
+// loop to send a new report
 Timer_A_initUpModeParam Timer_A_params = {0};
 
 void initTimer (void);
@@ -69,79 +70,86 @@ void initTimer (void);
 void main (void)
 {
 #if defined(__GNUC__) && (__MSP430__)
-uint8_t index = 1;
+	uint8_t index = 1;
 #endif
-    WDT_A_hold(WDT_A_BASE); // Stop watchdog timer
+	WDT_A_hold(WDT_A_BASE); // Stop watchdog timer
 
-    // Minumum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
-    PMM_setVCore(PMM_CORE_LEVEL_2);
-    USBHAL_initPorts();           // Config GPIOS for low-power (output low)
-    USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
-    initTimer();
-    USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
+	// Minumum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
+	PMM_setVCore(PMM_CORE_LEVEL_2);
+	USBHAL_initPorts();           // Config GPIOS for low-power (output low)
+	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
+	initTimer();
+	USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
 
-    __enable_interrupt();                           // Enable interrupts globally
-    
-    while (1)
-    {
-        // Check the USB state and directly main loop accordingly
-        switch (USB_getConnectionState())
-        {
-            // This case is executed while your device is enumerated on the
-            // USB host
-            case ST_ENUM_ACTIVE:
+	__enable_interrupt();                           // Enable interrupts globally
 
-                // Start Timer
-                Timer_A_startCounter(TIMER_A0_BASE,
-                    TIMER_A_UP_MODE);
+	while (1)
+	{
+		// Check the USB state and directly main loop accordingly
+		switch (USB_getConnectionState())
+		{
+		// This case is executed while your device is enumerated on the
+		// USB host
+		case ST_ENUM_ACTIVE:
 
-                // Enter LPM0, until the timer wakes the CPU
-                __bis_SR_register(LPM0_bits + GIE);
+			// Start Timer
+			Timer_A_startCounter(TIMER_A0_BASE,
+					TIMER_A_UP_MODE);
 
-                // Timer has awakened the CPU.  Proceed with main loop...
-                if (sendNewMousePosition){
-                	int i;
-                    // Build the report
-                	// TODO:
-                	for (i = 0; i < 9; i++)
-                		dev1Rpt.padValuesInCnts[i] = i;
+			// Enter LPM0, until the timer wakes the CPU
+			__bis_SR_register(LPM0_bits + GIE);
 
-                    // Send the report
-                    USBHID_sendReport((void *)&dev1Rpt, HID0_INTFNUM);
+			// Timer has awakened the CPU.  Proceed with main loop...
+			if (sendNewMousePosition){
+				int i;
+				// Build the report
+				// TODO:
+				{
+					for (i = 0; i < 9; i++)
+						dev1Rpt.padValuesInCnts[i] = i;
+					dev1Rpt.padValuesInCnts[0] = gTestPadVal;
+					dev1Rpt.padValuesInCnts[8] = gTestPadVal;
+					gTestPadVal++;
+					if (gTestPadVal > 4095)
+						gTestPadVal = 0;
+				}
 
-                    // Toggle LED on P1.0
-                    GPIO_toggleOutputOnPin(LED_PORT, LED_PIN);
+				// Send the report
+				USBHID_sendReport((void *)&dev1Rpt, HID0_INTFNUM);
 
-                    if (index++ >= 90){
-                        index = 1;
-                    }
-                }
-                break;
+				// Toggle LED on P1.0
+				GPIO_toggleOutputOnPin(LED_PORT, LED_PIN);
+
+				if (index++ >= 90){
+					index = 1;
+				}
+			}
+			break;
 
 
-            // These cases are executed while your device is disconnected from
-            // the host (meaning, not enumerated); enumerated but suspended
-            // by the host, or connected to a powered hub without a USB host
-            // present.
-            case ST_PHYS_DISCONNECTED:
-            case ST_ENUM_SUSPENDED:
-            case ST_PHYS_CONNECTED_NOENUM_SUSP:
-                TA0CTL &= ~MC_1;
-                P1OUT &= ~BIT0;
-                __bis_SR_register(LPM3_bits + GIE);
-                _NOP();
-                break;
+			// These cases are executed while your device is disconnected from
+			// the host (meaning, not enumerated); enumerated but suspended
+			// by the host, or connected to a powered hub without a USB host
+			// present.
+		case ST_PHYS_DISCONNECTED:
+		case ST_ENUM_SUSPENDED:
+		case ST_PHYS_CONNECTED_NOENUM_SUSP:
+			TA0CTL &= ~MC_1;
+			P1OUT &= ~BIT0;
+			__bis_SR_register(LPM3_bits + GIE);
+			_NOP();
+			break;
 
-            // The default is executed for the momentary state
-            // ST_ENUM_IN_PROGRESS.  Usually, this state only last a few
-            // seconds.  Be sure not to enter LPM3 in this state; USB
-            // communication is taking place here, and therefore the mode must
-            // be LPM0 or active-CPU.
-            case ST_ENUM_IN_PROGRESS:
-            default:;
-        }
+			// The default is executed for the momentary state
+			// ST_ENUM_IN_PROGRESS.  Usually, this state only last a few
+			// seconds.  Be sure not to enter LPM3 in this state; USB
+			// communication is taking place here, and therefore the mode must
+			// be LPM0 or active-CPU.
+		case ST_ENUM_IN_PROGRESS:
+		default:;
+		}
 
-    }  //while(1)
+	}  //while(1)
 } //main()
 
 
@@ -157,31 +165,31 @@ void __attribute__ ((interrupt(UNMI_VECTOR))) UNMI_ISR (void)
 #error Compiler not found!
 #endif
 {
-    switch (__even_in_range(SYSUNIV, SYSUNIV_BUSIFG ))
-    {
-        case SYSUNIV_NONE:
-            __no_operation();
-            break;
-        case SYSUNIV_NMIIFG:
-            __no_operation();
-            break;
-        case SYSUNIV_OFIFG:
-            UCS_clearFaultFlag(UCS_XT2OFFG);
-            UCS_clearFaultFlag(UCS_DCOFFG);
-            SFR_clearInterrupt(SFR_OSCILLATOR_FAULT_INTERRUPT);
-            break;
-        case SYSUNIV_ACCVIFG:
-            __no_operation();
-            break;
-        case SYSUNIV_BUSIFG:
-            // If the CPU accesses USB memory while the USB module is
-            // suspended, a "bus error" can occur.  This generates an NMI.  If
-            // USB is automatically disconnecting in your software, set a
-            // breakpoint here and see if execution hits it.  See the
-            // Programmer's Guide for more information.
-            SYSBERRIV = 0; //clear bus error flag
-            USB_disable(); //Disable
-    }
+	switch (__even_in_range(SYSUNIV, SYSUNIV_BUSIFG ))
+	{
+	case SYSUNIV_NONE:
+		__no_operation();
+		break;
+	case SYSUNIV_NMIIFG:
+		__no_operation();
+		break;
+	case SYSUNIV_OFIFG:
+		UCS_clearFaultFlag(UCS_XT2OFFG);
+		UCS_clearFaultFlag(UCS_DCOFFG);
+		SFR_clearInterrupt(SFR_OSCILLATOR_FAULT_INTERRUPT);
+		break;
+	case SYSUNIV_ACCVIFG:
+		__no_operation();
+		break;
+	case SYSUNIV_BUSIFG:
+		// If the CPU accesses USB memory while the USB module is
+		// suspended, a "bus error" can occur.  This generates an NMI.  If
+		// USB is automatically disconnecting in your software, set a
+		// breakpoint here and see if execution hits it.  See the
+		// Programmer's Guide for more information.
+		SYSBERRIV = 0; //clear bus error flag
+		USB_disable(); //Disable
+	}
 }
 
 /*  
@@ -196,105 +204,105 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) TIMER0_A0_ISR (void)
 #error Compiler not found!
 #endif
 {
-sendNewMousePosition = TRUE;                 // Set flag telling main loop to send a report
-__bic_SR_register_on_exit(LPM0_bits);        // Keep CPU awake after returning;
-                                             // enables a run through the main loop
+	sendNewMousePosition = TRUE;                 // Set flag telling main loop to send a report
+	__bic_SR_register_on_exit(LPM0_bits);        // Keep CPU awake after returning;
+	// enables a run through the main loop
 }
 
 // Lookup table for mouse position values.  "const" indicates it will be stored
 // in flash.
 const int16_t tableSinCosLookUp[93][2] = {
-    0,200,
-    14,200,
-    28,198,
-    42,196,
-    55,192,
-    68,188,
-    81,183,
-    94,177,
-    106,170,
-    118,162,
-    129,153,
-    139,144,
-    149,134,
-    158,123,
-    166,112,
-    173,100,
-    180,88,
-    185,75,
-    190,62,
-    194,48,
-    197,35,
-    199,21,
-    200,7,
-    200,-7,
-    199,-21,
-    197,-35,
-    194,-48,
-    190,-62,
-    185,-75,
-    180,-88,
-    173,-100,
-    166,-112,
-    158,-123,
-    149,-134,
-    139,-144,
-    129,-153,
-    118,-162,
-    106,-170,
-    94,-177,
-    81,-183,
-    68,-188,
-    55,-192,
-    42,-196,
-    28,-198,
-    14,-200,
-    0,-200,
-    -14,-200,
-    -28,-198,
-    -42,-196,
-    -55,-192,
-    -68,-188,
-    -81,-183,
-    -94,-177,
-    -106,-170,
-    -118,-162,
-    -129,-153,
-    -139,-144,
-    -149,-134,
-    -158,-123,
-    -166,-112,
-    -173,-100,
-    -180,-88,
-    -185,-75,
-    -190,-62,
-    -194,-48,
-    -197,-35,
-    -199,-21,
-    -200,-7,
-    -200,7,
-    -199,21,
-    -197,35,
-    -194,48,
-    -190,62,
-    -185,75,
-    -180,88,
-    -173,100,
-    -166,112,
-    -158,123,
-    -149,134,
-    -139,144,
-    -129,153,
-    -118,162,
-    -106,170,
-    -94,177,
-    -81,183,
-    -68,188,
-    -55,192,
-    -42,196,
-    -28,198,
-    -14,200,
-    0,200
+		0,200,
+		14,200,
+		28,198,
+		42,196,
+		55,192,
+		68,188,
+		81,183,
+		94,177,
+		106,170,
+		118,162,
+		129,153,
+		139,144,
+		149,134,
+		158,123,
+		166,112,
+		173,100,
+		180,88,
+		185,75,
+		190,62,
+		194,48,
+		197,35,
+		199,21,
+		200,7,
+		200,-7,
+		199,-21,
+		197,-35,
+		194,-48,
+		190,-62,
+		185,-75,
+		180,-88,
+		173,-100,
+		166,-112,
+		158,-123,
+		149,-134,
+		139,-144,
+		129,-153,
+		118,-162,
+		106,-170,
+		94,-177,
+		81,-183,
+		68,-188,
+		55,-192,
+		42,-196,
+		28,-198,
+		14,-200,
+		0,-200,
+		-14,-200,
+		-28,-198,
+		-42,-196,
+		-55,-192,
+		-68,-188,
+		-81,-183,
+		-94,-177,
+		-106,-170,
+		-118,-162,
+		-129,-153,
+		-139,-144,
+		-149,-134,
+		-158,-123,
+		-166,-112,
+		-173,-100,
+		-180,-88,
+		-185,-75,
+		-190,-62,
+		-194,-48,
+		-197,-35,
+		-199,-21,
+		-200,-7,
+		-200,7,
+		-199,21,
+		-197,35,
+		-194,48,
+		-190,62,
+		-185,75,
+		-180,88,
+		-173,100,
+		-166,112,
+		-158,123,
+		-149,134,
+		-139,144,
+		-129,153,
+		-118,162,
+		-106,170,
+		-94,177,
+		-81,183,
+		-68,188,
+		-55,192,
+		-42,196,
+		-28,198,
+		-14,200,
+		0,200
 };
 
 /*
@@ -303,12 +311,12 @@ const int16_t tableSinCosLookUp[93][2] = {
 // This function sets the timer A parameters
 void setTimer_A_Parameters()
 {
-    Timer_A_params.clockSource = TIMER_A_CLOCKSOURCE_ACLK;
+	Timer_A_params.clockSource = TIMER_A_CLOCKSOURCE_ACLK;
 	Timer_A_params.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
-    Timer_A_params.timerPeriod = 547;  // 547/32768 = a period of 16.7ms
+	Timer_A_params.timerPeriod = 547;  // 547/32768 = a period of 16.7ms
 	Timer_A_params.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
 	Timer_A_params.captureCompareInterruptEnable_CCR0_CCIE =
-		       TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
+			TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
 	Timer_A_params.timerClear = TIMER_A_DO_CLEAR;
 	Timer_A_params.startTimer = false;
 }
@@ -320,11 +328,11 @@ void setTimer_A_Parameters()
  */
 void initTimer (void)
 {
-    setTimer_A_Parameters();
-    
-    // Start timer
-    Timer_A_clearTimerInterrupt(TIMER_A0_BASE);
+	setTimer_A_Parameters();
 
-    Timer_A_initUpMode(TIMER_A0_BASE, &Timer_A_params);
+	// Start timer
+	Timer_A_clearTimerInterrupt(TIMER_A0_BASE);
+
+	Timer_A_initUpMode(TIMER_A0_BASE, &Timer_A_params);
 }
 //Released_Version_5_00_01
