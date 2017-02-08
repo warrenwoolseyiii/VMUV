@@ -66,9 +66,17 @@ namespace DEV_1Client
                 RawDataDisplay.Text = s;
         }
 
-        public void SetPadHeatMapsInRGB(byte[] rgbVals)
+        public void SetPadHeatMapsInRGB(byte[] intensity)
         {
-            Pad0HeatMap.Fill = new SolidColorBrush(Color.FromArgb(64, rgbVals[0], rgbVals[1], rgbVals[2]));
+            Pad0HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[0], 66, 165, 211));
+            Pad1HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[1], 66, 165, 211));
+            Pad2HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[2], 66, 165, 211));
+            Pad3HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[3], 66, 165, 211));
+            Pad4HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[4], 66, 165, 211));
+            Pad5HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[5], 66, 165, 211));
+            Pad6HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[6], 66, 165, 211));
+            Pad7HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[7], 66, 165, 211));
+            Pad8HeatMap.Fill = new SolidColorBrush(Color.FromArgb(intensity[8], 66, 165, 211));
         }
 
         public void UpdateWindow()

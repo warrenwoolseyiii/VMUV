@@ -7,11 +7,63 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="#231F1F">
         <Image x:Name="DEV_1Pad" Source="Assets\DEV_1Sample.PNG" HorizontalAlignment="Left" Width="755" Height="720" VerticalAlignment="Top"/>
-        <TextBlock x:Name="ConnectionStatus" HorizontalAlignment="Left" Margin="760,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="335" Height="55"/>
-        <TextBlock x:Name="RawDataDisplay" HorizontalAlignment="Left" Margin="760,70,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="335" Height="255"/>
-        <Polygon x:Name="Pad0HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="263.034,92.763,869.047,497.07" RenderTransformOrigin="0.5,0.5" UseLayoutRounding="False" d:LayoutRounding="Auto">
+        <TextBlock x:Name="ConnectionStatus" HorizontalAlignment="Left" Margin="760,10,0,0" 
+                   TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="335" Height="55"
+                   FontSize="24"/>
+        <TextBlock x:Name="RawDataDisplay" HorizontalAlignment="Left" Margin="760,70,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" 
+                   Width="335" Height="255" FontSize="24"/>
+        <Polygon x:Name="Pad0HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,178 74,178" Margin="262,91,869.047,497.07" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="0"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad1HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="495.667,91,636.333,499" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="45"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad2HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="660.334,255.667,471.666,334.333" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="90"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad3HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="660.5,490.666,471.5,99.334" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="135"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad4HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="494,655,638,-65" 
+                 RenderTransformOrigin="0,0">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="180"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad5HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="259.5,652.833,872.5,-62.833" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="225"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad6HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="94.833,487.167,1037.167,102.833" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="270"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad7HeatMap" Fill="#FFF4F4F5" Points="0,0 232,0 157,177 74,177" Margin="96.833,255.834,1035.167,334.166" 
+                 RenderTransformOrigin="0,0" UseLayoutRounding="False" d:LayoutRounding="Auto">
+            <Polygon.RenderTransform>
+                <CompositeTransform Rotation="315"/>
+            </Polygon.RenderTransform>
+        </Polygon>
+        <Polygon x:Name="Pad8HeatMap" Fill="#FFF4F4F5" Points="61,0 144,0 202,60 202,141 143,200 60,200 0,141, 0,60" 
+                 Margin="277,272,883,295" RenderTransformOrigin="0,0">
             <Polygon.RenderTransform>
                 <CompositeTransform Rotation="0"/>
             </Polygon.RenderTransform>
