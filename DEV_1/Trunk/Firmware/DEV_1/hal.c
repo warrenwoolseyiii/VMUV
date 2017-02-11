@@ -29,23 +29,36 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/*
- * ======== hal.c ========
- *
- */
+
 #include "msp430.h"
-
 #include "driverlib.h"
-
 #include "USB_API/USB_Common/device.h"
 #include "USB_config/descriptors.h"
-
 #include "hal.h"
 
 #define GPIO_ALL	GPIO_PIN0|GPIO_PIN1|GPIO_PIN2|GPIO_PIN3| \
 					GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
 
+static Timer_A_initUpModeParam Timer_A_params = {0};
 
+void USBHAL_setupTimer_A_Params()
+{
+	Timer_A_params.clockSource = TIMER_A_CLOCKSOURCE_ACLK;
+	Timer_A_params.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
+	Timer_A_params.timerPeriod = 547;  // 547/32768 = a period of 16.7ms
+	Timer_A_params.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
+	Timer_A_params.captureCompareInterruptEnable_CCR0_CCIE =
+			TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
+	Timer_A_params.timerClear = TIMER_A_DO_CLEAR;
+	Timer_A_params.startTimer = false;
+}
+
+void USBHAL_initTimer_A()
+{
+	USBHAL_setupTimer_A_Params();
+	Timer_A_clearTimerInterrupt(TIMER_A0_BASE);
+	Timer_A_initUpMode(TIMER_A0_BASE, &Timer_A_params);
+}
 
 /*
 * This function drives all the I/O's as output-low, to avoid floating inputs
@@ -136,4 +149,4 @@ void USBHAL_initClocks(uint32_t mclkFreq)
         mclkFreq/32768);
 }
 
-//Released_Version_5_00_01
+

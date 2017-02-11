@@ -46,7 +46,7 @@
 #define   initClocks      USBHAL_initClocks
 #endif
 
-
+void USBHAL_setupTimer_A_Params();
+void USBHAL_initTimer_A();
 void USBHAL_initPorts(void);
 void USBHAL_initClocks(uint32_t mclkFreq);
-//Released_Version_5_00_01

@@ -29,20 +29,15 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
+
 #include <string.h>
-
 #include "driverlib.h"
-
 #include "USB_config/descriptors.h"
 #include "USB_API/USB_Common/device.h"
 #include "USB_API/USB_Common/usb.h"                 // USB-specific functions
 #include "USB_API/USB_HID_API/UsbHid.h"
-
-/*
- * NOTE: Modify hal.h to select a specific evaluation board and customize for
- * your own board.
- */
 #include "hal.h"
+#include "messagePassing.h"
 
 
 #define LED_PORT    GPIO_PORT_P1
@@ -53,35 +48,13 @@ typedef struct {
 } t_DEV_1_Rpt;
 
 t_DEV_1_Rpt dev1Rpt;        // HID report, to be sent to the PC.
-const int16_t tableSinCosLookUp[93][2];                 // Lookup table for mouse data;
-#if defined(__TI_COMPILER_VERSION__) || (__IAR_SYSTEMS_ICC__)
-uint8_t index = 1;                                     // Index for lookup table
-#endif
-volatile uint8_t sendNewMousePosition = FALSE;        // Flag by which timer tells main
 uint16_t gTestPadVal = 0;
-// loop to send a new report
-Timer_A_initUpModeParam Timer_A_params = {0};
 
-void initTimer (void);
+void initDEV1();
 
-/*  
- * ======== main ========
- */
 void main (void)
 {
-#if defined(__GNUC__) && (__MSP430__)
-	uint8_t index = 1;
-#endif
-	WDT_A_hold(WDT_A_BASE); // Stop watchdog timer
-
-	// Minumum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
-	PMM_setVCore(PMM_CORE_LEVEL_2);
-	USBHAL_initPorts();           // Config GPIOS for low-power (output low)
-	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
-	initTimer();
-	USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
-
-	__enable_interrupt();                           // Enable interrupts globally
+	initDEV1();
 
 	while (1)
 	{
@@ -96,19 +69,21 @@ void main (void)
 			Timer_A_startCounter(TIMER_A0_BASE,
 					TIMER_A_UP_MODE);
 
-			// Enter LPM0, until the timer wakes the CPU
-			__bis_SR_register(LPM0_bits + GIE);
-
-			// Timer has awakened the CPU.  Proceed with main loop...
-			if (sendNewMousePosition){
-				int i;
+			if (Msg_GetTimer_A_InterruptNotification())
+			{
+				Msg_ClrTimer_A_InterruptNotification();
 				// Build the report
 				// TODO:
 				{
+					int i;
 					for (i = 0; i < 9; i++)
-						dev1Rpt.padValuesInCnts[i] = i;
-					dev1Rpt.padValuesInCnts[0] = gTestPadVal;
-					dev1Rpt.padValuesInCnts[8] = gTestPadVal;
+					{
+						if (i % 2)
+							dev1Rpt.padValuesInCnts[i] = gTestPadVal;
+						else
+							dev1Rpt.padValuesInCnts[i] = (4095 - gTestPadVal);
+					}
+
 					gTestPadVal++;
 					if (gTestPadVal > 4095)
 						gTestPadVal = 0;
@@ -119,10 +94,6 @@ void main (void)
 
 				// Toggle LED on P1.0
 				GPIO_toggleOutputOnPin(LED_PORT, LED_PIN);
-
-				if (index++ >= 90){
-					index = 1;
-				}
 			}
 			break;
 
@@ -149,190 +120,19 @@ void main (void)
 		default:;
 		}
 
-	}  //while(1)
-} //main()
-
-
-/*  
- * ======== UNMI_ISR ========
- */
-#if defined(__TI_COMPILER_VERSION__) || (__IAR_SYSTEMS_ICC__)
-#pragma vector = UNMI_VECTOR
-__interrupt void UNMI_ISR (void)
-#elif defined(__GNUC__) && (__MSP430__)
-void __attribute__ ((interrupt(UNMI_VECTOR))) UNMI_ISR (void)
-#else
-#error Compiler not found!
-#endif
-{
-	switch (__even_in_range(SYSUNIV, SYSUNIV_BUSIFG ))
-	{
-	case SYSUNIV_NONE:
-		__no_operation();
-		break;
-	case SYSUNIV_NMIIFG:
-		__no_operation();
-		break;
-	case SYSUNIV_OFIFG:
-		UCS_clearFaultFlag(UCS_XT2OFFG);
-		UCS_clearFaultFlag(UCS_DCOFFG);
-		SFR_clearInterrupt(SFR_OSCILLATOR_FAULT_INTERRUPT);
-		break;
-	case SYSUNIV_ACCVIFG:
-		__no_operation();
-		break;
-	case SYSUNIV_BUSIFG:
-		// If the CPU accesses USB memory while the USB module is
-		// suspended, a "bus error" can occur.  This generates an NMI.  If
-		// USB is automatically disconnecting in your software, set a
-		// breakpoint here and see if execution hits it.  See the
-		// Programmer's Guide for more information.
-		SYSBERRIV = 0; //clear bus error flag
-		USB_disable(); //Disable
 	}
 }
 
-/*  
- * ======== TIMER0_A0_ISR ========
- */
-#if defined(__TI_COMPILER_VERSION__) || (__IAR_SYSTEMS_ICC__)
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void TIMER0_A0_ISR (void)
-#elif defined(__GNUC__) && (__MSP430__)
-void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) TIMER0_A0_ISR (void)
-#else
-#error Compiler not found!
-#endif
+void initDEV1()
 {
-	sendNewMousePosition = TRUE;                 // Set flag telling main loop to send a report
-	__bic_SR_register_on_exit(LPM0_bits);        // Keep CPU awake after returning;
-	// enables a run through the main loop
+	WDT_A_hold(WDT_A_BASE);
+
+	// Minumum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
+	PMM_setVCore(PMM_CORE_LEVEL_2);
+	USBHAL_initPorts();
+	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
+	USBHAL_initTimer_A();
+	USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
+
+	__enable_interrupt();
 }
-
-// Lookup table for mouse position values.  "const" indicates it will be stored
-// in flash.
-const int16_t tableSinCosLookUp[93][2] = {
-		0,200,
-		14,200,
-		28,198,
-		42,196,
-		55,192,
-		68,188,
-		81,183,
-		94,177,
-		106,170,
-		118,162,
-		129,153,
-		139,144,
-		149,134,
-		158,123,
-		166,112,
-		173,100,
-		180,88,
-		185,75,
-		190,62,
-		194,48,
-		197,35,
-		199,21,
-		200,7,
-		200,-7,
-		199,-21,
-		197,-35,
-		194,-48,
-		190,-62,
-		185,-75,
-		180,-88,
-		173,-100,
-		166,-112,
-		158,-123,
-		149,-134,
-		139,-144,
-		129,-153,
-		118,-162,
-		106,-170,
-		94,-177,
-		81,-183,
-		68,-188,
-		55,-192,
-		42,-196,
-		28,-198,
-		14,-200,
-		0,-200,
-		-14,-200,
-		-28,-198,
-		-42,-196,
-		-55,-192,
-		-68,-188,
-		-81,-183,
-		-94,-177,
-		-106,-170,
-		-118,-162,
-		-129,-153,
-		-139,-144,
-		-149,-134,
-		-158,-123,
-		-166,-112,
-		-173,-100,
-		-180,-88,
-		-185,-75,
-		-190,-62,
-		-194,-48,
-		-197,-35,
-		-199,-21,
-		-200,-7,
-		-200,7,
-		-199,21,
-		-197,35,
-		-194,48,
-		-190,62,
-		-185,75,
-		-180,88,
-		-173,100,
-		-166,112,
-		-158,123,
-		-149,134,
-		-139,144,
-		-129,153,
-		-118,162,
-		-106,170,
-		-94,177,
-		-81,183,
-		-68,188,
-		-55,192,
-		-42,196,
-		-28,198,
-		-14,200,
-		0,200
-};
-
-/*
- * ======== setTimer_A_Parameters ========
- */
-// This function sets the timer A parameters
-void setTimer_A_Parameters()
-{
-	Timer_A_params.clockSource = TIMER_A_CLOCKSOURCE_ACLK;
-	Timer_A_params.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
-	Timer_A_params.timerPeriod = 547;  // 547/32768 = a period of 16.7ms
-	Timer_A_params.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
-	Timer_A_params.captureCompareInterruptEnable_CCR0_CCIE =
-			TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
-	Timer_A_params.timerClear = TIMER_A_DO_CLEAR;
-	Timer_A_params.startTimer = false;
-}
-
-
-
-/*
- * ======== initTimer ========
- */
-void initTimer (void)
-{
-	setTimer_A_Parameters();
-
-	// Start timer
-	Timer_A_clearTimerInterrupt(TIMER_A0_BASE);
-
-	Timer_A_initUpMode(TIMER_A0_BASE, &Timer_A_params);
-}
-//Released_Version_5_00_01
