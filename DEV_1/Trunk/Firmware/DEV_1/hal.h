@@ -46,6 +46,8 @@
 #define   initClocks      USBHAL_initClocks
 #endif
 
+void USBHAL_setupADC12_A_Params();
+void USBHAL_initADC12_A();
 void USBHAL_setupTimer_A_Params();
 void USBHAL_initTimer_A();
 void USBHAL_initPorts(void);

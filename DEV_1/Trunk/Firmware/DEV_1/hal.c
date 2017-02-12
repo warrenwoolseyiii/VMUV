@@ -40,6 +40,28 @@
 					GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
 
 static Timer_A_initUpModeParam Timer_A_params = {0};
+static ADC12_A_configureMemoryParam ADC12_A_params = {0};
+
+void USBHAL_setupADC12_A_Params()
+{
+	ADC12_A_params.positiveRefVoltageSourceSelect = ADC12_A_VREFPOS_AVCC;
+	ADC12_A_params.negativeRefVoltageSourceSelect = ADC12_A_VREFNEG_AVSS;
+	ADC12_A_params.inputSourceSelect = ADC12_A_INPUT_A15;
+	ADC12_A_params.memoryBufferControlIndex = ADC12_A_MEMORY_15;
+	ADC12_A_params.endOfSequence = ADC12_A_NOTENDOFSEQUENCE;
+}
+
+void USBHAL_initADC12_A()
+{
+	USBHAL_setupADC12_A_Params();
+	ADC12_A_init(ADC12_A_BASE, ADC12_A_SAMPLEHOLDSOURCE_SC,
+			ADC12_A_CLOCKSOURCE_SMCLK, ADC12_A_CLOCKDIVIDER_1);
+	ADC12_A_setupSamplingTimer(ADC12_A_BASE, ADC12_A_CYCLEHOLD_1024_CYCLES,
+			ADC12_A_CYCLEHOLD_1024_CYCLES, ADC12_A_MULTIPLESAMPLESENABLE);
+	ADC12_A_configureMemory(ADC12_A_BASE, &ADC12_A_params);
+	ADC12_A_enable(ADC12_A_BASE);
+	ADC12_A_enableInterrupt(ADC12_A_BASE, ADC12_A_IE15);
+}
 
 void USBHAL_setupTimer_A_Params()
 {

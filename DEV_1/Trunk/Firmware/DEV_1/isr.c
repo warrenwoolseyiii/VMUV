@@ -45,3 +45,10 @@ __interrupt void TIMER0_A0_ISR (void)
 {
 	Msg_SetTimer_A_InterruptNotification();
 }
+
+#pragma vector=ADC12_VECTOR
+__interrupt void ADC12ISR (void)
+{
+	Msg_SetADC12_A_ConversionResult(ADC12_A_getResults(ADC12_A_BASE, ADC12_A_MEMORY_15));
+	Msg_SetADC12_A_ConversionComplete();
+}
