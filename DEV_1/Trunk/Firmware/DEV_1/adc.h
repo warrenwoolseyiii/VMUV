@@ -8,8 +8,11 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-void startADC();
+#define NUM_CHANNELS_TO_READ	9	// 9 Pads
+
+void startNextADCConversion();
 uint8_t hasADCStarted();
-void stopADC();
+void stopADCConversions();
+void serviceADC();
 
 #endif /* ADC_H_ */

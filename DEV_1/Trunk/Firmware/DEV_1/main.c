@@ -41,29 +41,29 @@
 #include "adc.h"
 
 
-#define LED_PORT    GPIO_PORT_P1
-#define LED_PIN     GPIO_PIN0
+#define LED_PORT    GPIO_PORT_P6
+#define LED_PIN1    GPIO_PIN4
+#define LED_PIN2	GPIO_PIN5
 
-typedef struct {
+typedef struct
+{
 	uint16_t padValuesInCnts[9];
 } t_DEV_1_Rpt;
 
-t_DEV_1_Rpt dev1Rpt;        // HID report, to be sent to the PC.
-uint16_t gTestPadVal = 0;
+t_DEV_1_Rpt gDev1Rpt;
 
 void initDEV1();
 void usbStateMain();
 void servicePeripherals();
 void serviceUSBConnection();
+void serviceUSBDisconnect();
 
 void main (void)
 {
 	initDEV1();
 
 	while (1)
-	{
 		usbStateMain();
-	}
 }
 
 void initDEV1()
@@ -74,7 +74,6 @@ void initDEV1()
 	PMM_setVCore(PMM_CORE_LEVEL_2);
 	USBHAL_initPorts();
 	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
-	USBHAL_initTimer_A();
 	USBHAL_initADC12_A();
 	USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
 
@@ -97,11 +96,7 @@ void usbStateMain()
 	case ST_PHYS_DISCONNECTED:
 	case ST_ENUM_SUSPENDED:
 	case ST_PHYS_CONNECTED_NOENUM_SUSP:
-		TA0CTL &= ~MC_1;
-		P1OUT &= ~BIT0;
-		stopADC();
-		__bis_SR_register(LPM3_bits + GIE);
-		_NOP();
+		serviceUSBDisconnect();
 		break;
 
 		// The default is executed for the momentary state
@@ -116,45 +111,23 @@ void usbStateMain()
 
 void servicePeripherals()
 {
-	Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
-
-	if (!hasADCStarted())
-		startADC();
-
-	if (Msg_GetADC12_A_ConversionComplete())
-	{
-		uint16_t tempResult = Msg_GetADC12_A_ConversionResult();
-		Msg_ClrADC12_A_ConversionComplete();
-	}
+	serviceADC();
 }
 
 void serviceUSBConnection()
 {
-	if (Msg_GetTimer_A_InterruptNotification())
+	if (Msg_GetNewPadDataAvailable())
 	{
-		Msg_ClrTimer_A_InterruptNotification();
-
-		// Build the report
-		// TODO:
-		{
-			int i;
-			for (i = 0; i < 9; i++)
-			{
-				if (i % 2)
-					dev1Rpt.padValuesInCnts[i] = gTestPadVal;
-				else
-					dev1Rpt.padValuesInCnts[i] = (4095 - gTestPadVal);
-			}
-
-			gTestPadVal++;
-			if (gTestPadVal > 4095)
-				gTestPadVal = 0;
-		}
-
-		// Send the report
-		USBHID_sendReport((void *)&dev1Rpt, HID0_INTFNUM);
-
-		// Toggle LED on P1.0
-		GPIO_toggleOutputOnPin(LED_PORT, LED_PIN);
+		Msg_ClrNewPadDataAvailable();
+		Msg_GetPadData(gDev1Rpt.padValuesInCnts);
+		USBHID_sendReport((void *)&gDev1Rpt, HID0_INTFNUM);
+		GPIO_toggleOutputOnPin(LED_PORT, LED_PIN1);
 	}
+}
+
+void serviceUSBDisconnect()
+{
+	stopADCConversions();
+	__bis_SR_register(LPM3_bits + GIE);
+	_NOP();
 }
