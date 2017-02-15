@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Windows.Devices.Enumeration;
+using Windows.Devices.HumanInterfaceDevice;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -26,16 +28,16 @@ namespace DEV_1Client
     public sealed partial class MainPage : Page
     {
         public static MainPage currentMainPage;
-        private static UpdaterService updater = null;// new UpdaterService(currentMainPage);
-        private static DeviceManager deviceMngr = null;// new DeviceManager(updater);
+        private static UpdaterService updater = null;
+        private static DeviceManager deviceMngr = null;
 
         public MainPage()
         {
             this.InitializeComponent();
             currentMainPage = this;
+            Device dev_1 = new Device();
             updater = new UpdaterService(currentMainPage);
             deviceMngr = new DeviceManager(updater);
-
             InitializeModules();
         }
 

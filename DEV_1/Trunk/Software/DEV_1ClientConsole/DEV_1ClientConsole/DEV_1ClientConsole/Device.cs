@@ -1,6 +1,6 @@
 ﻿using Windows.Devices.HumanInterfaceDevice;
 
-namespace DEV_1Client
+namespace DEV_1ClientConsole
 {
     class Device
     {

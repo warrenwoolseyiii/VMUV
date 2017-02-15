@@ -9,22 +9,21 @@ using Windows.Devices.HumanInterfaceDevice;
 using Windows.Storage;
 using Windows.Foundation;
 using Windows.Storage.Streams;
-using System.Threading;
 
-namespace DEV_1Client
+namespace DEV_1ClientConsole
 {
     class DeviceManager
     {
         private static Device dev_1 = new Device();
         private static DeviceData currentDeviceData = new DeviceData();
-        private static UpdaterService updaterService = null;
+        private static InterprocessComms comms = null;
         private static HidDevice hidDevice = null;
         private static bool deviceIsEnum = false;
         private static bool enumInProgress = false;
 
-        public DeviceManager(UpdaterService updater)
+        public DeviceManager(InterprocessComms commMngr)
         {
-            updaterService = updater;
+            comms = commMngr;
         }
 
         public bool IsDeviceEnumerated()
@@ -102,18 +101,16 @@ namespace DEV_1Client
 
         private void UpdateAfterEvent(UpdaterEvents evt)
         {
-            if (updaterService == null)
-                return;
-
             try
             {
                 switch (evt)
                 {
                     case UpdaterEvents.event_device_enumeration_complete:
-                        updaterService.OnDeviceEnumerationComplete();
+                        Console.WriteLine("DEV_1 Enumeration Complete!\n");
                         break;
                     case UpdaterEvents.event_data_received:
-                        updaterService.OnDataReceived(currentDeviceData);
+                        if (comms != null)
+                            comms.WritePadData(currentDeviceData);
                         break;
                 }
             }
