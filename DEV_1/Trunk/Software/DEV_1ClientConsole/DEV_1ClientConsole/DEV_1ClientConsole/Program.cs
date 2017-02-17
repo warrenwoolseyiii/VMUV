@@ -14,13 +14,13 @@ namespace DEV_1ClientConsole
         static void Main(string[] args)
         {
             EnumerateDevice();
+            comms.InitializePipe();
 
             while (true)
             {
                 if ((deviceMngr.IsDeviceEnumerated()) && (!comms.ClientIsConnected()))
                 {
                     comms.WaitForClientConnect();
-                    Console.WriteLine("Client Connected\n");
                 }
             }
         }

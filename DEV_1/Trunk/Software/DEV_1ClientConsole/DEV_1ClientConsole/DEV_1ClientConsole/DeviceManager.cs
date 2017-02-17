@@ -51,7 +51,8 @@ namespace DEV_1ClientConsole
                 }
                 catch (Exception e0)
                 {
-                    // TODO: Figure out how to effectivly throw an exception
+                    ExceptionHandler eHandle = new ExceptionHandler(e0);
+                    eHandle.TakeActionOnException();
                 }
             }
 
@@ -77,46 +78,17 @@ namespace DEV_1ClientConsole
             UpdateAfterEvent(UpdaterEvents.event_data_received);
         }
 
-        /* TODO: Re enable this code block when we are trying to figure out how to handle
-        hot plugging and unplugging
-        public void OnDeviceRemoved(DeviceWatcher sender, DeviceInformationUpdate information)
-        {
-            BlockingSearchForDevice();
-        }
-
-        public void BlockingSearchForDevice()
-        {
-            DeviceWatcher deviceWatcher = DeviceInformation.CreateWatcher(
-                HidDevice.GetDeviceSelector(dev_1.GetUsagePage(), dev_1.GetUsage()));
-            deviceWatcher.Removed += new TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>(OnDeviceRemoved);
-
-            Task t = Task.Run(async () =>
-            {
-                while (!deviceIsEnum)
-                    await EnumerateDEV_1();
-            });
-
-            deviceWatcher.Start();
-        }*/
-
         private void UpdateAfterEvent(UpdaterEvents evt)
         {
-            try
+            switch (evt)
             {
-                switch (evt)
-                {
-                    case UpdaterEvents.event_device_enumeration_complete:
-                        Console.WriteLine("DEV_1 Enumeration Complete!\n");
-                        break;
-                    case UpdaterEvents.event_data_received:
-                        if (comms != null)
-                            comms.WritePadData(currentDeviceData);
-                        break;
-                }
-            }
-            catch (Exception e0)
-            {
-                // TODO: pass this back to the caller if it fails
+                case UpdaterEvents.event_device_enumeration_complete:
+                    Console.WriteLine("DEV_1 Enumeration Complete!\n");
+                    break;
+                case UpdaterEvents.event_data_received:
+                    if (comms != null)
+                        comms.WritePadData(currentDeviceData);
+                    break;
             }
         }
 

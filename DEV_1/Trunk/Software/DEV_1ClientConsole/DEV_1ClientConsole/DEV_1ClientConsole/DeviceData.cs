@@ -80,7 +80,8 @@ namespace DEV_1ClientConsole
             }
             catch (Exception e0)
             {
-                // TODO: Handle this exception
+                ExceptionHandler eHandle = new ExceptionHandler(e0);
+                eHandle.TakeActionOnException();
                 return 0;
             }
         }
