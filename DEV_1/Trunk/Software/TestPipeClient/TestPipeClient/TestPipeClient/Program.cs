@@ -4,30 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System.IO.Pipes;
-
 namespace TestPipeClient
 {
     class Program
     {
-        private static NamedPipeClientStream clientStream;
+        private static DEV_1 dev1 = new DEV_1();
 
         static void Main(string[] args)
         {
-            int cnt = 0;
-            clientStream = new NamedPipeClientStream(".", "DEV_1Pipe", PipeDirection.In, PipeOptions.None);
-            clientStream.Connect();
+            dev1.ConnectToClientService();
+            Console.WriteLine("Connection success!\n");
 
-            Console.WriteLine("Connection success\n");
             while (true)
             {
-                int len = 0;
-
-                len = clientStream.ReadByte() * 256;
-                len += clientStream.ReadByte();
-                byte[] buff = new byte[len];
-                clientStream.Read(buff, 0, len);
-                Console.WriteLine("Received packet %d\n", cnt++);
+                dev1.ReadPacket();
+                if (dev1.IsPacketValid())
+                    Console.WriteLine(dev1.GetDataInString());
             }
         }
     }
