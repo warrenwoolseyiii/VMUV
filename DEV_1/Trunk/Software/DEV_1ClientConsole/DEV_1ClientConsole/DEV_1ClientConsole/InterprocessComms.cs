@@ -15,9 +15,17 @@ namespace DEV_1ClientConsole
 
         public void InitializePipe()
         {
-            if (pipeServer == null)
-                pipeServer = new
-                NamedPipeServerStream("DEV_1Pipe", PipeDirection.Out, 1);
+            try
+            {
+                if (pipeServer == null)
+                    pipeServer = new
+                    NamedPipeServerStream("DEV_1Pipe", PipeDirection.Out, 1);
+            }
+            catch (Exception e0)
+            {
+                InterProcessCommsExceptionHandler eHandle = new InterProcessCommsExceptionHandler(this, e0);
+                eHandle.TakeActionOnException();
+            }
         }
 
         public void DestroyPipe()
@@ -55,6 +63,7 @@ namespace DEV_1ClientConsole
         {
             byte[] dataInBytes = data.GetRawDataInBytes();
             int len = dataInBytes.Length;
+            int chkSum = data.GetDeviceDataCheckSum();
 
             if (pipeServer.IsConnected)
             {
@@ -63,6 +72,8 @@ namespace DEV_1ClientConsole
                     pipeServer.WriteByte((byte)(len / 256));
                     pipeServer.WriteByte((byte)(len & 0xFF));
                     pipeServer.Write(dataInBytes, 0, len);
+                    pipeServer.WriteByte((byte)(chkSum / 256));
+                    pipeServer.WriteByte((byte)(chkSum & 0xFF));
                     pipeServer.Flush();
                 }
                 catch (Exception e0)

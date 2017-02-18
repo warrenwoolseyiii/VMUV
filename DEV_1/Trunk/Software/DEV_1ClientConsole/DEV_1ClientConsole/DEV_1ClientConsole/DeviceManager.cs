@@ -74,7 +74,7 @@ namespace DEV_1ClientConsole
             DataReader dr = DataReader.FromBuffer(buffer);
             byte[] bytes = new byte[inputReport.Data.Length];
             dr.ReadBytes(bytes);
-            currentDeviceData.SetRawDataInCnts(bytes);
+            currentDeviceData.SetRawDataInBytes(bytes);
             UpdateAfterEvent(UpdaterEvents.event_data_received);
         }
 
