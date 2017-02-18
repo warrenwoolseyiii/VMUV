@@ -32,6 +32,7 @@ namespace DEV_1ClientConsole
         {
             if (pipeServer != null)
             {
+                pipeServer.Close();
                 pipeServer.Dispose();
                 pipeServer = null;
             }
