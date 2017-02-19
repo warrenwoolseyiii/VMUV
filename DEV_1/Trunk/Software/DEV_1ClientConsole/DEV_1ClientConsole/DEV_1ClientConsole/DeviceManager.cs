@@ -20,6 +20,7 @@ namespace DEV_1ClientConsole
         private static HidDevice hidDevice = null;
         private static bool deviceIsEnum = false;
         private static bool enumInProgress = false;
+        private static int avgCnts = 0;
 
         public DeviceManager(InterprocessComms commMngr)
         {
@@ -74,8 +75,22 @@ namespace DEV_1ClientConsole
             DataReader dr = DataReader.FromBuffer(buffer);
             byte[] bytes = new byte[inputReport.Data.Length];
             dr.ReadBytes(bytes);
-            currentDeviceData.SetRawDataInBytes(bytes);
-            UpdateAfterEvent(UpdaterEvents.event_data_received);
+            DeviceData local = new DeviceData();
+            local.SetRawDataInBytes(bytes);
+            AccumulatePadData(local);
+        }
+
+        private void AccumulatePadData(DeviceData data)
+        {
+            currentDeviceData.AverageData(data);
+            avgCnts++;
+            if (avgCnts > 4)
+            {
+                UpdateAfterEvent(UpdaterEvents.event_data_received);
+                avgCnts = 0;
+                currentDeviceData.ClearData();
+            }
+
         }
 
         private void UpdateAfterEvent(UpdaterEvents evt)

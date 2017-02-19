@@ -87,6 +87,22 @@ namespace DEV_1ClientConsole
             }
         }
 
+        public void AverageData(DeviceData dataIn)
+        {
+            Int16[] tmp = dataIn.GetRawDataInCnts();
+            for (int i = 0; i < rawDataLengthInInts; i++)
+            {
+                rawDataInCnts[i] += tmp[i];
+                rawDataInCnts[i] /= 2;
+            }
+        }
+
+        public void ClearData()
+        {
+            for (int i = 0; i < rawDataLengthInInts; i++)
+                rawDataInCnts[i] = 0;
+        }
+
         private void CalculateDeviceDataCheckSum()
         {
             rawDataCheckSum = 0;

@@ -12,6 +12,7 @@ namespace TestPipeClient
 
         static void Main(string[] args)
         {
+            int cnt = 0;
             dev1.ConnectToClientService();
             Console.WriteLine("Connection success!\n");
 
@@ -19,7 +20,11 @@ namespace TestPipeClient
             {
                 dev1.ReadPacket();
                 if (dev1.IsPacketValid())
+                {
+                    cnt++;
+                    Console.WriteLine(cnt.ToString());
                     Console.WriteLine(dev1.GetDataInString());
+                }
             }
         }
     }
