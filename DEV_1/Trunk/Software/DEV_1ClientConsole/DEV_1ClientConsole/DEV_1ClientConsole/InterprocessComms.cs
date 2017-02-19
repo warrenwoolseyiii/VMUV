@@ -12,6 +12,8 @@ namespace DEV_1ClientConsole
     class InterprocessComms
     {
         private NamedPipeServerStream pipeServer = null;
+        private static int txCnt = 0;
+        private bool pipeIsBroken = false;
 
         public void InitializePipe()
         {
@@ -33,8 +35,16 @@ namespace DEV_1ClientConsole
             pipeServer.Disconnect();
         }
 
+        public void DestroyPipe()
+        {
+            pipeIsBroken = true;
+        }
+
         public void WaitForClientConnect()
         {
+            if (pipeIsBroken)
+                return;
+
             try
             {
                 pipeServer.WaitForConnection();
@@ -65,12 +75,13 @@ namespace DEV_1ClientConsole
             {
                 try
                 {
+                    pipeServer.WriteByte((byte)(txCnt / 256));
+                    pipeServer.WriteByte((byte)(txCnt & 0xFF));
                     pipeServer.WriteByte((byte)(len / 256));
                     pipeServer.WriteByte((byte)(len & 0xFF));
                     pipeServer.Write(dataInBytes, 0, len);
-                    pipeServer.WriteByte((byte)(chkSum / 256));
-                    pipeServer.WriteByte((byte)(chkSum & 0xFF));
                     pipeServer.Flush();
+                    txCnt++;
                 }
                 catch (Exception e0)
                 {
@@ -79,6 +90,12 @@ namespace DEV_1ClientConsole
                 }
             }
         }
+
+        public bool IsPipeBroken()
+        {
+            return pipeIsBroken;
+        }
+
     }
 
     class InterProcessCommsExceptionHandler : ExceptionHandler
@@ -103,7 +120,10 @@ namespace DEV_1ClientConsole
         public void FixBrokenPipe()
         {
             if (localComms != null)
+            {
                 localComms.DisconnectPipe();
+                localComms.DestroyPipe();
+            }
         }
     }
 }

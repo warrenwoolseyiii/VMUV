@@ -75,9 +75,11 @@ namespace DEV_1ClientConsole
             DataReader dr = DataReader.FromBuffer(buffer);
             byte[] bytes = new byte[inputReport.Data.Length];
             dr.ReadBytes(bytes);
-            DeviceData local = new DeviceData();
-            local.SetRawDataInBytes(bytes);
-            AccumulatePadData(local);
+            currentDeviceData.SetRawDataInBytes(bytes);
+            UpdateAfterEvent(UpdaterEvents.event_data_received);
+            //DeviceData local = new DeviceData();
+            //local.SetRawDataInBytes(bytes);
+            //AccumulatePadData(local);
         }
 
         private void AccumulatePadData(DeviceData data)

@@ -13,16 +13,18 @@ namespace DEV_1ClientConsole
 
         static void Main(string[] args)
         {
-            EnumerateDevice();
             comms.InitializePipe();
+            EnumerateDevice();
 
-            while (true)
+            while (!comms.IsPipeBroken())
             {
                 if ((deviceMngr.IsDeviceEnumerated()) && (!comms.ClientIsConnected()))
                 {
                     comms.WaitForClientConnect();
                 }
             }
+
+            Console.WriteLine("Pipe is broken!\n");
         }
 
         private static async Task EnumerateDevice()
