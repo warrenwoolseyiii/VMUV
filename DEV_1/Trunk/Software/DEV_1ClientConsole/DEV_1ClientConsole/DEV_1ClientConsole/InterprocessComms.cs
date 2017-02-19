@@ -11,7 +11,7 @@ namespace DEV_1ClientConsole
 {
     class InterprocessComms
     {
-        private static NamedPipeServerStream pipeServer = null;
+        private NamedPipeServerStream pipeServer = null;
 
         public void InitializePipe()
         {
@@ -28,14 +28,9 @@ namespace DEV_1ClientConsole
             }
         }
 
-        public void DestroyPipe()
+        public void DisconnectPipe()
         {
-            if (pipeServer != null)
-            {
-                pipeServer.Close();
-                pipeServer.Dispose();
-                pipeServer = null;
-            }
+            pipeServer.Disconnect();
         }
 
         public void WaitForClientConnect()
@@ -80,7 +75,7 @@ namespace DEV_1ClientConsole
                 catch (Exception e0)
                 {
                     InterProcessCommsExceptionHandler eHandle = new InterProcessCommsExceptionHandler(this, e0);
-                    eHandle.TakeActionOnException();
+                    eHandle.FixBrokenPipe();
                 }
             }
         }
@@ -102,9 +97,13 @@ namespace DEV_1ClientConsole
             {
                 PrintExceptionToConsole();
                 Console.WriteLine("Pipe was disconnected! Attempting to re-initialize...\n");
-                localComms.DestroyPipe();
-                localComms.InitializePipe();
             }
+        }
+
+        public void FixBrokenPipe()
+        {
+            if (localComms != null)
+                localComms.DisconnectPipe();
         }
     }
 }
