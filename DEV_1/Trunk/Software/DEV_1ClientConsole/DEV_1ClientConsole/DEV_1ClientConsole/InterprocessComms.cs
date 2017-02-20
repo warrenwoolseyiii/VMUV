@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.IO.Pipes;
-using System.IO;
 
 namespace DEV_1ClientConsole
 {
     class InterprocessComms
     {
         private NamedPipeServerStream pipeServer = null;
-        private static int txCnt = 0;
+        private int txCnt = 0;
         private bool pipeIsBroken = false;
 
         public void InitializePipe()
@@ -67,21 +61,13 @@ namespace DEV_1ClientConsole
 
         public void WritePadData(DeviceData data)
         {
-            byte[] dataInBytes = data.GetRawDataInBytes();
-            int len = dataInBytes.Length;
-            int chkSum = data.GetDeviceDataCheckSum();
 
             if (pipeServer.IsConnected)
             {
                 try
                 {
-                    pipeServer.WriteByte((byte)(txCnt / 256));
-                    pipeServer.WriteByte((byte)(txCnt & 0xFF));
-                    pipeServer.WriteByte((byte)(len / 256));
-                    pipeServer.WriteByte((byte)(len & 0xFF));
-                    pipeServer.Write(dataInBytes, 0, len);
-                    pipeServer.Flush();
-                    txCnt++;
+                    byte[] tx = data.GetRawDataInBytes();
+                    pipeServer.Write(tx, 0, 18);
                 }
                 catch (Exception e0)
                 {
@@ -95,7 +81,6 @@ namespace DEV_1ClientConsole
         {
             return pipeIsBroken;
         }
-
     }
 
     class InterProcessCommsExceptionHandler : ExceptionHandler

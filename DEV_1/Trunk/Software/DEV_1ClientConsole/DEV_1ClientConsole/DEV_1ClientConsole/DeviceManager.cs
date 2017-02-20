@@ -75,18 +75,17 @@ namespace DEV_1ClientConsole
             DataReader dr = DataReader.FromBuffer(buffer);
             byte[] bytes = new byte[inputReport.Data.Length];
             dr.ReadBytes(bytes);
-            currentDeviceData.SetRawDataInBytes(bytes);
-            UpdateAfterEvent(UpdaterEvents.event_data_received);
-            //DeviceData local = new DeviceData();
-            //local.SetRawDataInBytes(bytes);
-            //AccumulatePadData(local);
+            DeviceData local = new DeviceData();
+            local.SetRawDataInBytes(bytes);
+            Accumulate(local);
         }
 
-        private void AccumulatePadData(DeviceData data)
+        private void Accumulate(DeviceData dataIn)
         {
-            currentDeviceData.AverageData(data);
+            currentDeviceData.AverageData(dataIn);
             avgCnts++;
-            if (avgCnts > 4)
+
+            if (avgCnts > 19)
             {
                 UpdateAfterEvent(UpdaterEvents.event_data_received);
                 avgCnts = 0;
@@ -112,7 +111,7 @@ namespace DEV_1ClientConsole
         enum UpdaterEvents
         {
             event_device_enumeration_complete,
-            event_data_received
+            event_data_received,
         };
     }
 }
