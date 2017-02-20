@@ -85,7 +85,7 @@ namespace DEV_1ClientConsole
             currentDeviceData.AverageData(dataIn);
             avgCnts++;
 
-            if (avgCnts > 19)
+            if (avgCnts > 9)
             {
                 UpdateAfterEvent(UpdaterEvents.event_data_received);
                 avgCnts = 0;
