@@ -5,7 +5,8 @@ namespace DEV_1ClientConsole
 {
     class InterprocessComms
     {
-        private NamedPipeServerStream pipeServer = null;
+        private NamedPipeServerStream pipeServer = new
+                    NamedPipeServerStream("DEV_1Pipe", PipeDirection.Out, 1);
         private int txCnt = 0;
         private bool pipeIsBroken = false;
 
@@ -13,9 +14,7 @@ namespace DEV_1ClientConsole
         {
             try
             {
-                if (pipeServer == null)
-                    pipeServer = new
-                    NamedPipeServerStream("DEV_1Pipe", PipeDirection.Out, 1);
+                WaitForClientConnect();
             }
             catch (Exception e0)
             {
@@ -34,7 +33,7 @@ namespace DEV_1ClientConsole
             pipeIsBroken = true;
         }
 
-        public void WaitForClientConnect()
+        private void WaitForClientConnect()
         {
             if (pipeIsBroken)
                 return;
