@@ -10,7 +10,6 @@ namespace DEV_1ClientConsole
     {
         const Int16 rawDataLengthInBytes = 18;
         const Int16 rawDataLengthInInts = rawDataLengthInBytes / 2;
-        private Int16 rawDataCheckSum = 0;
         private Int16[] rawDataInCnts = new Int16[9];
 
         public void SetRawDataInBytes(byte[] bytes)
@@ -85,20 +84,6 @@ namespace DEV_1ClientConsole
                 eHandle.TakeActionOnException();
                 return 0;
             }
-        }
-
-        private void CalculateDeviceDataCheckSum()
-        {
-            rawDataCheckSum = 0;
-
-            for (int i = 0; i < rawDataLengthInInts; i++)
-                rawDataCheckSum += rawDataInCnts[i];
-        }
-
-        public Int16 GetDeviceDataCheckSum()
-        {
-            CalculateDeviceDataCheckSum();
-            return rawDataCheckSum;
         }
     }
 }
