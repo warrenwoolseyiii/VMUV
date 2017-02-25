@@ -12,7 +12,7 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             if ((bytes == null) || (bytes.Length < rawDataLengthInBytes))
             {
-                // TODO: Notify user / logger of null / too short data
+                return;
             }
             else
             {
@@ -21,6 +21,22 @@ namespace VMUVUnityPlugin_NET35_v100
                 for (i = 0; i < len; i++, j += 2)
                     rawDataInCnts[i] = ConvertBytesToInt16(bytes, j);
             }
+        }
+
+        public byte[] GetRawDataInBytes()
+        {
+            byte[] rtn = new byte[rawDataLengthInBytes];
+            byte[] tmp = new byte[2];
+            int i, j;
+
+            for (i = j = 0; i < rawDataLengthInInts; i++)
+            {
+                tmp = ConvertInt16ToBytes(rawDataInCnts[i]);
+                rtn[j++] = tmp[0];
+                rtn[j++] = tmp[1];
+            }
+
+            return rtn;
         }
 
         public String ToStringRawDisplayFormat()
@@ -39,22 +55,6 @@ namespace VMUVUnityPlugin_NET35_v100
         public Int16[] GetRawDataInCnts()
         {
             return rawDataInCnts;
-        }
-
-        public byte[] GetRawDataInBytes()
-        {
-            byte[] rtn = new byte[rawDataLengthInBytes];
-            byte[] tmp = new byte[2];
-            int i, j;
-
-            for (i = j = 0; i < rawDataLengthInInts; i++)
-            {
-                tmp = ConvertInt16ToBytes(rawDataInCnts[i]);
-                rtn[j++] = tmp[0];
-                rtn[j++] = tmp[1];
-            }
-
-            return rtn;
         }
 
         private byte[] ConvertInt16ToBytes(Int16 num)
