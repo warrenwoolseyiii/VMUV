@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DEV2.cs" />
+    <Compile Include="DEV2ClientProcess.cs" />
+    <Compile Include="DEV2DataConnection.cs" />
     <Compile Include="DEV2DeviceData.cs" />
     <Compile Include="DEV2ExceptionHandler.cs" />
     <Compile Include="DEV2VRMotionFusion.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -16,14 +17,9 @@ namespace VMUVUnityPlugin_NET35_v100
             localException = e;
         }
 
-        public void PrintExceptionToConsole()
-        {
-            Console.WriteLine(localException.ToString());
-        }
-
         public void TakeActionOnException()
         {
-            PrintExceptionToConsole();
+            // TODO:
         }
     }
 }
