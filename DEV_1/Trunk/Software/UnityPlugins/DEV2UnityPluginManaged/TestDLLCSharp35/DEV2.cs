@@ -41,9 +41,6 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public void OnAppQuit()
         {
-            if (dataConnection.ClientStreamIsConnected())
-                dataConnection.CLoseDEV2ClientStream();
-
             if (clientProcess.DEV2ClientHasLaunched())
                 clientProcess.KillDEV2Client();
         }

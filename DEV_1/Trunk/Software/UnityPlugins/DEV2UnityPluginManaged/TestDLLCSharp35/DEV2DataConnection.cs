@@ -34,17 +34,6 @@ namespace VMUVUnityPlugin_NET35_v100
                 ReadAsync();
         }
 
-        public void CLoseDEV2ClientStream()
-        {
-            if (connectionSuccess)
-            {
-                connectionActive = false;
-                while (!asyncReadComplete)
-                { }
-                clientPipe.Dispose();
-            }
-        }
-
         public bool ClientStreamIsConnected()
         {
             return connectionSuccess;

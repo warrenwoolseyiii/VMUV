@@ -41,16 +41,7 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public void KillDEV2Client()
         {
-            try
-            {
-                clientProcess.Kill();
-                clientProcessLaunched = false;
-            }
-            catch (Exception e0)
-            {
-                DEV2ExceptionHandler eHandle = new DEV2ExceptionHandler(e0);
-                eHandle.TakeActionOnException();
-            }
+            clientProcess.Kill();
         }
     }
 }
