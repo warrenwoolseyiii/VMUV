@@ -1,0 +1,6 @@
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\bin\Debug\UnityEngine.dll
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\bin\Debug\UnityEngine.xml
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\bin\Debug\VMUVUnityPlugin_NET35_v100.dll
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\bin\Debug\VMUVUnityPlugin_NET35_v100.pdb
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\obj\Debug\VMUVUnityPlugin_NET35_v100.dll
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\obj\Debug\VMUVUnityPlugin_NET35_v100.pdb
