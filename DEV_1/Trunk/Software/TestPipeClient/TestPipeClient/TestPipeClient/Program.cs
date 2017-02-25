@@ -10,6 +10,8 @@ namespace TestPipeClient
 
         static void Main(string[] args)
         {
+            int numReads = 0;
+            bool runMain = true;
             try
             {
                 Process myProcess = new Process();
@@ -26,12 +28,21 @@ namespace TestPipeClient
             Console.WriteLine("Connection success!\n");
             dev1.ReadAsync();
 
-            while (true)
+            while (runMain)
             {
                 if (dev1.IsAsyncReadComplete())
                 {
-                    dev1.ReadAsync();
-                    Console.WriteLine(dev1.GetDataInString());
+                    numReads++;
+                    if (numReads > 50)
+                    {
+                        dev1.DisposePipe();
+                        runMain = false;
+                    }
+                    else
+                    {
+                        dev1.ReadAsync();
+                        Console.WriteLine(dev1.GetDataInString());
+                    }
                 }
             }
         }
