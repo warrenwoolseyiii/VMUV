@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DEV_1ClientConsole
@@ -18,7 +16,7 @@ namespace DEV_1ClientConsole
 
             while (!comms.IsPipeBroken())
             {
-
+                Thread.Sleep(50);
             }
 
             Console.WriteLine("Pipe is broken!\n");
