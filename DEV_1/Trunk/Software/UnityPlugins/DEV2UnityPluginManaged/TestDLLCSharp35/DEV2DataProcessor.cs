@@ -4,11 +4,12 @@ namespace VMUVUnityPlugin_NET35_v100
 {
     class DEV2DataProcessor
     {
-        DEV2Pad[] pads;
+        DEV2Pad[] pads = new DEV2Pad[9];
 
         public DEV2DataProcessor()
         {
-            pads = new DEV2Pad[9];
+            for (int i = 0; i < pads.Length; i++)
+                pads[i] = new DEV2Pad();
         }
 
         public void SetRawData(Int16[] raw)

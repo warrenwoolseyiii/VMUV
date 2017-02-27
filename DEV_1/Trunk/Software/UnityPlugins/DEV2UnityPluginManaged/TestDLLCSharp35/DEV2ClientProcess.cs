@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO.Pipes;
-using UnityEngine;
 using System.IO;
 
 namespace VMUVUnityPlugin_NET35_v100
@@ -15,7 +13,7 @@ namespace VMUVUnityPlugin_NET35_v100
         public DEV2ClientProcess()
         {
             clientProcessLaunched = false;
-            dev2ClientLocation = Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV_1ClientConsole");
+            dev2ClientLocation = Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV2\\DEV_1ClientConsole");
         }
 
         public bool DEV2ClientHasLaunched()

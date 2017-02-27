@@ -46,7 +46,7 @@ namespace VMUVUnityPlugin_NET35_v100
             CalculateCurrentTranslation(currentFwdIndicies, currentRevIndicies, pads);
             CalculateCurrentStraffe(currentLeftStraffe, currentRightStraffe, pads);
 
-            if (!IsCenterPadActive(pads[9]))
+            if (!IsCenterPadActive(pads[8]))
             {
                 currentTranslation = currentStraffe = 0.0f;
                 isMoving = false;

@@ -4,14 +4,15 @@ namespace VMUVUnityPlugin_NET35_v100
 {
     class DEV2Pad
     {
-        private Int16 rawCnts, maxRawCnts, minRawCnts, range, scaledValue;
+        private Int16 rawCnts, maxRawCnts, minRawCnts, rangeCnts, scaledValueCnts;
         private float activeThresholdPct, pctActive;
         private bool isPadActive;
 
         public DEV2Pad()
         {
             rawCnts = maxRawCnts = minRawCnts = 2048;
-            range = scaledValue = 0;
+            scaledValueCnts = 0;
+            rangeCnts = 1;
             activeThresholdPct = 0.85f;
             pctActive = 0f;
             isPadActive = false;
@@ -56,17 +57,20 @@ namespace VMUVUnityPlugin_NET35_v100
 
         private void CalculateRange()
         {
-            range = (Int16)(maxRawCnts - minRawCnts);
+            Int16 tmp = (Int16)(maxRawCnts - minRawCnts);
+
+            if (tmp != 0)
+                rangeCnts = tmp;
         }
 
         private void ScaleToRange()
         {
-            scaledValue = (Int16)(rawCnts - minRawCnts);
+            scaledValueCnts = (Int16)(rawCnts - minRawCnts);
         }
 
         private void CalculatePctActive()
         {
-            pctActive = (float)((float)scaledValue / (float)range);
+            pctActive = (float)((float)scaledValueCnts / (float)rangeCnts);
 
             if (pctActive < activeThresholdPct)
                 isPadActive = true;

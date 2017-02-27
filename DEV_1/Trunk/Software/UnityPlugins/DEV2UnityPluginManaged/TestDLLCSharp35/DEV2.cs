@@ -29,10 +29,16 @@ namespace VMUVUnityPlugin_NET35_v100
         public void OnUpdate(Vector3 lHand, Vector3 rHand)
         {
             if (!clientProcess.DEV2ClientHasLaunched())
+            {
                 clientProcess.StartDEV2Client();
+                return;
+            }
 
             if (!dataConnection.ClientStreamIsConnected())
+            {
                 dataConnection.StartDEV2ClientStream();
+                return;
+            }
 
             dataProcessor.SetRawData(dataConnection.GetDataInCnts());
             dataProcessor.ProcessData();
