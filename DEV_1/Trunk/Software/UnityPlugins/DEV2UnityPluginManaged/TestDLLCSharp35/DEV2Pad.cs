@@ -10,10 +10,12 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public DEV2Pad()
         {
-            rawCnts = maxRawCnts = minRawCnts = 2048;
+            rawCnts = 0;
+            minRawCnts = 4095;
+            maxRawCnts = 1;
             scaledValueCnts = 0;
             rangeCnts = 1;
-            activeThresholdPct = 0.85f;
+            activeThresholdPct = 0.35f;
             pctActive = 0f;
             isPadActive = false;
         }
@@ -21,6 +23,11 @@ namespace VMUVUnityPlugin_NET35_v100
         public void SetRawCnts(Int16 cnts)
         {
             rawCnts = cnts;
+        }
+
+        public void SetSensitivity(float pctSensitivity)
+        {
+            activeThresholdPct = pctSensitivity;
         }
 
         public void ProcessRawData()
@@ -48,7 +55,7 @@ namespace VMUVUnityPlugin_NET35_v100
                 CalculateRange();
             }
 
-            if (rawCnts < minRawCnts)
+            if ((rawCnts < minRawCnts) && (rawCnts != 0))
             {
                 minRawCnts = rawCnts;
                 CalculateRange();
@@ -74,6 +81,8 @@ namespace VMUVUnityPlugin_NET35_v100
 
             if (pctActive < activeThresholdPct)
                 isPadActive = true;
+            else
+                isPadActive = false;
         }
     }
 }

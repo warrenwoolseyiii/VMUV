@@ -40,6 +40,7 @@ namespace VMUVUnityPlugin_NET35_v100
         public void KillDEV2Client()
         {
             clientProcess.Kill();
+            clientProcess.Dispose();
         }
     }
 }
