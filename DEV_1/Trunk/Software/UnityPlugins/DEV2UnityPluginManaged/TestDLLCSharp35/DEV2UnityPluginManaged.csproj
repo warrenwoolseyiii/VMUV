@@ -44,8 +44,10 @@
     <Compile Include="DEV2.cs" />
     <Compile Include="DEV2ClientProcess.cs" />
     <Compile Include="DEV2DataConnection.cs" />
+    <Compile Include="DEV2DataProcessor.cs" />
     <Compile Include="DEV2DeviceData.cs" />
     <Compile Include="DEV2ExceptionHandler.cs" />
+    <Compile Include="DEV2Pad.cs" />
     <Compile Include="DEV2VRMotionFusion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

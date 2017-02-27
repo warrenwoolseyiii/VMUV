@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace VMUVUnityPlugin_NET35_v100
 {

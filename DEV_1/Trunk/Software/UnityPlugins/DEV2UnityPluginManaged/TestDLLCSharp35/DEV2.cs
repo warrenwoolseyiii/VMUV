@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO.Pipes;
-using UnityEngine;
-using System.IO;
+﻿using UnityEngine;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -12,12 +8,14 @@ namespace VMUVUnityPlugin_NET35_v100
         private DEV2VRMotionFusion motionFusion;
         private DEV2DataConnection dataConnection;
         private DEV2ClientProcess clientProcess;
+        private DEV2DataProcessor dataProcessor;
 
         public DEV2()
         {
             dataConnection = new DEV2DataConnection();
             clientProcess = new DEV2ClientProcess();
             motionFusion = new DEV2VRMotionFusion();
+            dataProcessor = new DEV2DataProcessor();
         }
 
         public void OnStart()
@@ -36,7 +34,10 @@ namespace VMUVUnityPlugin_NET35_v100
             if (!dataConnection.ClientStreamIsConnected())
                 dataConnection.StartDEV2ClientStream();
 
-            motionFusion.CalculateTranslationAndStaffe(dataConnection.GetDataInCnts(), lHand, rHand);
+            dataProcessor.SetRawData(dataConnection.GetDataInCnts());
+            dataProcessor.ProcessData();
+
+            motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), lHand, rHand);
         }
 
         public void OnAppQuit()
