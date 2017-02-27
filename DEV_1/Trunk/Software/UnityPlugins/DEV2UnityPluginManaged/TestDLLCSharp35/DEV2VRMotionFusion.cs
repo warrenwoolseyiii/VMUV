@@ -15,7 +15,6 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             currentTranslation = 0;
             currentStraffe = 0;
-            thresholdValueInCnts = 750;
             isMoving = false;
         }
 
@@ -29,7 +28,7 @@ namespace VMUVUnityPlugin_NET35_v100
             return currentStraffe;
         }
 
-        public void CalculateTranslationAndStaffe(Int16[] pads, Vector3 lH, Vector3 rH)
+        public void CalculateTranslationAndStaffe(DEV2Pad[] pads, Vector3 lH, Vector3 rH)
         {
             PadQuadrants qLH, qRH;
 
@@ -47,7 +46,7 @@ namespace VMUVUnityPlugin_NET35_v100
             CalculateCurrentTranslation(currentFwdIndicies, currentRevIndicies, pads);
             CalculateCurrentStraffe(currentLeftStraffe, currentRightStraffe, pads);
 
-            if (!IsCenterPadActive(pads))
+            if (!IsCenterPadActive(pads[8]))
             {
                 currentTranslation = currentStraffe = 0.0f;
                 isMoving = false;
@@ -89,9 +88,9 @@ namespace VMUVUnityPlugin_NET35_v100
             return quad;
         }
 
-        private bool IsCenterPadActive(Int16[] pads)
+        private bool IsCenterPadActive(DEV2Pad pad)
         {
-            return (pads[8] < 2500);
+            return pad.IsPadActive();
         }
 
         private int[] AssignPadsToForward(PadQuadrants qLH, PadQuadrants qRH)
@@ -244,17 +243,17 @@ namespace VMUVUnityPlugin_NET35_v100
             return revInd;
         }
 
-        private void CalculateCurrentTranslation(int[] fwdIndicies, int[] revIndicies, Int16[] padValues)
+        private void CalculateCurrentTranslation(int[] fwdIndicies, int[] revIndicies, DEV2Pad[] pads)
         {
             for (int i = 0; i < fwdIndicies.Length; i++)
             {
-                if (padValues[fwdIndicies[i]] < thresholdValueInCnts)
+                if (pads[fwdIndicies[i]].IsPadActive())
                 {
                     currentTranslation = 0.5f;
                     isMoving = true;
                     break;
                 }
-                else if (padValues[revIndicies[i]] < thresholdValueInCnts)
+                else if (pads[revIndicies[i]].IsPadActive())
                 {
                     currentTranslation = -0.5f;
                     isMoving = true;
@@ -268,13 +267,13 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
-        private void CalculateCurrentStraffe(int leftStraffeIndex, int rightStraffeIndex, Int16[] padValues)
+        private void CalculateCurrentStraffe(int leftStraffeIndex, int rightStraffeIndex, DEV2Pad[] pads)
         {
-            if (padValues[leftStraffeIndex] < thresholdValueInCnts)
+            if (pads[leftStraffeIndex].IsPadActive())
             {
                 currentStraffe = -0.5f;
             }
-            else if (padValues[rightStraffeIndex] < thresholdValueInCnts)
+            else if (pads[rightStraffeIndex].IsPadActive())
             {
                 currentStraffe = 0.5f;
             }
