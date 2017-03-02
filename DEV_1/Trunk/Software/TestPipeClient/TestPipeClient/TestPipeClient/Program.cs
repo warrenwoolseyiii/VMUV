@@ -12,7 +12,7 @@ namespace TestPipeClient
         {
             int numReads = 0;
             bool runMain = true;
-            try
+            /*try
             {
                 Process myProcess = new Process();
                 myProcess.StartInfo.FileName = 
@@ -22,7 +22,7 @@ namespace TestPipeClient
             catch (Exception e0)
             {
 
-            }
+            }*/
 
             dev1.ConnectToClientService();
             Console.WriteLine("Connection success!\n");

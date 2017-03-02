@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -7,6 +8,7 @@ namespace VMUVUnityPlugin_NET35_v100
         private Int16 rawCnts, maxRawCnts, minRawCnts, rangeCnts, scaledValueCnts;
         private float activeThresholdPct, pctActive;
         private bool isPadActive;
+        private Vector3 coordinate;
 
         public DEV2Pad()
         {
@@ -17,6 +19,7 @@ namespace VMUVUnityPlugin_NET35_v100
             rangeCnts = 1;
             activeThresholdPct = 0.35f;
             pctActive = 0f;
+            coordinate = new Vector3(0, 0, 0);
             isPadActive = false;
         }
 
@@ -45,6 +48,11 @@ namespace VMUVUnityPlugin_NET35_v100
         public float GetPctActive()
         {
             return pctActive;
+        }
+
+        public void SetCoordinate(Vector3 coord)
+        {
+            coordinate = coord;
         }
 
         private void CalculateMaxMin()
