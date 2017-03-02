@@ -3,40 +3,34 @@ using System.IO.Pipes;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
-    class DEV2DataConnection
+    public static class DEV2DataConnection
     {
-        private DEV2DeviceData dataPing, dataPong;
-        private NamedPipeClientStream clientPipe;
-        private bool connectionSuccess, pingActive, asyncReadComplete, connectionActive;
-        private byte[] dataBytes;
-        private int dataCnt;
+        private static DEV2DeviceData dataPing = new DEV2DeviceData();
+        private static DEV2DeviceData dataPong = new DEV2DeviceData();
+        private static NamedPipeClientStream clientPipe = null;
+        private static bool connectionSuccess = false;
+        private static bool pingActive = true;
+        private static bool asyncReadComplete = false;
+        private static bool connectionActive = false;
+        private static byte[] dataBytes = new byte[18];
+        private static int dataCnt;
 
-        public DEV2DataConnection()
+        public static void StartDEV2ClientStream()
         {
-            connectionSuccess = false;
-            pingActive = true;
-            asyncReadComplete = false;
-            connectionActive = false;
-            dataCnt = -1;
-            dataBytes = new byte[18];
-            dataPing = new DEV2DeviceData();
-            dataPong = new DEV2DeviceData();
-            clientPipe = new NamedPipeClientStream(".", "DEV_1Pipe", PipeDirection.In, PipeOptions.None);
-        }
+            if (clientPipe == null)
+                clientPipe = new NamedPipeClientStream(".", "DEV_1Pipe", PipeDirection.In, PipeOptions.None);
 
-        public void StartDEV2ClientStream()
-        {
             connectionActive = connectionSuccess = ConnectClientPipe();
             if (connectionSuccess)
                 ReadAsync();
         }
 
-        public bool ClientStreamIsConnected()
+        public static bool ClientStreamIsConnected()
         {
             return connectionSuccess;
         }
 
-        public Int16[] GetDataInCnts()
+        public static Int16[] GetDataInCnts()
         {
             if (pingActive)
                 return dataPong.GetRawDataInCnts();
@@ -44,7 +38,7 @@ namespace VMUVUnityPlugin_NET35_v100
                 return dataPing.GetRawDataInCnts();
         }
 
-        public string GetDataInString()
+        public static string GetDataInString()
         {
             if (pingActive)
                 return dataPong.ToStringRawDisplayFormat();
@@ -52,7 +46,7 @@ namespace VMUVUnityPlugin_NET35_v100
                 return dataPing.ToStringRawDisplayFormat();
         }
 
-        private bool ConnectClientPipe()
+        private static bool ConnectClientPipe()
         {
             try
             {
@@ -68,7 +62,7 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
-        private void ReadAsync()
+        private static void ReadAsync()
         {
             try
             {
@@ -85,7 +79,7 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
-        private void AsyncReadCallBack(IAsyncResult ar)
+        private static void AsyncReadCallBack(IAsyncResult ar)
         {
             dataCnt = 0;
 
@@ -109,7 +103,7 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
-        private void SetDataInPingPong(byte[] data)
+        private static void SetDataInPingPong(byte[] data)
         {
             if (pingActive)
             {

@@ -4,24 +4,18 @@ using System.IO;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
-    class DEV2ClientProcess
+    public static class DEV2ClientProcess
     {
-        private Process clientProcess;
-        private bool clientProcessLaunched;
-        private string dev2ClientLocation;
+        private static Process clientProcess;
+        private static bool clientProcessLaunched = false;
+        private static string dev2ClientLocation = Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV2\\DEV_1ClientConsole");
 
-        public DEV2ClientProcess()
-        {
-            clientProcessLaunched = false;
-            dev2ClientLocation = Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV2\\DEV_1ClientConsole");
-        }
-
-        public bool DEV2ClientHasLaunched()
+        public static bool DEV2ClientHasLaunched()
         {
             return clientProcessLaunched;
         }
 
-        public void StartDEV2Client()
+        public static void StartDEV2Client()
         {
             try
             {
@@ -37,7 +31,7 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
-        public void KillDEV2Client()
+        public static void KillDEV2Client()
         {
             clientProcess.Kill();
             clientProcess.Dispose();

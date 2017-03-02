@@ -1,86 +1,66 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
-    public class DEV2
+    public static class DEV2
     {
 
-        private DEV2VRMotionFusion motionFusion;
-        private DEV2DataConnection dataConnection;
-        private DEV2ClientProcess clientProcess;
-        private DEV2DataProcessor dataProcessor;
-        private DEV2Calibration calibrator;
-        private DEV2Pad[] pads;
+        private static DEV2VRMotionFusion motionFusion = new DEV2VRMotionFusion();
+        private static DEV2DataProcessor dataProcessor = new DEV2DataProcessor();
 
-        public DEV2()
+        public static void OnStart()
         {
-            pads = new DEV2Pad[9];
-            for (int i = 0; i < pads.Length; i++)
-                pads[i] = new DEV2Pad();
+            if (!DEV2ClientProcess.DEV2ClientHasLaunched())
+                DEV2ClientProcess.StartDEV2Client();
 
-            dataConnection = new DEV2DataConnection();
-            clientProcess = new DEV2ClientProcess();
-            motionFusion = new DEV2VRMotionFusion();
-            dataProcessor = new DEV2DataProcessor(pads);
-            calibrator = new DEV2Calibration(pads);
+            if (!DEV2DataConnection.ClientStreamIsConnected())
+                DEV2DataConnection.StartDEV2ClientStream();
         }
 
-        public void OnStart()
-        {
-            clientProcess.StartDEV2Client();
-
-            if (clientProcess.DEV2ClientHasLaunched())
-                dataConnection.StartDEV2ClientStream();
-        }
-
-        public void OnUpdate(Vector3 lHand, Vector3 rHand)
+        public static void OnUpdate()
         {
             RunRawDataProcessor();
-            motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), lHand, rHand);
+            motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), 
+                InputTracking.GetLocalPosition(VRNode.LeftHand), InputTracking.GetLocalPosition(VRNode.RightHand));
         }
 
-        public void CalibratePad(Vector3 point)
+        public static void OnAppQuit()
         {
-            RunRawDataProcessor();
-            calibrator.CalibratePad(point);
+            if (DEV2ClientProcess.DEV2ClientHasLaunched())
+                DEV2ClientProcess.KillDEV2Client();
         }
 
-        public void OnAppQuit()
+        public static string GetDataInString()
         {
-            if (clientProcess.DEV2ClientHasLaunched())
-                clientProcess.KillDEV2Client();
+            return DEV2DataConnection.GetDataInString();
         }
 
-        public string GetDataInString()
-        {
-            return dataConnection.GetDataInString();
-        }
-
-        public float GetTranslationFromDEV2()
+        public static float GetTranslationFromDEV2()
         {
             return motionFusion.GetTranslation();
         }
 
-        public float GetStraffeFromDEV2()
+        public static float GetStraffeFromDEV2()
         {
             return motionFusion.GetStraffe();
         }
 
-        private void RunRawDataProcessor()
+        private static void RunRawDataProcessor()
         {
-            if (!clientProcess.DEV2ClientHasLaunched())
+            if (!DEV2ClientProcess.DEV2ClientHasLaunched())
             {
-                clientProcess.StartDEV2Client();
+                DEV2ClientProcess.StartDEV2Client();
                 return;
             }
 
-            if (!dataConnection.ClientStreamIsConnected())
+            if (!DEV2DataConnection.ClientStreamIsConnected())
             {
-                dataConnection.StartDEV2ClientStream();
+                DEV2DataConnection.StartDEV2ClientStream();
                 return;
             }
 
-            dataProcessor.SetRawData(dataConnection.GetDataInCnts());
+            dataProcessor.SetRawData(DEV2DataConnection.GetDataInCnts());
             dataProcessor.ProcessData();
         }
     }
