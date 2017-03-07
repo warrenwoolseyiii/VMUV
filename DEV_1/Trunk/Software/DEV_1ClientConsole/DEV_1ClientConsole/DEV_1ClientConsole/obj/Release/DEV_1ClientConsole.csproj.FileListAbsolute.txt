@@ -1,9 +1,0 @@
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\bin\Release\DEV_1ClientConsole.exe.config
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\bin\Release\DEV_1ClientConsole.exe
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\bin\Release\DEV_1ClientConsole.pdb
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\bin\Release\System.Runtime.WindowsRuntime.dll
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\bin\Release\Windows.winmd
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\bin\Release\System.Runtime.WindowsRuntime.xml
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\obj\Release\DEV_1ClientConsole.exe
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\obj\Release\DEV_1ClientConsole.pdb
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\DEV_1ClientConsole\DEV_1ClientConsole\DEV_1ClientConsole\obj\Release\DEV_1ClientConsole.csprojResolveAssemblyReference.cache

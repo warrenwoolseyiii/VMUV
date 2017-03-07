@@ -1,113 +1,42 @@
 ﻿using System;
-using System.IO.Pipes;
 
 namespace DEV_1ClientConsole
 {
-    class InterprocessComms
+    static class InterprocessComms
     {
-        private NamedPipeServerStream pipeServer = new
-                    NamedPipeServerStream("DEV_1Pipe", PipeDirection.Out, 1);
-        private int txCnt = 0;
-        private bool pipeIsBroken = false;
-
-        public void InitializePipe()
+        public static void Init()
         {
-            try
-            {
-                WaitForClientConnect();
-            }
-            catch (Exception e0)
-            {
-                InterProcessCommsExceptionHandler eHandle = new InterProcessCommsExceptionHandler(this, e0);
-                eHandle.TakeActionOnException();
-            }
+            PipeInterface.ConnectToClient();
+            PipeInterface.AsyncRead(1);
+            Console.WriteLine("Client Connected!");
         }
 
-        public void DisconnectPipe()
+        public static void ProcessNextRequest()
         {
-            pipeServer.Disconnect();
-        }
-
-        public void DestroyPipe()
-        {
-            pipeIsBroken = true;
-        }
-
-        private void WaitForClientConnect()
-        {
-            if (pipeIsBroken)
-                return;
-
-            try
+            if (PipeInterface.ClientIsConnected() && PipeInterface.AsyncReadComplete())
             {
-                pipeServer.WaitForConnection();
-                Console.WriteLine("Client Connected\n");
-            }
-            catch (Exception e0)
-            {
-                InterProcessCommsExceptionHandler eHandle = new InterProcessCommsExceptionHandler(this, e0);
-                eHandle.TakeActionOnException();
+                byte[] request = PipeInterface.GetReadBytes();
+                ActOnRequest(request);
+                PipeInterface.AsyncRead(1);
             }
         }
 
-        public bool ClientIsConnected()
+        private static void ActOnRequest(byte[] req)
         {
-            if (pipeServer != null)
-                return pipeServer.IsConnected;
-            else
-                return false;
-        }
+            Requests localReq = (Requests)req[0];
 
-        public void WritePadData(DeviceData data)
-        {
-
-            if (pipeServer.IsConnected)
+            switch (localReq)
             {
-                try
-                {
-                    byte[] tx = data.GetRawDataInBytes();
-                    pipeServer.Write(tx, 0, 18);
-                }
-                catch (Exception e0)
-                {
-                    InterProcessCommsExceptionHandler eHandle = new InterProcessCommsExceptionHandler(this, e0);
-                    eHandle.FixBrokenPipe();
-                }
+                case Requests.req_get_pad_data_rpt:
+                    byte[] padData = CurrentValueTable.GetPadDataBytes();
+                    PipeInterface.WriteAsync(padData, padData.Length);
+                    break;
             }
         }
 
-        public bool IsPipeBroken()
+        enum Requests
         {
-            return pipeIsBroken;
-        }
-    }
-
-    class InterProcessCommsExceptionHandler : ExceptionHandler
-    {
-        InterprocessComms localComms = null;
-
-        public InterProcessCommsExceptionHandler(InterprocessComms iComms, Exception e)
-        {
-            localException = e;
-            localComms = iComms;
-        }
-
-        new public void TakeActionOnException()
-        {
-            if (localComms != null)
-            {
-                PrintExceptionToConsole();
-                Console.WriteLine("Pipe was disconnected! Attempting to re-initialize...\n");
-            }
-        }
-
-        public void FixBrokenPipe()
-        {
-            if (localComms != null)
-            {
-                localComms.DisconnectPipe();
-                localComms.DestroyPipe();
-            }
-        }
+            req_get_pad_data_rpt
+        };
     }
 }
