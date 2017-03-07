@@ -40,7 +40,7 @@ namespace DEV_1ClientConsole
         public static void AsyncRead(int len)
         {
             asyncReadComplete = false;
-            pipeServer.ReadAsync(readBuff, 0, len);
+            pipeServer.BeginRead(readBuff, 0, len, AsyncReadCB, null);
         }
 
         public static bool AsyncReadComplete()
@@ -56,6 +56,12 @@ namespace DEV_1ClientConsole
         public static void WriteAsync(byte[] bytes, int len)
         {
             pipeServer.WriteAsync(bytes, 0, len);
+        }
+
+        private static void AsyncReadCB(IAsyncResult ar)
+        {
+            pipeServer.EndRead(ar);
+            asyncReadComplete = true;
         }
     }
 }
