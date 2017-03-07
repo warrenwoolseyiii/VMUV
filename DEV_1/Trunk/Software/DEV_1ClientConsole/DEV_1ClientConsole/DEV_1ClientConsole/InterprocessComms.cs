@@ -31,6 +31,7 @@ namespace DEV_1ClientConsole
                     byte[] padData = CurrentValueTable.GetPadDataBytes();
                     PipeInterface.WriteAsync(padData, padData.Length);
                     break;
+
             }
         }
 

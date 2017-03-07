@@ -12,7 +12,7 @@ namespace DEV_1ClientConsole
             while (true)
             {
                 InterprocessComms.ProcessNextRequest();
-                Thread.Sleep(5);
+                Thread.Sleep(10);
             }
         }
     }
