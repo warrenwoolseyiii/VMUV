@@ -18,7 +18,9 @@ namespace DEV_1ClientConsole
             {
                 byte[] request = PipeInterface.GetReadBytes();
                 ActOnRequest(request);
-                PipeInterface.AsyncRead(1);
+
+                if (request[0] != (byte)Requests.req_disconnect_pipe)
+                    PipeInterface.AsyncRead(1);
             }
             else if (!PipeInterface.ClientIsConnected())
             {
@@ -36,7 +38,7 @@ namespace DEV_1ClientConsole
                     HandlePadDataReq();
                     break;
                 case Requests.req_disconnect_pipe:
-
+                    HandleDisconnectRequest();
                     break;
 
             }

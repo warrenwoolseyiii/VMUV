@@ -5,13 +5,20 @@ namespace VMUVUnityPlugin_NET35_v100
     {
         private const int padDataRepLen = 18;
         private static bool disconnectReq = false;
+        private static bool disconnectSuccess = false;
 
         public static void Init()
         {
-            PipeInterface.ConnectToServer();
+            if (!PipeInterface.IsServerConnected())
+            {
+                PipeInterface.ConnectToServer();
 
-            if (PipeInterface.IsServerConnected())
-                PipeInterface.WriteAsync(Requests.req_get_pad_data_rpt);
+                if (PipeInterface.IsServerConnected())
+                {
+                    disconnectSuccess = false;
+                    PipeInterface.WriteAsync(Requests.req_get_pad_data_rpt);
+                }
+            }
         }
 
         public static void RequestDisconnect()
@@ -38,14 +45,24 @@ namespace VMUVUnityPlugin_NET35_v100
                     HandleReadPadData();
                     break;
                 case Requests.req_disconnect_pipe:
-                    
+                    HandleDisconnect();
                     break;
             }
+        }
+
+        public static bool IsDisconnectComplete()
+        {
+            return disconnectSuccess;
         }
 
         private static void HandleReadPadData()
         {
             PipeInterface.ReadAsync(padDataRepLen);
+        }
+
+        private static void HandleDisconnect()
+        {
+            disconnectSuccess = true;
         }
 
         public enum Requests

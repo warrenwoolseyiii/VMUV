@@ -12,9 +12,7 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void OnStart()
         {
-            if (!DEV2ClientProcess.DEV2ClientHasLaunched())
-                DEV2ClientProcess.StartDEV2Client();
-
+            ServerProcessManager.LaunchProcess();
             InterprocessComms.Init();
         }
 
@@ -27,8 +25,12 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void OnAppQuit()
         {
-            if (DEV2ClientProcess.DEV2ClientHasLaunched())
-                DEV2ClientProcess.KillDEV2Client();
+            InterprocessComms.RequestDisconnect();
+
+            while (!InterprocessComms.IsDisconnectComplete())
+            { }
+
+            ServerProcessManager.KillProcess();
         }
 
         public static DEV2Pad[] GetPads()
@@ -48,9 +50,9 @@ namespace VMUVUnityPlugin_NET35_v100
 
         private static void RunRawDataProcessor()
         {
-            if (!DEV2ClientProcess.DEV2ClientHasLaunched())
+            if (!ServerProcessManager.ProcessIsActive())
             {
-                DEV2ClientProcess.StartDEV2Client();
+                ServerProcessManager.LaunchProcess();
                 return;
             }
 

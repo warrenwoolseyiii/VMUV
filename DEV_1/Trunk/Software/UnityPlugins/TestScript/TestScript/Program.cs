@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using System;
 using VMUVUnityPlugin_NET35_v100;
 
 namespace TestScript
@@ -8,11 +7,19 @@ namespace TestScript
     {
         static void Main(string[] args)
         {
+            int cnt = 0;
+
             DEV2.OnStart();
 
             while(true)
             {
-                Thread.Sleep(5);
+                cnt++;
+                Thread.Sleep(1000);
+
+                if (cnt > 15)
+                {
+                    DEV2.OnAppQuit();
+                }
             }
         }
     }
