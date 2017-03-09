@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.VR;
+using System;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -14,8 +15,7 @@ namespace VMUVUnityPlugin_NET35_v100
             if (!DEV2ClientProcess.DEV2ClientHasLaunched())
                 DEV2ClientProcess.StartDEV2Client();
 
-            if (!DEV2DataConnection.ClientStreamIsConnected())
-                DEV2DataConnection.StartDEV2ClientStream();
+            InterprocessComms.Init();
         }
 
         public static void OnUpdate()
@@ -31,9 +31,9 @@ namespace VMUVUnityPlugin_NET35_v100
                 DEV2ClientProcess.KillDEV2Client();
         }
 
-        public static string GetDataInString()
+        public static DEV2Pad[] GetPads()
         {
-            return DEV2DataConnection.GetDataInString();
+            return dataProcessor.GetPads();
         }
 
         public static float GetTranslationFromDEV2()
@@ -54,13 +54,13 @@ namespace VMUVUnityPlugin_NET35_v100
                 return;
             }
 
-            if (!DEV2DataConnection.ClientStreamIsConnected())
+            if (!PipeInterface.IsServerConnected())
             {
-                DEV2DataConnection.StartDEV2ClientStream();
+                InterprocessComms.Init();
                 return;
             }
 
-            dataProcessor.SetRawData(DEV2DataConnection.GetDataInCnts());
+            //dataProcessor.SetRawData(DEV2DataConnection.GetDataInCnts());
             dataProcessor.ProcessData();
         }
     }

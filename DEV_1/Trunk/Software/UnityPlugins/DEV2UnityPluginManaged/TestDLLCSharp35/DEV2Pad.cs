@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
-    class DEV2Pad
+    public class DEV2Pad
     {
         private Int16 rawCnts, maxRawCnts, minRawCnts, rangeCnts, scaledValueCnts;
         private float activeThresholdPct, pctActive;

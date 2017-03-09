@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Foundation;
@@ -29,6 +28,8 @@ namespace DEV_1ClientConsole
 
                     if (deviceInfo.Count > 0)
                         device = await HidDevice.FromIdAsync(deviceInfo.ElementAt(0).Id, Windows.Storage.FileAccessMode.ReadWrite);
+                    else
+                        Logger.LogMessage("No DEV1 device found");
                 }
                 catch (Exception e)
                 {
@@ -39,7 +40,7 @@ namespace DEV_1ClientConsole
                 {
                     deviceIsEnumerated = true;
                     device.InputReportReceived += new TypedEventHandler<HidDevice, HidInputReportReceivedEventArgs>(USBInterruptTransferHandler);
-                    Console.WriteLine("Enumeration Complete!");
+                    Logger.LogMessage("DEV1 enumeration success!");
                 }
             }
         }
@@ -52,7 +53,7 @@ namespace DEV_1ClientConsole
             DataReader dr = DataReader.FromBuffer(buff);
             byte[] bytes = new byte[rpt.Data.Length];
             dr.ReadBytes(bytes);
-            USBPacketContainer packet = new USBPacketContainer(bytes);
+            USBPacketContainer packet = new USBPacketContainer(bytes, USBPacketContainer.Types.packet_type_pad_report);
             USBPacketManager.ParseNextPacket(packet);
         }
     }

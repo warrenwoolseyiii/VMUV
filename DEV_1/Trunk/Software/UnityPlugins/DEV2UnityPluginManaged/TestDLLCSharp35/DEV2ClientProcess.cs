@@ -19,22 +19,21 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             try
             {
-                clientProcess = new Process();
-                clientProcess.StartInfo.FileName = dev2ClientLocation;
-                clientProcess.Start();
+                //clientProcess = new Process();
+                //clientProcess.StartInfo.FileName = dev2ClientLocation;
+                //clientProcess.Start();
                 clientProcessLaunched = true;
             }
             catch (Exception e0)
             {
-                DEV2ExceptionHandler eHandle = new DEV2ExceptionHandler(e0);
-                eHandle.TakeActionOnException();
+                DEV2ExceptionHandler.TakeActionOnException(e0);
             }
         }
 
         public static void KillDEV2Client()
         {
-            clientProcess.Kill();
-            clientProcess.Dispose();
+            //clientProcess.Kill();
+            //clientProcess.Dispose();
         }
     }
 }

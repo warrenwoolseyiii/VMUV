@@ -50,10 +50,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteWiseUtilities.cs" />
     <Compile Include="CurrentValueTable.cs" />
     <Compile Include="ExceptionHandler.cs" />
     <Compile Include="HardwareInterface.cs" />
     <Compile Include="InterprocessComms.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="PipeInterface.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

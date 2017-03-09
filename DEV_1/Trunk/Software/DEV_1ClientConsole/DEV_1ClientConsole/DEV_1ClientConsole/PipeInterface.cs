@@ -16,6 +16,11 @@ namespace DEV_1ClientConsole
             if (!ClientIsConnected())
             {
                 pipeServer.WaitForConnection();
+                Logger.LogMessage("Established connection on DEV_1Pipe");
+            }
+            else
+            {
+                Logger.LogMessage("An attempt was made to establish a connection on DEV_1Pipe when the connection was already established");
             }
         }
 
@@ -35,12 +40,21 @@ namespace DEV_1ClientConsole
         public static void Disconnect()
         {
             pipeServer.Disconnect();
+            Logger.LogMessage("Disconnected from DEV_1Pipe");
         }
 
         public static void AsyncRead(int len)
         {
-            asyncReadComplete = false;
-            pipeServer.BeginRead(readBuff, 0, len, AsyncReadCB, null);
+            try
+            {
+                pipeServer.BeginRead(readBuff, 0, len, AsyncReadCB, null);
+                asyncReadComplete = false;
+                Logger.LogMessage("Async Read Started ...");
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.TakeActionOnException(e);
+            }
         }
 
         public static bool AsyncReadComplete()
@@ -60,8 +74,15 @@ namespace DEV_1ClientConsole
 
         private static void AsyncReadCB(IAsyncResult ar)
         {
-            pipeServer.EndRead(ar);
-            asyncReadComplete = true;
+            try
+            {
+                asyncReadComplete = true;
+                pipeServer.EndRead(ar);
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.TakeActionOnException(e);
+            }
         }
     }
 }
