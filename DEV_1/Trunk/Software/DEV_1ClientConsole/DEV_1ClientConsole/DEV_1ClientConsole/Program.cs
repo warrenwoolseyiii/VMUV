@@ -1,30 +1,19 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 
 namespace DEV_1ClientConsole
 {
     class Program
     {
-        private static InterprocessComms comms = new InterprocessComms();
-        private static DeviceManager deviceMngr = new DeviceManager(comms);
-
         static void Main(string[] args)
         {
-            EnumerateDevice();
-            comms.InitializePipe();
+            HardwareInterface.EnumerateDevice();
+            InterprocessComms.Init();
 
-            while (!comms.IsPipeBroken())
+            while (true)
             {
-                Thread.Sleep(50);
+                InterprocessComms.ProcessNextRequest();
+                Thread.Sleep(1);
             }
-
-            Console.WriteLine("Pipe is broken!\n");
-        }
-
-        private static async Task EnumerateDevice()
-        {
-            await deviceMngr.EnumerateDEV_1();
         }
     }
 }

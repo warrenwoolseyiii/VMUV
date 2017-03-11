@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\..\VRDemos\VRDemos\Trunk\Unity\Unity Plugins\DEV2\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -41,16 +41,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteWiseUtilities.cs" />
     <Compile Include="DEV2.cs" />
-    <Compile Include="DEV2Calibration.cs" />
-    <Compile Include="DEV2ClientProcess.cs" />
-    <Compile Include="DEV2DataConnection.cs" />
     <Compile Include="DEV2DataProcessor.cs" />
     <Compile Include="DEV2DeviceData.cs" />
     <Compile Include="DEV2ExceptionHandler.cs" />
     <Compile Include="DEV2Pad.cs" />
     <Compile Include="DEV2VRMotionFusion.cs" />
+    <Compile Include="InterprocessComms.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="PipeInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerProcessManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

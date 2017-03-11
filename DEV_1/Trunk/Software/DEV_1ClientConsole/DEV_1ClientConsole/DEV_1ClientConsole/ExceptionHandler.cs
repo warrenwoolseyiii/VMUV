@@ -1,33 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DEV_1ClientConsole
 {
-    class ExceptionHandler
-    {
-        protected Exception localException;
-
-        public ExceptionHandler()
+    static class ExceptionHandler
+    { 
+        public static void TakeActionOnException(Exception localException)
         {
-            localException = new Exception();
-        }
-
-        public ExceptionHandler(Exception e)
-        {
-            localException = e;
-        }
-
-        public void PrintExceptionToConsole()
-        {
-            Console.WriteLine(localException.ToString());
-        }
-
-        public void TakeActionOnException()
-        {
-            PrintExceptionToConsole();
+            Logger.LogMessage(localException.StackTrace);
+            Logger.LogMessage(localException.Message);
         }
     }
 }

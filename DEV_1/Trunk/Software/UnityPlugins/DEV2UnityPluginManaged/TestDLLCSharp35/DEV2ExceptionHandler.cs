@@ -2,23 +2,12 @@
 
 namespace VMUVUnityPlugin_NET35_v100
 {
-    class DEV2ExceptionHandler
+    static class DEV2ExceptionHandler
     {
-        protected Exception localException;
-
-        public DEV2ExceptionHandler()
+        public static void TakeActionOnException(Exception e)
         {
-            localException = new Exception();
-        }
-
-        public DEV2ExceptionHandler(Exception e)
-        {
-            localException = e;
-        }
-
-        public void TakeActionOnException()
-        {
-            // TODO:
+            Logger.LogMessage(e.StackTrace);
+            Logger.LogMessage(e.Message);
         }
     }
 }
