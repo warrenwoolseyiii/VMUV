@@ -26,6 +26,13 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void OnAppQuit()
         {
+            InterprocessComms.Disconnect();
+
+            while (!InterprocessComms.disconnectComplete)
+            {
+                InterprocessComms.Service();
+            }
+
             ServerProcessManager.KillProcess();
         }
 

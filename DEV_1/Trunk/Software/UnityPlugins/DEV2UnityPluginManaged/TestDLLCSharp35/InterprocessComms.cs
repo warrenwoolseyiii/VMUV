@@ -5,6 +5,8 @@ namespace VMUVUnityPlugin_NET35_v100
     {
         private const int padDataRepLen = 18;
         private static bool readyForNextRead = true;
+        private static bool disconnectReq = false;
+        public static bool disconnectComplete = false;
 
         public static void Init()
         {
@@ -18,6 +20,12 @@ namespace VMUVUnityPlugin_NET35_v100
             {
                 readyForNextRead = false;
                 PipeInterface.ReadPacket();
+
+                if (disconnectReq)
+                {
+                    PipeInterface.Disconnect();
+                    disconnectComplete = true;
+                }
             }
             else
             {
@@ -36,6 +44,11 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             readyForNextRead = true;
             Logger.LogMessage("Bad checksum...");
+        }
+
+        public static void Disconnect()
+        {
+            disconnectReq = true;
         }
     }
 }

@@ -8,6 +8,7 @@ namespace VMUVUnityPlugin_NET35_v100
     {
         private static Process serverProcess;
         private static string processLocation = Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV2\\DEV_1ClientConsole");
+            //"C://Users//Warren Woolsey//Repositories//VRDemos//VRDemos//Trunk//Unity//Unity Plugins//DEV2//DEV_1ClientConsole";
         private static bool processIsActive = false;
         private static bool killRequest = false;
 
@@ -22,9 +23,9 @@ namespace VMUVUnityPlugin_NET35_v100
             {
                 try
                 {
-                    //serverProcess = new Process();
-                    //serverProcess.StartInfo.FileName = processLocation;
-                    //serverProcess.Start();
+                    serverProcess = new Process();
+                    serverProcess.StartInfo.FileName = processLocation;
+                    serverProcess.Start();
                     processIsActive = true;
                 }
                 catch (Exception e0)
@@ -39,8 +40,8 @@ namespace VMUVUnityPlugin_NET35_v100
             if (processIsActive)
             {
                 killRequest = true;
-                //serverProcess.Kill();
-                //serverProcess.Dispose();
+                serverProcess.Kill();
+                serverProcess.Dispose();
                 processIsActive = false;
                 killRequest = false;
             }

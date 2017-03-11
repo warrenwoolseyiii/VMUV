@@ -29,6 +29,21 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
+        public static void Disconnect()
+        {
+            if (IsServerConnected())
+            {
+                try
+                {
+                    clientPipe.Dispose();
+                }
+                catch (Exception e)
+                {
+                    DEV2ExceptionHandler.TakeActionOnException(e);
+                }
+            }
+        }
+
         public static bool IsServerConnected()
         {
             return clientPipe.IsConnected;
