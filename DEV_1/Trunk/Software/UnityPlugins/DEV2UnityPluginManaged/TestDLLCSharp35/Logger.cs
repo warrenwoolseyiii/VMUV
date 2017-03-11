@@ -6,7 +6,7 @@ namespace VMUVUnityPlugin_NET35_v100
     {
         public static void LogMessage(string s)
         {
-            Console.WriteLine(s);
+            //Console.WriteLine(s);
         }
     }
 }

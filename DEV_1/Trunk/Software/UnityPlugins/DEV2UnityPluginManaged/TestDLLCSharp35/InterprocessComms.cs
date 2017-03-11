@@ -16,20 +16,23 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void Service()
         {
-            if (readyForNextRead)
+            if (PipeInterface.IsServerConnected())
             {
-                readyForNextRead = false;
-                PipeInterface.ReadPacket();
-
-                if (disconnectReq)
+                if (readyForNextRead)
                 {
-                    PipeInterface.Disconnect();
-                    disconnectComplete = true;
+                    readyForNextRead = false;
+                    PipeInterface.ReadPacket();
+
+                    if (disconnectReq)
+                    {
+                        PipeInterface.Disconnect();
+                        disconnectComplete = true;
+                    }
                 }
-            }
-            else
-            {
-                Logger.LogMessage("Waiting on read ...");
+                else
+                {
+                    Logger.LogMessage("Waiting on read ...");
+                }
             }
         }
 
