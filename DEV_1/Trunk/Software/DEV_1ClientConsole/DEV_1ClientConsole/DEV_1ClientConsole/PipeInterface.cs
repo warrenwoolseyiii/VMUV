@@ -1,4 +1,5 @@
-﻿using System.IO.Pipes;
+﻿using System;
+using System.IO.Pipes;
 
 namespace DEV_1ClientConsole
 {
@@ -36,16 +37,32 @@ namespace DEV_1ClientConsole
 
         public static void Disconnect()
         {
-            pipeServer.Disconnect();
-            Logger.LogMessage("Disconnected from DEV_1Pipe");
+            try
+            {
+                pipeServer.Disconnect();
+                Logger.LogMessage("Disconnected from DEV_1Pipe");
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.TakeActionOnException(e);
+            }
         }
 
         public static void WriteBytes(byte[] bytes, int len)
         {
-            writeComplete = false;
-            pipeServer.Write(bytes, 0, len);
-            pipeServer.WaitForPipeDrain();
-            writeComplete = true;
+            try
+            {
+                writeComplete = false;
+                pipeServer.Write(bytes, 0, len);
+                pipeServer.WaitForPipeDrain();
+                writeComplete = true;
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.TakeActionOnException(e);
+                writeComplete = false;
+                Disconnect();
+            }
         }
     }
 }

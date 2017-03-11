@@ -41,7 +41,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="VMUVUnityPlugin_NET35_v100">
+    <Reference Include="VMUVUnityPlugin_NET35_v100, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\..\VRDemos\VRDemos\Trunk\Unity\Unity Plugins\DEV2\VMUVUnityPlugin_NET35_v100.dll</HintPath>
     </Reference>
   </ItemGroup>

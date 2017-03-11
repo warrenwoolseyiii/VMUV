@@ -105,6 +105,16 @@ namespace VMUVUnityPlugin_NET35_v100
             return dest;
         }
 
+        public static byte[] CopyVarLen(byte[] src, int len)
+        {
+            byte[] dest = new byte[len];
+
+            for (int i = 0; i < len; i++)
+                dest[i] = src[i];
+
+            return dest;
+        }
+
         public static ushort[] Copy(ushort[] src)
         {
             ushort[] dest = new ushort[src.Length];
