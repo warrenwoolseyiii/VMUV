@@ -1,15 +1,12 @@
-﻿using System;
-using System.IO.Pipes;
+﻿using System.IO.Pipes;
 
 namespace DEV_1ClientConsole
 {
     static class PipeInterface
     {
         private static NamedPipeServerStream pipeServer = new
-            NamedPipeServerStream("DEV_1Pipe", PipeDirection.InOut, 1);
-        private const int maxReadLen = 10;
-        private static bool asyncReadComplete = false;
-        private static byte[] readBuff = new byte[maxReadLen];
+            NamedPipeServerStream("DEV_1Pipe", PipeDirection.Out, 1);
+        public static bool writeComplete = true;
 
         public static void ConnectToClient()
         {
@@ -43,46 +40,12 @@ namespace DEV_1ClientConsole
             Logger.LogMessage("Disconnected from DEV_1Pipe");
         }
 
-        public static void AsyncRead(int len)
+        public static void WriteBytes(byte[] bytes, int len)
         {
-            try
-            {
-                pipeServer.BeginRead(readBuff, 0, len, AsyncReadCB, null);
-                asyncReadComplete = false;
-                Logger.LogMessage("Async Read Started ...");
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.TakeActionOnException(e);
-            }
-        }
-
-        public static bool AsyncReadComplete()
-        {
-            return asyncReadComplete;
-        }
-
-        public static byte[] GetReadBytes()
-        {
-            return readBuff;
-        }
-
-        public static void WriteAsync(byte[] bytes, int len)
-        {
-            pipeServer.WriteAsync(bytes, 0, len);
-        }
-
-        private static void AsyncReadCB(IAsyncResult ar)
-        {
-            try
-            {
-                asyncReadComplete = true;
-                pipeServer.EndRead(ar);
-            }
-            catch (Exception e)
-            {
-                ExceptionHandler.TakeActionOnException(e);
-            }
+            writeComplete = false;
+            pipeServer.Write(bytes, 0, len);
+            pipeServer.WaitForPipeDrain();
+            writeComplete = true;
         }
     }
 }

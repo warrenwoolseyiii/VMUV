@@ -14,12 +14,13 @@ namespace TestScript
             while(true)
             {
                 cnt++;
-                Thread.Sleep(1000);
+                Thread.Sleep(15);
+                DEV2.OnUpdate();
 
-                if (cnt > 15)
-                {
-                    DEV2.OnAppQuit();
-                }
+                //if (cnt > 15)
+                //{
+                //    DEV2.OnAppQuit();
+                //}
             }
         }
     }

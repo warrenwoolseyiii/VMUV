@@ -6,19 +6,12 @@ namespace VMUVUnityPlugin_NET35_v100
         private const int padDataRepLen = 18;
         private static bool disconnectReq = false;
         private static bool disconnectSuccess = false;
+        private static bool readyForNextRead = true;
 
         public static void Init()
         {
             if (!PipeInterface.IsServerConnected())
-            {
                 PipeInterface.ConnectToServer();
-
-                if (PipeInterface.IsServerConnected())
-                {
-                    disconnectSuccess = false;
-                    PipeInterface.WriteAsync(Requests.req_get_pad_data_rpt);
-                }
-            }
         }
 
         public static void RequestDisconnect()
@@ -26,28 +19,24 @@ namespace VMUVUnityPlugin_NET35_v100
             disconnectReq = true;
         }
 
+        public static void Service()
+        {
+            if (readyForNextRead)
+            {
+                readyForNextRead = false;
+                PipeInterface.ReadPacket(18);
+            }
+            else
+            {
+                Logger.LogMessage("Waiting on read ...");
+            }
+        }
+
         public static void ActOnReadComplete(byte[] read)
         {
             DEV2DeviceData data = new DEV2DeviceData(read);
+            readyForNextRead = true;
             Logger.LogMessage("Read complete!\n" + ByteWiseUtilities.UShortToString(data.GetRawDataInCnts()));
-
-            if (disconnectReq)
-                PipeInterface.WriteAsync(Requests.req_disconnect_pipe);
-            else
-                PipeInterface.WriteAsync(Requests.req_get_pad_data_rpt);
-        }
-
-        public static void ActOnRequestDelivered(Requests deliveredReq)
-        {
-            switch (deliveredReq)
-            {
-                case Requests.req_get_pad_data_rpt:
-                    HandleReadPadData();
-                    break;
-                case Requests.req_disconnect_pipe:
-                    HandleDisconnect();
-                    break;
-            }
         }
 
         public static bool IsDisconnectComplete()
@@ -57,7 +46,7 @@ namespace VMUVUnityPlugin_NET35_v100
 
         private static void HandleReadPadData()
         {
-            PipeInterface.ReadAsync(padDataRepLen);
+            PipeInterface.ReadPacket(padDataRepLen);
         }
 
         private static void HandleDisconnect()

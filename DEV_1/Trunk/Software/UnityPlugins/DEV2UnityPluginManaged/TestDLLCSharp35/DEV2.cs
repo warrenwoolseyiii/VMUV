@@ -18,9 +18,10 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void OnUpdate()
         {
+            InterprocessComms.Service();
             RunRawDataProcessor();
-            motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), 
-                InputTracking.GetLocalPosition(VRNode.LeftHand), InputTracking.GetLocalPosition(VRNode.RightHand));
+            //motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), 
+                //InputTracking.GetLocalPosition(VRNode.LeftHand), InputTracking.GetLocalPosition(VRNode.RightHand));
         }
 
         public static void OnAppQuit()

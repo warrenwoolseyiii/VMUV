@@ -9,38 +9,18 @@ namespace DEV_1ClientConsole
         public static void Init()
         {
             PipeInterface.ConnectToClient();
-            PipeInterface.AsyncRead(1);
         }
 
         public static void ProcessNextRequest()
         {
-            if (PipeInterface.ClientIsConnected() && PipeInterface.AsyncReadComplete())
+            if (PipeInterface.ClientIsConnected())
             {
-                byte[] request = PipeInterface.GetReadBytes();
-                ActOnRequest(request);
-
-                if (request[0] != (byte)Requests.req_disconnect_pipe)
-                    PipeInterface.AsyncRead(1);
+                if (PipeInterface.writeComplete)
+                    HandlePadDataReq();
             }
             else if (!PipeInterface.ClientIsConnected())
             {
                 Init();
-            }
-        }
-
-        private static void ActOnRequest(byte[] req)
-        {
-            Requests localReq = (Requests)req[0];
-
-            switch (localReq)
-            {
-                case Requests.req_get_pad_data_rpt:
-                    HandlePadDataReq();
-                    break;
-                case Requests.req_disconnect_pipe:
-                    HandleDisconnectRequest();
-                    break;
-
             }
         }
 
@@ -49,7 +29,7 @@ namespace DEV_1ClientConsole
             txCounter++;
             Logger.LogMessage("Sending Pad Data Report: " + txCounter.ToString());
             byte[] padData = ByteWiseUtilities.ConvertUShortToBytesBigE(CurrentValueTable.GetPadData());
-            PipeInterface.WriteAsync(padData, padData.Length);
+            PipeInterface.WriteBytes(padData, padData.Length);
         }
 
         private static void HandleDisconnectRequest()

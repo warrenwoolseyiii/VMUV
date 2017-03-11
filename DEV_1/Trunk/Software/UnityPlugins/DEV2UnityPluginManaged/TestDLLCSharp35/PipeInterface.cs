@@ -5,7 +5,7 @@ namespace VMUVUnityPlugin_NET35_v100
 {
     static class PipeInterface
     {
-        private static NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "DEV_1Pipe", PipeDirection.InOut, PipeOptions.None);
+        private static NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "DEV_1Pipe", PipeDirection.In, PipeOptions.None);
         private static byte[] rxBuff = new byte[18];
         private static byte[] txBuff = new byte[18];
         private static InterprocessComms.Requests currentReq = InterprocessComms.Requests.req_get_pad_data_rpt;
@@ -31,36 +31,15 @@ namespace VMUVUnityPlugin_NET35_v100
             return clientPipe.IsConnected;
         }
 
-        public static void WriteAsync(InterprocessComms.Requests req)
+        public static void ReadPacket(int len)
         {
             try
             {
                 if (IsServerConnected())
                 {
-                    txBuff[0] = (byte)req;
-                    currentReq = req;
-                    clientPipe.BeginWrite(txBuff, 0, 1, AsyncWriteCallBack, null);
-                    Logger.LogMessage("Sending data request " + txBuff[0].ToString());
+                    clientPipe.Read(rxBuff, 0, 18);
+                    InterprocessComms.ActOnReadComplete(ByteWiseUtilities.Copy(rxBuff));
                 }
-            }
-            catch (Exception e)
-            {
-                DEV2ExceptionHandler.TakeActionOnException(e);
-            }
-        }
-
-        private static void AsyncWriteCallBack(IAsyncResult ar)
-        {
-            clientPipe.EndWrite(ar);
-            InterprocessComms.ActOnRequestDelivered(currentReq);
-        }
-
-        public static void ReadAsync(int len)
-        {
-            try
-            {
-                if (IsServerConnected())
-                    clientPipe.BeginRead(rxBuff, 0, len, AsyncReadCallBack, null);
             }
             catch (Exception e)
             {
