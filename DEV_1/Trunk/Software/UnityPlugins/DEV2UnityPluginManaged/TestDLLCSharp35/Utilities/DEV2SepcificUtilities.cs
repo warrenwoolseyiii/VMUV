@@ -47,7 +47,7 @@ namespace VMUVUnityPlugin_NET35_v100
             }
             catch (Exception e)
             {
-                //DEV2ExceptionHandler.TakeActionOnException(e);
+                DEV2ExceptionHandler.TakeActionOnException(e);
                 return (new Vector3(0, 0, 0));
             }
         }
@@ -60,6 +60,25 @@ namespace VMUVUnityPlugin_NET35_v100
                 currId += 8;
 
             return (ushort)currId;
+        }
+
+        public static bool IsUserOverPad(Vector3 padCoord)
+        {
+            float radius = 0.35f;
+            Vector3 user = GetHeadHandsFusion();
+
+            return (DrawDistanceBetweenPoints(padCoord, user) < radius);
+        }
+
+        public static float DrawDistanceBetweenPoints(Vector3 p1, Vector3 p2)
+        {
+            float x = Math.Abs(p2.x - p1.x);
+            float z = Math.Abs(p2.z - p1.z);
+
+            x = x * x;
+            z = z * z;
+
+            return (float)Math.Sqrt((double)(x + z));
         }
     }
 }

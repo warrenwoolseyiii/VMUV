@@ -21,7 +21,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 pads[i].SetCurrentValue(vals[i]);
         }
 
-        public ushort[] GetCurrentActivePads()
+        public ushort[] GetActivePadIds()
         {
             int numActivePads = GetNumActivePads();
             ushort[] rtn = new ushort[numActivePads];
@@ -75,6 +75,18 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 return;
 
             pads[id].coordinate = coord;
+        }
+
+        public bool AssertUserCoordinatesOverActivePad()
+        {
+            /* TODO:
+            ushort[] activePadIds = GetActivePadIds();
+
+            if (DEV2SepcificUtilities.IsUserOverPad(pads[activePadIds[0]].coordinate))
+                return true;
+            else
+                return false;
+                */
         }
     }
 }

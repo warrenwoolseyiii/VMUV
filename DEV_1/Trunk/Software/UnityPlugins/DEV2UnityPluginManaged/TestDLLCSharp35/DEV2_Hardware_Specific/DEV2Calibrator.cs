@@ -12,6 +12,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         private static int positionAccumIndex = 0;
         private static ushort northId, eastId, southId, westId;
         private static bool idIsSet = false;
+        public static bool initialized = false;
         private static DEV2Platform plat;
 
         public static void Init()
@@ -19,6 +20,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             plat = CurrentValueTable.GetCurrentPlatform();
             coordState = CoordinateAcquisitionStates.get_north;
             idIsSet = false;
+            initialized = true;
         }
 
         public static void RunCalibration()
@@ -47,6 +49,8 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                         calState = CalibrationStates.complete;
                     }
                     break;
+                case CalibrationStates.complete:
+                    break;
             }
         }
 
@@ -59,7 +63,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         {
             if (plat.IsCenterActive())
             {
-                ushort[] activePads = plat.GetCurrentActivePads();
+                ushort[] activePads = plat.GetActivePadIds();
                 if (activePads.Length == 1)
                 {
                     Vector3 test = new Vector3(0, 0, 0);
@@ -113,9 +117,9 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         {
             if (plat.IsCenterActive())
             {
-                SetId(plat.GetCurrentActivePads());
+                SetId(plat.GetActivePadIds());
                 
-                if (CheckId(plat.GetCurrentActivePads()))
+                if (CheckId(plat.GetActivePadIds()))
                 {
                     return SetCoordinate();
                 }

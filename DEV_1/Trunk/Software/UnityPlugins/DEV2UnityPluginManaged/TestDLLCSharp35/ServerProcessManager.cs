@@ -7,8 +7,8 @@ namespace VMUVUnityPlugin_NET35_v100
     static class ServerProcessManager
     {
         private static Process serverProcess;
-        private static string processLocation = "C://Users//Warren Woolsey//Repositories//VRDemos//VRDemos//Trunk//Unity//Unity Plugins//DEV2//DEV_1ClientConsole";
-            //Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV2\\DEV_1ClientConsole");
+        private static string processLocation = Path.Combine(Environment.CurrentDirectory, "Assets\\Plugins\\DEV2\\DEV_1ClientConsole");
+            //"C://Users//Warren Woolsey//Repositories//VRDemos//VRDemos//Trunk//Unity//Unity Plugins//DEV2//DEV_1ClientConsole";
         private static bool processIsActive = false;
         private static bool killRequest = false;
 
