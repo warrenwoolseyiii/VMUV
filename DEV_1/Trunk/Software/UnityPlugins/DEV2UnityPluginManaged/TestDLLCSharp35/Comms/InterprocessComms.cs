@@ -39,8 +39,8 @@ namespace VMUVUnityPlugin_NET35_v100
         public static void ActOnReadSuccess(byte[] read)
         {
             DEV2DeviceData data = new DEV2DeviceData(read);
+            CurrentValueTable.SetCurrentPlatformValues(data.GetRawDataInCnts());
             readyForNextRead = true;
-            Logger.LogMessage("Read complete!\n" + ByteWiseUtilities.UShortToString(data.GetRawDataInCnts()));
         }
 
         public static void ActOnReadFail()

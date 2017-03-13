@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace VMUVUnityPlugin_NET35_v100
 {
     static class ByteWiseUtilities
@@ -138,6 +134,30 @@ namespace VMUVUnityPlugin_NET35_v100
         private static bool CheckIfLengthIsEven(int len)
         {
             return (len % 2 == 0);
+        }
+
+        public static ushort CalculateMax(ushort val, ushort thresh)
+        {
+            ushort rtn;
+
+            if (val > thresh)
+                rtn = val;
+            else
+                rtn = thresh;
+
+            return rtn;
+        }
+
+        public static ushort CalculateMin(ushort val, ushort thresh)
+        {
+            ushort rtn;
+
+            if (val < thresh)
+                rtn = val;
+            else
+                rtn = thresh;
+
+            return rtn;
         }
     }
 }

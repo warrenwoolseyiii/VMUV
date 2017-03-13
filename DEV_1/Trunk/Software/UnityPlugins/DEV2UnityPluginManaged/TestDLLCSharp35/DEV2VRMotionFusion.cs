@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -90,7 +91,7 @@ namespace VMUVUnityPlugin_NET35_v100
 
         private bool IsCenterPadActive(DEV2Pad pad)
         {
-            return pad.IsPadActive();
+            return pad.IsActive();
         }
 
         private int[] AssignPadsToForward(PadQuadrants qLH, PadQuadrants qRH)
@@ -247,13 +248,13 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             for (int i = 0; i < fwdIndicies.Length; i++)
             {
-                if (pads[fwdIndicies[i]].IsPadActive())
+                if (pads[fwdIndicies[i]].IsActive())
                 {
                     currentTranslation = 0.5f;
                     isMoving = true;
                     break;
                 }
-                else if (pads[revIndicies[i]].IsPadActive())
+                else if (pads[revIndicies[i]].IsActive())
                 {
                     currentTranslation = -0.5f;
                     isMoving = true;
@@ -269,11 +270,11 @@ namespace VMUVUnityPlugin_NET35_v100
 
         private void CalculateCurrentStraffe(int leftStraffeIndex, int rightStraffeIndex, DEV2Pad[] pads)
         {
-            if (pads[leftStraffeIndex].IsPadActive())
+            if (pads[leftStraffeIndex].IsActive())
             {
                 currentStraffe = -0.5f;
             }
-            else if (pads[rightStraffeIndex].IsPadActive())
+            else if (pads[rightStraffeIndex].IsActive())
             {
                 currentStraffe = 0.5f;
             }

@@ -16,12 +16,7 @@ namespace TestScript
                 cnt++;
                 Thread.Sleep(15);
                 DEV2.OnUpdate();
-
-                if (cnt > 15)
-                {
-                    DEV2.OnAppQuit();
-                    break;
-                }
+                DEV2.Calibrate();
             }
         }
     }

@@ -41,18 +41,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteWiseUtilities.cs" />
+    <Compile Include="CurrentValueTable.cs" />
+    <Compile Include="DEV2_Hardware_Specific\DEV2Calibrator.cs" />
+    <Compile Include="DEV2_Hardware_Specific\DEV2Pad.cs" />
+    <Compile Include="DEV2_Hardware_Specific\DEV2Platform.cs" />
+    <Compile Include="Utilities\ByteWiseUtilities.cs" />
     <Compile Include="DEV2.cs" />
-    <Compile Include="DEV2DataProcessor.cs" />
     <Compile Include="DEV2DeviceData.cs" />
     <Compile Include="DEV2ExceptionHandler.cs" />
-    <Compile Include="DEV2Pad.cs" />
     <Compile Include="DEV2VRMotionFusion.cs" />
-    <Compile Include="InterprocessComms.cs" />
+    <Compile Include="Comms\InterprocessComms.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="PipeInterface.cs" />
+    <Compile Include="Comms\PipeInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerProcessManager.cs" />
+    <Compile Include="Utilities\DEV2SepcificUtilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

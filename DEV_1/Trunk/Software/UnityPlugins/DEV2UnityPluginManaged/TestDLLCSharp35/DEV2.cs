@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.VR;
 using System;
+using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -8,7 +9,6 @@ namespace VMUVUnityPlugin_NET35_v100
     {
 
         private static DEV2VRMotionFusion motionFusion = new DEV2VRMotionFusion();
-        private static DEV2DataProcessor dataProcessor = new DEV2DataProcessor();
 
         public static void OnStart()
         {
@@ -19,7 +19,7 @@ namespace VMUVUnityPlugin_NET35_v100
         public static void OnUpdate()
         {
             InterprocessComms.Service();
-            RunRawDataProcessor();
+            CheckCriticalModules();
             //motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), 
                 //InputTracking.GetLocalPosition(VRNode.LeftHand), InputTracking.GetLocalPosition(VRNode.RightHand));
         }
@@ -36,11 +36,6 @@ namespace VMUVUnityPlugin_NET35_v100
             ServerProcessManager.KillProcess();
         }
 
-        public static DEV2Pad[] GetPads()
-        {
-            return dataProcessor.GetPads();
-        }
-
         public static float GetTranslationFromDEV2()
         {
             return motionFusion.GetTranslation();
@@ -51,7 +46,12 @@ namespace VMUVUnityPlugin_NET35_v100
             return motionFusion.GetStraffe();
         }
 
-        private static void RunRawDataProcessor()
+        public static void Calibrate()
+        {
+            DEV2Calibrator.RunCalibration();
+        }
+
+        private static void CheckCriticalModules()
         {
             if (!ServerProcessManager.ProcessIsActive())
             {
@@ -64,9 +64,6 @@ namespace VMUVUnityPlugin_NET35_v100
                 InterprocessComms.Init();
                 return;
             }
-
-            //dataProcessor.SetRawData(DEV2DataConnection.GetDataInCnts());
-            dataProcessor.ProcessData();
         }
     }
 }
