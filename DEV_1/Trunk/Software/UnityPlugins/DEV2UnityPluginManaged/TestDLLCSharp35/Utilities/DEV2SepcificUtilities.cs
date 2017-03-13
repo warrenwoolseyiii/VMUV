@@ -1,5 +1,7 @@
 ﻿using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
 using UnityEngine;
+using UnityEngine.VR;
+using System;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -29,6 +31,35 @@ namespace VMUVUnityPlugin_NET35_v100
             }
 
             return rtn;
+        }
+
+        public static Vector3 GetHeadHandsFusion()
+        {
+            Vector3[] fusion = new Vector3[3];
+
+            try
+            {
+                fusion[0] = InputTracking.GetLocalPosition(VRNode.Head);
+                fusion[1] = InputTracking.GetLocalPosition(VRNode.LeftHand);
+                fusion[2] = InputTracking.GetLocalPosition(VRNode.RightHand);
+
+                return AverageVectors(fusion);
+            }
+            catch (Exception e)
+            {
+                //DEV2ExceptionHandler.TakeActionOnException(e);
+                return (new Vector3(0, 0, 0));
+            }
+        }
+
+        public static ushort HandlePadIDRollOver(short currId)
+        {
+            if (currId > 7)
+                currId -= 8;
+            else if (currId < 0)
+                currId += 8;
+
+            return (ushort)currId;
         }
     }
 }

@@ -14,6 +14,7 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             ServerProcessManager.LaunchProcess();
             InterprocessComms.Init();
+            DEV2Calibrator.Init();
         }
 
         public static void OnUpdate()

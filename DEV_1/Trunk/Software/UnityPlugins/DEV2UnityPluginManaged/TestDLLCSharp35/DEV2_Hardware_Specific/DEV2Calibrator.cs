@@ -6,10 +6,20 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
     static class DEV2Calibrator
     {
         private static CalibrationStates calState = CalibrationStates.force_ranges;
-        private static CoordinateAcquisitionStates coordState = CoordinateAcquisitionStates.get_north;
+        private static CoordinateAcquisitionStates coordState = CoordinateAcquisitionStates.complete;
         private const int positionAccumLimit = 100;
         private static Vector3[] positionAccumVector = new Vector3[positionAccumLimit];
         private static int positionAccumIndex = 0;
+        private static ushort northId, eastId, southId, westId;
+        private static bool idIsSet = false;
+        private static DEV2Platform plat;
+
+        public static void Init()
+        {
+            plat = CurrentValueTable.GetCurrentPlatform();
+            coordState = CoordinateAcquisitionStates.get_north;
+            idIsSet = false;
+        }
 
         public static void RunCalibration()
         {
@@ -26,25 +36,27 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                     if (WaitForCenter())
                     {
                         Logger.LogMessage("Center Set!");
+                        idIsSet = false;
                         calState = CalibrationStates.acquire_coordinates;
                     }
                     break;
                 case CalibrationStates.acquire_coordinates:
-                    ForceCoordinatePositions();
+                    if (ForceCoordinatePositions())
+                    {
+                        Logger.LogMessage("Coordinal Positions Set!");
+                        calState = CalibrationStates.complete;
+                    }
                     break;
             }
         }
 
         private static bool ForceAllRangesToBeSet()
         {
-            DEV2Platform plat = CurrentValueTable.GetCurrentPlatform();
             return plat.IsPlatformInitialized();
         }
 
         private static bool WaitForCenter()
         {
-            DEV2Platform plat = CurrentValueTable.GetCurrentPlatform();
-
             if (plat.IsCenterActive())
             {
                 ushort[] activePads = plat.GetCurrentActivePads();
@@ -63,32 +75,122 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             switch (coordState)
             {
                 case CoordinateAcquisitionStates.get_north:
-                    if (GetNorth())
+                    if (GetOrdinalCoordinate())
+                    {
+                        idIsSet = false;
                         coordState = CoordinateAcquisitionStates.get_east;
+                    }
                     break;
+                case CoordinateAcquisitionStates.get_east:
+                    if (GetOrdinalCoordinate())
+                    {
+                        idIsSet = false;
+                        coordState = CoordinateAcquisitionStates.get_south;
+                    }
+                    break;
+                case CoordinateAcquisitionStates.get_south:
+                    if (GetOrdinalCoordinate())
+                    {
+                        idIsSet = false;
+                        coordState = CoordinateAcquisitionStates.get_west;
+                    }
+                    break;
+                case CoordinateAcquisitionStates.get_west:
+                    if (GetOrdinalCoordinate())
+                    {
+                        idIsSet = false;
+                        coordState = CoordinateAcquisitionStates.complete;
+                    }
+                    break;
+                case CoordinateAcquisitionStates.complete:
+                    return true;
             }
 
             return false;
         }
 
-        private static bool GetNorth()
+        private static bool GetOrdinalCoordinate()
         {
-            DEV2Platform plat = CurrentValueTable.GetCurrentPlatform();
-            ushort[] activePads = plat.GetCurrentActivePads();
-
             if (plat.IsCenterActive())
             {
-                if (activePads.Length == 2)
+                SetId(plat.GetCurrentActivePads());
+                
+                if (CheckId(plat.GetCurrentActivePads()))
                 {
-                    ushort northId = activePads[0];
-                    Vector3 test = new Vector3(0.5f, 0.5f, 0.5f);
+                    return SetCoordinate();
+                }
+            }
 
-                    if (AccumulateCoordinate(test))
-                    {
-                        Logger.LogMessage("North set " + test.ToString() + "\n\rId: " + northId.ToString());
+            return false;
+        }
+
+        private static void SetId(ushort[] activePads)
+        {
+            if (idIsSet)
+                return;
+
+            if (activePads.Length != 2)
+                return;
+
+            switch (coordState)
+            {
+                case CoordinateAcquisitionStates.get_north:
+                    northId = activePads[0];
+                    break;
+                case CoordinateAcquisitionStates.get_east:
+                    eastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(northId - 2));
+                    break;
+                case CoordinateAcquisitionStates.get_west:
+                    westId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(southId - 2));
+                    break;
+                case CoordinateAcquisitionStates.get_south:
+                    southId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(eastId - 2));
+                    break;
+            }
+
+            idIsSet = true;
+        }
+
+        private static bool CheckId(ushort[] activePads)
+        {
+            if (activePads.Length != 2)
+                return false;
+
+            switch (coordState)
+            {
+                case CoordinateAcquisitionStates.get_north:
+                    return (northId == activePads[0]);
+                case CoordinateAcquisitionStates.get_east:
+                    return (eastId == activePads[0]);
+                case CoordinateAcquisitionStates.get_west:
+                    return (westId == activePads[0]);
+                case CoordinateAcquisitionStates.get_south:
+                    return (southId == activePads[0]);
+                default:
+                    return false;
+            }
+        }
+
+        private static bool SetCoordinate()
+        {
+            if (AccumulateCoordinate(DEV2SepcificUtilities.GetHeadHandsFusion()))
+            {
+                switch (coordState)
+                {
+                    case CoordinateAcquisitionStates.get_north:
                         plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), northId);
                         return true;
-                    }
+                    case CoordinateAcquisitionStates.get_east:
+                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), eastId);
+                        return true;
+                    case CoordinateAcquisitionStates.get_west:
+                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), westId);
+                        return true;
+                    case CoordinateAcquisitionStates.get_south:
+                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), southId);
+                        return true;
+                    default:
+                        return false;
                 }
             }
 
@@ -115,7 +217,8 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
     {
         force_ranges,
         wait_for_center,
-        acquire_coordinates
+        acquire_coordinates,
+        complete
     }
 
     enum CoordinateAcquisitionStates
