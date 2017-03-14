@@ -52,6 +52,10 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             {
                 currentNumActivePads = activePadIds.Length - 1;
                 currentActivePadIds = activePadIds;
+
+                if (CheckForStraffe(GetIdOfPadUserIsOver()))
+                    return;
+                   
             }
             else
             {
@@ -131,11 +135,46 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             return rtn;
         }
 
+        private static ushort GetIdOfPadUserIsOver()
+        {
+            for (ushort i = 0; i < 8; i++)
+            {
+                if (DEV2SepcificUtilities.IsUserOverPad(platform.GetPadCoordinateById(i)))
+                    return i;
+            }
+
+            return 8;
+        }
+
+        private static bool CheckForStraffe(ushort padUserIsOver)
+        {
+            ushort deltaCCW, deltaCW;
+
+            deltaCCW = DEV2SepcificUtilities.CalculatePadIdDeltaCCW(padUserIsOver, currentActivePadIds[0]);
+            deltaCW = DEV2SepcificUtilities.CalculatePadIdDeltaCW(padUserIsOver, currentActivePadIds[0]);
+
+            if (deltaCCW == 2 || deltaCCW == 1)
+            {
+                motionSate = MotionStates.straffe_left;
+                return true;
+            }
+            else if (deltaCW == 2 || deltaCW == 1)
+            {
+                motionSate = MotionStates.straffe_right;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         enum MotionStates
         {
             no_motion,
             forward,
-            straffe,
+            straffe_left,
+            straffe_right,
             backward
         }
     }

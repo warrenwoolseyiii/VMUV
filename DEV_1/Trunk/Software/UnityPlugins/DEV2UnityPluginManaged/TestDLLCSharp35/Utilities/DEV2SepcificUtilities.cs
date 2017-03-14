@@ -118,5 +118,19 @@ namespace VMUVUnityPlugin_NET35_v100
 
             return padIds;
         }
+
+        public static ushort CalculatePadIdDeltaCCW(ushort start, ushort end)
+        {
+            if (start < end)
+                start += 8;
+            return (ushort)(start - end);
+        }
+
+        public static ushort CalculatePadIdDeltaCW(ushort start, ushort end)
+        {
+            if (end < start)
+                end += 8;
+            return (ushort)(end - start);
+        }
     }
 }
