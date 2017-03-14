@@ -95,5 +95,11 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 
             return (pads[id].coordinate);
         }
+
+        public void SetCalibrationComplete()
+        {
+            for (int i = 0; i < pads.Length; i++)
+                pads[i].usingCalFile = true;
+        }
     }
 }

@@ -19,6 +19,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         public static void Init()
         {
             plat = CurrentValueTable.GetCurrentPlatform();
+            calState = CalibrationStates.force_ranges;
             coordState = CoordinateAcquisitionStates.get_north;
             idIsSet = false;
             initialized = true;
@@ -54,9 +55,13 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 case CalibrationStates.interpolate_coordinates:
                     InterpolateCoordinates();
                     calState = CalibrationStates.export_calibration_file;
-                    calibrationComplete = true;
+                    break;
+                case CalibrationStates.export_calibration_file:
+                    calState = CalibrationStates.complete;
                     break;
                 case CalibrationStates.complete:
+                    plat.SetCalibrationComplete();
+                    calibrationComplete = true;
                     break;
             }
         }

@@ -9,7 +9,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         private ushort minValue = 4095;
         public ushort id = 0;
         public Vector3 coordinate = new Vector3(0, 0, 0);
-        private bool usingCalFile = false;
+        public bool usingCalFile = false;
         private bool initialized = false;
         private float sensitivity = 0.65f;
         private float pctActive = 0f;
@@ -52,6 +52,10 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 
                 if (!usingCalFile)
                     CalculateMaxMin();
+                else if (currentValue > maxValue)
+                    currentValue = maxValue;
+                else if (currentValue < minValue)
+                    currentValue = minValue;
 
                 CalculatePctActive();
             }

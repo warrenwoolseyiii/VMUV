@@ -91,5 +91,32 @@ namespace VMUVUnityPlugin_NET35_v100
 
             return rtn;
         }
+
+        public static bool ArePadIdsConsecutive(ushort[] pads, int numPadsToCheck)
+        {
+            if ((pads.Length < numPadsToCheck) || (numPadsToCheck < 2))
+                return false;
+
+            for (int i = 0; i < numPadsToCheck; i++)
+            {
+                if ((HandlePadIDRollOver((short)(pads[i] - 1)) == pads[i + 1]) || (HandlePadIDRollOver((short)(pads[i] - 1)) == pads[i + 1]))
+                    continue;
+                else
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static ushort[] GetAdjacentPadIds(ushort padId)
+        {
+            ushort[] padIds = new ushort[3];
+
+            padIds[0] = HandlePadIDRollOver((short)(padId - 1));
+            padIds[1] = padId;
+            padIds[2] = HandlePadIDRollOver((short)(padId + 1));
+
+            return padIds;
+        }
     }
 }
