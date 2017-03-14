@@ -13,6 +13,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         private static ushort northId, eastId, southId, westId;
         private static bool idIsSet = false;
         public static bool initialized = false;
+        public static bool calibrationComplete = false;
         private static DEV2Platform plat;
 
         public static void Init()
@@ -21,6 +22,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             coordState = CoordinateAcquisitionStates.get_north;
             idIsSet = false;
             initialized = true;
+            calibrationComplete = false;
         }
 
         public static void RunCalibration()
@@ -46,8 +48,13 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                     if (ForceCoordinatePositions())
                     {
                         Logger.LogMessage("Coordinal Positions Set!");
-                        calState = CalibrationStates.complete;
+                        calState = CalibrationStates.interpolate_coordinates;
                     }
+                    break;
+                case CalibrationStates.interpolate_coordinates:
+                    InterpolateCoordinates();
+                    calState = CalibrationStates.export_calibration_file;
+                    calibrationComplete = true;
                     break;
                 case CalibrationStates.complete:
                     break;
@@ -126,6 +133,26 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             }
 
             return false;
+        }
+
+        private static void InterpolateCoordinates()
+        {
+            ushort northEastId, southEastId, southWestId, northWestId;
+            Vector3 pt;
+
+            northEastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(northId - 1));
+            southEastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(eastId - 1));
+            southWestId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(southId - 1));
+            northWestId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(westId - 1));
+
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(northId), plat.GetPadCoordinateById(eastId));
+            plat.SetPlatformCoordinate(pt, northEastId);
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(eastId), plat.GetPadCoordinateById(southId));
+            plat.SetPlatformCoordinate(pt, southEastId);
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(southId), plat.GetPadCoordinateById(westId));
+            plat.SetPlatformCoordinate(pt, southWestId);
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(westId), plat.GetPadCoordinateById(northId));
+            plat.SetPlatformCoordinate(pt, northWestId);
         }
 
         private static void SetId(ushort[] activePads)
@@ -222,6 +249,8 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         force_ranges,
         wait_for_center,
         acquire_coordinates,
+        interpolate_coordinates,
+        export_calibration_file,
         complete
     }
 

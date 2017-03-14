@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.VR;
-using System;
-using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
+﻿using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
+using VMUVUnityPlugin_NET35_v100.Motion;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -20,8 +18,7 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             InterprocessComms.Service();
             CheckCriticalModules();
-            //motionFusion.CalculateTranslationAndStaffe(dataProcessor.GetPads(), 
-                //InputTracking.GetLocalPosition(VRNode.LeftHand), InputTracking.GetLocalPosition(VRNode.RightHand));
+            StandardWalkRun.CalculateTranslationAndStraffe();
         }
 
         public static void OnAppQuit()
@@ -36,22 +33,17 @@ namespace VMUVUnityPlugin_NET35_v100
             ServerProcessManager.KillProcess();
         }
 
-        public static float GetTranslationFromDEV2()
-        {
-            return motionFusion.GetTranslation();
-        }
-
-        public static float GetStraffeFromDEV2()
-        {
-            return motionFusion.GetStraffe();
-        }
-
         public static void Calibrate()
         {
             if (!DEV2Calibrator.initialized)
                 DEV2Calibrator.Init();
 
             DEV2Calibrator.RunCalibration();
+        }
+
+        public static float GetTranslation()
+        {
+            return StandardWalkRun.GetTranslation();
         }
 
         private static void CheckCriticalModules()

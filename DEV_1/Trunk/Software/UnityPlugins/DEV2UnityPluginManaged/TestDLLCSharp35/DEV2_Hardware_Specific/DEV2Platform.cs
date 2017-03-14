@@ -77,16 +77,23 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             pads[id].coordinate = coord;
         }
 
-        public bool AssertUserCoordinatesOverActivePad()
+        public DEV2Pad[] GetActivePads()
         {
-            /* TODO:
             ushort[] activePadIds = GetActivePadIds();
+            DEV2Pad[] activePads = new DEV2Pad[activePadIds.Length];
 
-            if (DEV2SepcificUtilities.IsUserOverPad(pads[activePadIds[0]].coordinate))
-                return true;
-            else
-                return false;
-                */
+            for (int i = 0; i < activePadIds.Length; i++)
+                activePads[i] = pads[activePadIds[i]];
+
+            return activePads;
+        }
+
+        public Vector3 GetPadCoordinateById(ushort id)
+        {
+            if (id > pads.Length)
+                return new Vector3(0, 0, 0);
+
+            return (pads[id].coordinate);
         }
     }
 }

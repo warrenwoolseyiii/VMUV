@@ -45,6 +45,7 @@
     <Compile Include="DEV2_Hardware_Specific\DEV2Calibrator.cs" />
     <Compile Include="DEV2_Hardware_Specific\DEV2Pad.cs" />
     <Compile Include="DEV2_Hardware_Specific\DEV2Platform.cs" />
+    <Compile Include="Motion\StandardWalkRun.cs" />
     <Compile Include="Utilities\ByteWiseUtilities.cs" />
     <Compile Include="DEV2.cs" />
     <Compile Include="DEV2DeviceData.cs" />

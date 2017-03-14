@@ -80,5 +80,16 @@ namespace VMUVUnityPlugin_NET35_v100
 
             return (float)Math.Sqrt((double)(x + z));
         }
+
+        public static Vector3 GetMidPointBetweenPoints(Vector3 p1, Vector3 p2)
+        {
+            Vector3 rtn = new Vector3(0, 0, 0);
+
+            rtn.x = (p1.x + p2.x) / 2.0f;
+            rtn.y = (p1.y + p2.y) / 2.0f;
+            rtn.z = (p1.z + p2.z) / 2.0f;
+
+            return rtn;
+        }
     }
 }
