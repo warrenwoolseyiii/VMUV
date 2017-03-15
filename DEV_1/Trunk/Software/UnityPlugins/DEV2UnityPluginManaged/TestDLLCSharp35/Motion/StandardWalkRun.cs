@@ -16,6 +16,11 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             return translation;
         }
 
+        public static float GetStraffe()
+        {
+            return straffe;
+        }
+
         public static void CalculateTranslationAndStraffe()
         {
             if (!DEV2Calibrator.calibrationComplete)
@@ -33,6 +38,12 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                     break;
                 case MotionStates.forward:
                     HandleForward();
+                    break;
+                case MotionStates.straffe_left:
+                    HandleStraffe(-1);
+                    break;
+                case MotionStates.straffe_right:
+                    HandleStraffe(1);
                     break;
             }
         }
@@ -54,8 +65,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                 currentActivePadIds = activePadIds;
 
                 if (CheckForStraffe(GetIdOfPadUserIsOver()))
-                    return;
-                   
+                    return;   
             }
             else
             {
@@ -83,6 +93,36 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             else
             {
                 translation = 0;
+            }
+        }
+
+        private static void HandleStraffe(int dir)
+        {
+            if (!ScreenForActivity())
+            {
+                EndMotion();
+                return;
+            }
+
+            if (AreActivePadIdsSameAsCurrent())
+            {
+                int numHits = GetNumActivePadsUserIsOver(currentActivePadIds);
+
+                if (numHits < 1)
+                {
+                    straffe = 1.0f * dir;
+                }
+                else
+                {
+                    straffe = 0;
+                    currentNumActivePads = 3;
+                    currentActivePadIds = DEV2SepcificUtilities.GetAdjacentPadIds(currentActivePadIds[0]);
+                    motionSate = MotionStates.forward;
+                }
+            }
+            else
+            {
+                straffe = 0;
             }
         }
 

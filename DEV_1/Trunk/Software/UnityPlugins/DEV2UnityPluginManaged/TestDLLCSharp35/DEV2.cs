@@ -46,6 +46,11 @@ namespace VMUVUnityPlugin_NET35_v100
             return StandardWalkRun.GetTranslation();
         }
 
+        public static float GetStraffe()
+        {
+            return StandardWalkRun.GetStraffe();
+        }
+
         private static void CheckCriticalModules()
         {
             if (!ServerProcessManager.ProcessIsActive())
