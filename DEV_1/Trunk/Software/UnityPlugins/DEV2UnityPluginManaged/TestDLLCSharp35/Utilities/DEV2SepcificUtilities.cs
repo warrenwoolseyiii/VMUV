@@ -62,9 +62,8 @@ namespace VMUVUnityPlugin_NET35_v100
             return (ushort)currId;
         }
 
-        public static bool IsUserOverPad(Vector3 padCoord)
+        public static bool IsUserOverPad(Vector3 padCoord, float radius)
         {
-            float radius = 0.35f;
             Vector3 user = GetHeadHandsFusion();
 
             return (DrawDistanceBetweenPoints(padCoord, user) < radius);

@@ -10,6 +10,7 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void OnStart()
         {
+            Logger.LogMessage("Attempting to start..");
             ServerProcessManager.LaunchProcess();
             InterprocessComms.Init();
         }

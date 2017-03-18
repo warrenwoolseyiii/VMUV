@@ -4,12 +4,13 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 {
     class DEV2Pad
     {
-        private ushort currentValue = 0;
-        private ushort maxValue = 1;
-        private ushort minValue = 4095;
         public ushort id = 0;
         public Vector3 coordinate = new Vector3(0, 0, 0);
         public bool usingCalFile = false;
+
+        private ushort currentValue = 0;
+        private ushort maxValue = 1;
+        private ushort minValue = 4095;
         private bool initialized = false;
         private float sensitivity = 0.65f;
         private float pctActive = 0f;
@@ -71,12 +72,6 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             return pctActive;
         }
 
-        public void SetSensitivity(float sens)
-        {
-            if (sens < 1.0f && sens > 0.0f)
-                sensitivity = sens;
-        }
-
         public CalTerms ExportCalTerms()
         {
             CalTerms rtn = new CalTerms();
@@ -85,6 +80,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             rtn.minValue = minValue;
             rtn.maxValue = maxValue;
             rtn.sensitivity = sensitivity;
+            rtn.id = id;
 
             return rtn;
         }

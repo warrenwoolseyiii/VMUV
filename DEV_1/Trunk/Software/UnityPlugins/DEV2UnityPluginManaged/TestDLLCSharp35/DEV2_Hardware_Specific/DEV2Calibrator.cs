@@ -150,14 +150,14 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             southWestId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(southId - 1));
             northWestId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(westId - 1));
 
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(northId), plat.GetPadCoordinateById(eastId));
-            plat.SetPlatformCoordinate(pt, northEastId);
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(eastId), plat.GetPadCoordinateById(southId));
-            plat.SetPlatformCoordinate(pt, southEastId);
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(southId), plat.GetPadCoordinateById(westId));
-            plat.SetPlatformCoordinate(pt, southWestId);
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(plat.GetPadCoordinateById(westId), plat.GetPadCoordinateById(northId));
-            plat.SetPlatformCoordinate(pt, northWestId);
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(northId)).coordinate, (plat.GetPadById(eastId)).coordinate);
+            (plat.GetPadById(northEastId)).coordinate = pt;
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(eastId)).coordinate, (plat.GetPadById(southId)).coordinate);
+            (plat.GetPadById(southEastId)).coordinate = pt;
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(southId)).coordinate, (plat.GetPadById(westId)).coordinate);
+            (plat.GetPadById(southWestId)).coordinate = pt;
+            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(westId)).coordinate, (plat.GetPadById(northId)).coordinate);
+            (plat.GetPadById(northWestId)).coordinate = pt;
         }
 
         private static void SetId(ushort[] activePads)
@@ -214,16 +214,16 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 switch (coordState)
                 {
                     case CoordinateAcquisitionStates.get_north:
-                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), northId);
+                        (plat.GetPadById(northId)).coordinate = DEV2SepcificUtilities.AverageVectors(positionAccumVector);
                         return true;
                     case CoordinateAcquisitionStates.get_east:
-                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), eastId);
+                        (plat.GetPadById(eastId)).coordinate = DEV2SepcificUtilities.AverageVectors(positionAccumVector);
                         return true;
                     case CoordinateAcquisitionStates.get_west:
-                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), westId);
+                        (plat.GetPadById(westId)).coordinate = DEV2SepcificUtilities.AverageVectors(positionAccumVector);
                         return true;
                     case CoordinateAcquisitionStates.get_south:
-                        plat.SetPlatformCoordinate(DEV2SepcificUtilities.AverageVectors(positionAccumVector), southId);
+                        (plat.GetPadById(southId)).coordinate = DEV2SepcificUtilities.AverageVectors(positionAccumVector);
                         return true;
                     default:
                         return false;

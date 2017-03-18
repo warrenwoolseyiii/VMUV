@@ -27,6 +27,10 @@ namespace VMUVUnityPlugin_NET35_v100
                     DEV2ExceptionHandler.TakeActionOnException(e);
                 }
             }
+            else
+            {
+                Logger.LogMessage("A connect request was made but not processed");
+            }
         }
 
         public static void Disconnect()
@@ -36,11 +40,16 @@ namespace VMUVUnityPlugin_NET35_v100
                 try
                 {
                     clientPipe.Dispose();
+                    Logger.LogMessage("Client pipe was disposed");
                 }
                 catch (Exception e)
                 {
                     DEV2ExceptionHandler.TakeActionOnException(e);
                 }
+            }
+            else
+            {
+                Logger.LogMessage("A disconnect request was made but not processed");
             }
         }
 

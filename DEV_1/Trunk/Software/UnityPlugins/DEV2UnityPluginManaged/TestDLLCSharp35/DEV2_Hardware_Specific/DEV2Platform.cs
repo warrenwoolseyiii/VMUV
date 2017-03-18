@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 {
     class DEV2Platform
@@ -69,12 +68,10 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             return true;
         }
 
-        public void SetPlatformCoordinate(Vector3 coord, ushort id)
+        public void SetCalibrationComplete()
         {
-            if (id > pads.Length)
-                return;
-
-            pads[id].coordinate = coord;
+            for (int i = 0; i < pads.Length; i++)
+                pads[i].usingCalFile = true;
         }
 
         public DEV2Pad[] GetActivePads()
@@ -88,18 +85,17 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             return activePads;
         }
 
-        public Vector3 GetPadCoordinateById(ushort id)
+        public DEV2Pad GetPadById(ushort id)
         {
             if (id > pads.Length)
-                return new Vector3(0, 0, 0);
-
-            return (pads[id].coordinate);
+                return pads[8];
+            else
+                return pads[id];
         }
 
-        public void SetCalibrationComplete()
+        public DEV2Pad[] GetAllPads()
         {
-            for (int i = 0; i < pads.Length; i++)
-                pads[i].usingCalFile = true;
+            return pads;
         }
     }
 }

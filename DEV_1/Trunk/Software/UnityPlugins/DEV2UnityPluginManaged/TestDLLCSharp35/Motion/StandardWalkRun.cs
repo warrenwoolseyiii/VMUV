@@ -6,6 +6,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
     {
         private static float translation = 0.0f;
         private static float straffe = 0.0f;
+        private static float radius = 0.35f;
         private static DEV2Platform platform = CurrentValueTable.GetCurrentPlatform();
         private static MotionStates motionSate = MotionStates.no_motion;
         private static int currentNumActivePads = 0;
@@ -45,6 +46,9 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                 case MotionStates.straffe_right:
                     HandleStraffe(1);
                     break;
+                case MotionStates.backward:
+                    HandleReverse();
+                    break;
             }
         }
 
@@ -65,7 +69,15 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                 currentActivePadIds = activePadIds;
 
                 if (CheckForStraffe(GetIdOfPadUserIsOver()))
-                    return;   
+                {
+                    return;
+                }
+                if (CheckForReverse(GetIdOfPadUserIsOver()))
+                {
+                    currentNumActivePads = 3;
+                    currentActivePadIds = DEV2SepcificUtilities.GetAdjacentPadIds(activePadIds[0]);
+                    return;
+                }
             }
             else
             {
@@ -126,6 +138,24 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             }
         }
 
+        private static void HandleReverse()
+        {
+            if (!ScreenForActivity())
+            {
+                EndMotion();
+                return;
+            }
+
+            if (AreActivePadIdsSameAsCurrent())
+            {
+                translation = -1.0f;
+            }
+            else
+            {
+                translation = 0;
+            }
+        }
+
         private static void EndMotion()
         {
             motionSate = MotionStates.no_motion;
@@ -168,7 +198,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
 
             for (int i = 0; i < (pads.Length - 1); i++)
             {
-                if (DEV2SepcificUtilities.IsUserOverPad(platform.GetPadCoordinateById(pads[i])))
+                if (DEV2SepcificUtilities.IsUserOverPad((platform.GetPadById(pads[i])).coordinate, radius))
                     rtn++;
             }
 
@@ -179,7 +209,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
         {
             for (ushort i = 0; i < 8; i++)
             {
-                if (DEV2SepcificUtilities.IsUserOverPad(platform.GetPadCoordinateById(i)))
+                if (DEV2SepcificUtilities.IsUserOverPad((platform.GetPadById(i)).coordinate, radius))
                     return i;
             }
 
@@ -201,6 +231,29 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             else if (deltaCW == 2 || deltaCW == 1)
             {
                 motionSate = MotionStates.straffe_right;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static bool CheckForReverse(ushort padUserIsOver)
+        {
+            ushort deltaCCW, deltaCW;
+
+            deltaCCW = DEV2SepcificUtilities.CalculatePadIdDeltaCCW(padUserIsOver, currentActivePadIds[0]);
+            deltaCW = DEV2SepcificUtilities.CalculatePadIdDeltaCW(padUserIsOver, currentActivePadIds[0]);
+
+            if (deltaCCW == 3 || deltaCCW == 4 || deltaCCW == 5)
+            {
+                motionSate = MotionStates.backward;
+                return true;
+            }
+            else if (deltaCW == 5 || deltaCW == 4 || deltaCW == 3)
+            {
+                motionSate = MotionStates.backward;
                 return true;
             }
             else
