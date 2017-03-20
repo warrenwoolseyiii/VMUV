@@ -57,6 +57,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                     calState = CalibrationStates.export_calibration_file;
                     break;
                 case CalibrationStates.export_calibration_file:
+                    CreateCalibrationFile();
                     calState = CalibrationStates.complete;
                     break;
                 case CalibrationStates.complete:
@@ -93,6 +94,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 case CoordinateAcquisitionStates.get_north:
                     if (GetOrdinalCoordinate())
                     {
+                        Logger.LogMessage("North is set!");
                         idIsSet = false;
                         coordState = CoordinateAcquisitionStates.get_east;
                     }
@@ -100,6 +102,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 case CoordinateAcquisitionStates.get_east:
                     if (GetOrdinalCoordinate())
                     {
+                        Logger.LogMessage("East is set!");
                         idIsSet = false;
                         coordState = CoordinateAcquisitionStates.get_south;
                     }
@@ -107,6 +110,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 case CoordinateAcquisitionStates.get_south:
                     if (GetOrdinalCoordinate())
                     {
+                        Logger.LogMessage("South is set!");
                         idIsSet = false;
                         coordState = CoordinateAcquisitionStates.get_west;
                     }
@@ -114,6 +118,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 case CoordinateAcquisitionStates.get_west:
                     if (GetOrdinalCoordinate())
                     {
+                        Logger.LogMessage("West is set!");
                         idIsSet = false;
                         coordState = CoordinateAcquisitionStates.complete;
                     }
@@ -246,6 +251,18 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             {
                 return false;
             }
+        }
+
+        private static void CreateCalibrationFile()
+        {
+            string jsonCalFile = "";
+            string path = "C:\\Users\\Warren Woolsey\\Desktop\\calFile.txt";
+
+            for (ushort i = 0; i < (plat.GetAllPads()).Length; i++)
+                jsonCalFile += JSONUtilities.CreatePadCalTerms(plat.GetPadById(i));
+
+            JSONUtilities.WriteJsonFile(path, jsonCalFile);
+            Logger.LogMessage("Calibration file written to " + path);
         }
     }
 
