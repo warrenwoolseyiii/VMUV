@@ -13,6 +13,7 @@ namespace VMUVUnityPlugin_NET35_v100
             Logger.LogMessage("Attempting to start..");
             ServerProcessManager.LaunchProcess();
             InterprocessComms.Init();
+            CurrentValueTable.SetCalibrationTermsOnStart(DEV2Calibrator.ReadCalibrationFile());
         }
 
         public static void OnUpdate()

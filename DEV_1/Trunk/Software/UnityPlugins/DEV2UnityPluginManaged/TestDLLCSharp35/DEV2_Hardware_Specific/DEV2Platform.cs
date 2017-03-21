@@ -11,6 +11,12 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 pads[i] = new DEV2Pad((ushort)i);
         }
 
+        public void SetCalibrationTerms(CalTerms[] terms)
+        {
+            for (int i = 0; i < pads.Length; i++)
+                pads[i].InitWithValues(terms[i], true);
+        }
+
         public void SetValues(ushort[] vals)
         {
             if (vals.Length < pads.Length)

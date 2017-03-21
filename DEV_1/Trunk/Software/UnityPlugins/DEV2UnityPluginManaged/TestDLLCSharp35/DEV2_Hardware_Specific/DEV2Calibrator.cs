@@ -15,6 +15,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         public static bool initialized = false;
         public static bool calibrationComplete = false;
         private static DEV2Platform plat;
+        private static string calFilePath = "C:\\Users\\Warren Woolsey\\Desktop\\calFile.txt";
 
         public static void Init()
         {
@@ -256,13 +257,28 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         private static void CreateCalibrationFile()
         {
             string jsonCalFile = "";
-            string path = "C:\\Users\\Warren Woolsey\\Desktop\\calFile.txt";
+            string path = calFilePath;
 
-            for (ushort i = 0; i < (plat.GetAllPads()).Length; i++)
-                jsonCalFile += JSONUtilities.CreatePadCalTerms(plat.GetPadById(i));
-
+            jsonCalFile = JSONUtilities.CreatePadCalTerms(plat.GetAllPads());
             JSONUtilities.WriteJsonFile(path, jsonCalFile);
             Logger.LogMessage("Calibration file written to " + path);
+        }
+
+        public static CalTerms[] ReadCalibrationFile()
+        {
+            string jsonCalFile = "";
+            string path = calFilePath;
+
+            jsonCalFile = JSONUtilities.ReadJsonFile(path);
+
+            if (jsonCalFile != null)
+            {
+                CalTerms[] terms = JSONUtilities.ReadPadCalTermsFromJson(jsonCalFile);
+                calibrationComplete = true;
+                return terms;
+            }
+
+            return null;
         }
     }
 
