@@ -1,5 +1,4 @@
-﻿using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.VR;
 using System;
 
@@ -130,6 +129,54 @@ namespace VMUVUnityPlugin_NET35_v100
             if (end < start)
                 end += 8;
             return (ushort)(end - start);
+        }
+
+        public static float CalculatePctDiff(float x, float y)
+        {
+            return (float)((Math.Abs(x - y) / ((x + y) / 2)));
+        }
+
+        public static Vector3 CalculateMidPointOnArc(Vector3[] refPts, Vector3 c, float offSet)
+        {
+            Vector3 midPt = GetMidPointBetweenPoints(refPts[0], refPts[1]);
+            Vector3[] pts = new Vector3[4];
+            Vector3 rtn = new Vector3(0, refPts[0].y, 0);
+            float xDiff, zDiff;
+
+            pts[0].x = c.x + offSet;
+            pts[0].z = c.z + offSet;
+
+            pts[1].x = c.x + offSet;
+            pts[1].z = c.z - offSet;
+
+            pts[2].x = c.x - offSet;
+            pts[2].z = c.z - offSet;
+
+            pts[3].x = c.x - offSet;
+            pts[3].z = c.z + offSet;
+
+            xDiff = 10.0f;
+            zDiff = 10.0f;
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                float xTmp = Math.Abs(CalculatePctDiff(pts[i].x, midPt.x));
+                float zTmp = Math.Abs(CalculatePctDiff(pts[i].z, midPt.z));
+
+                if (xTmp < xDiff)
+                {
+                    rtn.x = pts[i].x;
+                    xDiff = xTmp;
+                }
+
+                if (zTmp < zDiff)
+                {
+                    rtn.z = pts[i].z;
+                    zDiff = zTmp;
+                }
+            }
+
+            return rtn;
         }
     }
 }

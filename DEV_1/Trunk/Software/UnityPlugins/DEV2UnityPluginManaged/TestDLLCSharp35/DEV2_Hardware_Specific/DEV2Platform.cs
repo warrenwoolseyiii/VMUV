@@ -17,6 +17,12 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
                 pads[i].InitWithValues(terms[i], true);
         }
 
+        public void WipeCalibrationFile()
+        {
+            for (int i = 0; i < pads.Length; i++)
+                pads[i].ReInit();
+        }
+
         public void SetValues(ushort[] vals)
         {
             if (vals.Length < pads.Length)

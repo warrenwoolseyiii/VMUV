@@ -41,6 +41,18 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             initialized = true;
         }
 
+        public void ReInit()
+        {
+            initialized = false;
+            usingCalFile = false;
+            currentValue = 0;
+            maxValue = 1;
+            minValue = 4095;
+            sensitivity = 0.65f;
+            pctActive = 0f;
+            coordinate.x = coordinate.y = coordinate.z = 0.0f;
+    }
+
         public void SetCurrentValue(ushort currVal)
         {
             if (!initialized)

@@ -20,17 +20,27 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         public static void Init()
         {
             plat = CurrentValueTable.GetCurrentPlatform();
-            calState = CalibrationStates.force_ranges;
+            calState = CalibrationStates.init;
             coordState = CoordinateAcquisitionStates.get_north;
             idIsSet = false;
             initialized = true;
             calibrationComplete = false;
+            plat.WipeCalibrationFile();
         }
 
         public static void RunCalibration()
         {
             switch (calState)
             {
+                case CalibrationStates.init:
+                    calState = CalibrationStates.init;
+                    coordState = CoordinateAcquisitionStates.get_north;
+                    idIsSet = false;
+                    initialized = true;
+                    calibrationComplete = false;
+                    plat.WipeCalibrationFile();
+                    calState = CalibrationStates.force_ranges;
+                    break;
                 case CalibrationStates.force_ranges:
                     if (ForceAllRangesToBeSet())
                     {
@@ -149,21 +159,59 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         private static void InterpolateCoordinates()
         {
             ushort northEastId, southEastId, southWestId, northWestId;
-            Vector3 pt;
+            Vector3 pt, center;
+            Vector3[] pts = new Vector3[2];
+            float offset;
+
+            center = CalculateCenterCoord();
+            (plat.GetPadById(8)).coordinate = center;
+
+            offset = CalculatePlatformRadius() * 0.707107f;
 
             northEastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(northId - 1));
             southEastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(eastId - 1));
             southWestId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(southId - 1));
             northWestId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(westId - 1));
 
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(northId)).coordinate, (plat.GetPadById(eastId)).coordinate);
+            pts[0] = (plat.GetPadById(northId)).coordinate;
+            pts[1] = (plat.GetPadById(eastId)).coordinate;
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
             (plat.GetPadById(northEastId)).coordinate = pt;
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(eastId)).coordinate, (plat.GetPadById(southId)).coordinate);
+
+            pts[0] = (plat.GetPadById(eastId)).coordinate;
+            pts[1] = (plat.GetPadById(southId)).coordinate;
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
             (plat.GetPadById(southEastId)).coordinate = pt;
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(southId)).coordinate, (plat.GetPadById(westId)).coordinate);
+
+            pts[0] = (plat.GetPadById(southId)).coordinate;
+            pts[1] = (plat.GetPadById(westId)).coordinate;
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
             (plat.GetPadById(southWestId)).coordinate = pt;
-            pt = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(westId)).coordinate, (plat.GetPadById(northId)).coordinate);
+
+            pts[0] = (plat.GetPadById(westId)).coordinate;
+            pts[1] = (plat.GetPadById(northId)).coordinate;
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
             (plat.GetPadById(northWestId)).coordinate = pt;
+        }
+
+        private static Vector3 CalculateCenterCoord()
+        {
+            Vector3[] midPoint = new Vector3[2];
+
+            midPoint[0] = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(northId)).coordinate, (plat.GetPadById(southId)).coordinate);
+            midPoint[1] = DEV2SepcificUtilities.GetMidPointBetweenPoints((plat.GetPadById(westId)).coordinate, (plat.GetPadById(eastId)).coordinate);
+
+            return DEV2SepcificUtilities.AverageVectors(midPoint);
+        }
+
+        private static float CalculatePlatformRadius()
+        {
+            float[] diameter = new float[2];
+
+            diameter[0] = DEV2SepcificUtilities.DrawDistanceBetweenPoints((plat.GetPadById(northId)).coordinate, (plat.GetPadById(southId)).coordinate);
+            diameter[1] = DEV2SepcificUtilities.DrawDistanceBetweenPoints((plat.GetPadById(westId)).coordinate, (plat.GetPadById(eastId)).coordinate);
+
+            return ((diameter[0] + diameter[1]) / 4.0f);
         }
 
         private static void SetId(ushort[] activePads)
@@ -284,6 +332,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 
     enum CalibrationStates
     {
+        init,
         force_ranges,
         wait_for_center,
         acquire_coordinates,

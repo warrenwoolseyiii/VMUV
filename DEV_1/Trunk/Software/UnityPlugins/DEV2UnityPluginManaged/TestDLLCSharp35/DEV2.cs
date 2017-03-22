@@ -5,14 +5,13 @@ namespace VMUVUnityPlugin_NET35_v100
 {
     public static class DEV2
     {
-
         private static DEV2VRMotionFusion motionFusion = new DEV2VRMotionFusion();
+        private static bool destroyed = false;
 
         public static void OnStart()
         {
             Logger.LogMessage("Attempting to start..");
             ServerProcessManager.LaunchProcess();
-            InterprocessComms.Init();
             CurrentValueTable.SetCalibrationTermsOnStart(DEV2Calibrator.ReadCalibrationFile());
         }
 
@@ -25,14 +24,18 @@ namespace VMUVUnityPlugin_NET35_v100
 
         public static void OnAppQuit()
         {
-            InterprocessComms.Disconnect();
-
-            while (!InterprocessComms.disconnectComplete)
+            if (!destroyed)
             {
-                InterprocessComms.Service();
-            }
+                destroyed = true;
+                InterprocessComms.Disconnect();
 
-            ServerProcessManager.KillProcess();
+                while (!InterprocessComms.disconnectComplete)
+                {
+                    InterprocessComms.Service();
+                }
+
+                ServerProcessManager.KillProcess();
+            }
         }
 
         public static void Calibrate()
