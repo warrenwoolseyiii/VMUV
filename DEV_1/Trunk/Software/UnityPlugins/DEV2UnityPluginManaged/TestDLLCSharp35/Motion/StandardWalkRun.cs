@@ -6,11 +6,9 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
     {
         private static float translation = 0.0f;
         private static float straffe = 0.0f;
-        private static float radius = 0.5f;
+        private static float radius = 0.40f;
         private static DEV2Platform platform = CurrentValueTable.GetCurrentPlatform();
         private static MotionStates motionSate = MotionStates.no_motion;
-        private static int currentNumActivePads = 0;
-        private static ushort[] currentActivePadIds = new ushort[8];
 
         public static float GetTranslation()
         {
@@ -67,13 +65,14 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             }
             else
             {
-                ushort padId = GetIdOfPadUserIsOver();
-
-                if (CheckForStraffe(padId))
+                ushort[] padId = GetIdOfPadUserIsOver();
+                if (padId == null)
                     return;
 
-                if (CheckForReverse(padId))
-                    return;
+                CheckForStrafeAndReverse(padId);
+
+                //if (CheckForReverse(padId))
+                    //return;
             }
         }
 
@@ -142,50 +141,81 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             return rtn;
         }
 
-        private static ushort GetIdOfPadUserIsOver()
+        private static ushort[] GetIdOfPadUserIsOver()
         {
+            int numPads = 0;
+
             for (ushort i = 0; i < 8; i++)
             {
                 if (DEV2SepcificUtilities.IsUserOverPad((platform.GetPadById(i)).coordinate, radius))
-                    return i;
+                    numPads++;
             }
 
-            return 8;
+            if (numPads > 0)
+            {
+                ushort[] ids = new ushort[numPads];
+                int ndx = 0;
+
+                for (ushort i = 0; i < 8; i++)
+                {
+                    if (DEV2SepcificUtilities.IsUserOverPad((platform.GetPadById(i)).coordinate, radius))
+                        ids[ndx++] = i;
+                }
+
+                return ids;
+            }
+
+            return null;
         }
 
-        private static bool CheckForStraffe(ushort padUserIsOver)
+        private static void CheckForStrafeAndReverse(ushort[] padUserIsOver)
         {
             ushort deltaCCW = 8;
             ushort deltaCW = 8;
             ushort[] activePads = platform.GetActivePadIds();
+            ushort[] padsOfInterest = new ushort[(activePads.Length - 1) + padUserIsOver.Length];
+            bool isLeft = false;
 
-            // Always parse to the nearest neighbor for straffe, this is done because we could have multiple pads active
-            for (ushort i = 0; i < (activePads.Length - 1); i++)
+            deltaCCW = DEV2SepcificUtilities.CalculatePadIdDeltaCCW(padUserIsOver[0], activePads[0]);
+            deltaCW = DEV2SepcificUtilities.CalculatePadIdDeltaCW(padUserIsOver[0], activePads[0]);
+
+            if (deltaCCW < deltaCW)
+                isLeft = true;
+
+            // Handle edge case
+            if (padUserIsOver.Length > 1 && padUserIsOver[0] == 0 && padUserIsOver[1] == 7)
             {
-                ushort tmp = DEV2SepcificUtilities.CalculatePadIdDeltaCCW(padUserIsOver, activePads[i]);
-      
-                if (tmp < deltaCCW)
-                    deltaCCW = tmp;
-
-                tmp = DEV2SepcificUtilities.CalculatePadIdDeltaCW(padUserIsOver, activePads[i]);
-
-                if (tmp < deltaCW)
-                    deltaCW = tmp;
+                padUserIsOver[0] = 7;
+                padUserIsOver[1] = 0;
             }
 
-            if (deltaCCW == 2 || deltaCCW == 1)
+            int i,j;
+
+            if (isLeft)
             {
-                motionSate = MotionStates.straffe_left;
-                return true;
-            }
-            else if (deltaCW == 2 || deltaCW == 1)
-            {
-                motionSate = MotionStates.straffe_right;
-                return true;
+                for (j = 0; j < (activePads.Length - 1); j++)
+                    padsOfInterest[j] = activePads[j];
+                for (i = 0; i < padUserIsOver.Length; i++)
+                    padsOfInterest[i + j] = padUserIsOver[i];
             }
             else
             {
-                return false;
+                for (j = 0; j < padUserIsOver.Length; j++)
+                    padsOfInterest[j] = padUserIsOver[j];
+                for (i = 0; i < (activePads.Length - 1); i++)
+                    padsOfInterest[i + j] = activePads[i];
+            }
+
+            if (DEV2SepcificUtilities.ArePadIdsConsecutive(padsOfInterest, padsOfInterest.Length))
+            {
+                if (isLeft)
+                    motionSate = MotionStates.straffe_left;
+                else
+                    motionSate = MotionStates.straffe_right;
+            }
+            else
+            {
+                motionSate = MotionStates.backward;
             }
         }
 
@@ -209,12 +239,12 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                     deltaCW = tmp;
             }
 
-            if (deltaCCW == 3 || deltaCCW == 4 || deltaCCW == 5)
+            if (deltaCCW >= 3 && deltaCCW <=5)
             {
                 motionSate = MotionStates.backward;
                 return true;
             }
-            else if (deltaCW == 5 || deltaCW == 4 || deltaCW == 3)
+            else if (deltaCW >= 3 && deltaCW <= 5)
             {
                 motionSate = MotionStates.backward;
                 return true;

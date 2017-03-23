@@ -12,7 +12,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         private ushort maxValue = 1;
         private ushort minValue = 4095;
         private bool initialized = false;
-        private float sensitivity = 0.65f;
+        private float sensitivity = 0.35f;
         private float pctActive = 0f;
         
         public DEV2Pad()

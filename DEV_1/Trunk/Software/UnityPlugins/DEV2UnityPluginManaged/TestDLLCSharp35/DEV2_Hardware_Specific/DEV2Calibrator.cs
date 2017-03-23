@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.VR;
+using System.IO;
+using System;
 
 namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 {
@@ -15,7 +16,8 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
         public static bool initialized = false;
         public static bool calibrationComplete = false;
         private static DEV2Platform plat;
-        private static string calFilePath = "C:\\Users\\Warren Woolsey\\Desktop\\calFile.txt";
+        private static string calFilePath = Path.Combine(Environment.CurrentDirectory, "calFile.txt");
+            //"C:\\Users\\Warren Woolsey\\Desktop\\calFile.txt";
 
         public static void Init()
         {

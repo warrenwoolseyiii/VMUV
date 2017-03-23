@@ -95,9 +95,9 @@ namespace VMUVUnityPlugin_NET35_v100
             if ((pads.Length < numPadsToCheck) || (numPadsToCheck < 2))
                 return false;
 
-            for (int i = 0; i < numPadsToCheck; i++)
+            for (int i = 0; i < (numPadsToCheck - 1); i++)
             {
-                if ((HandlePadIDRollOver((short)(pads[i] - 1)) == pads[i + 1]) || (HandlePadIDRollOver((short)(pads[i] - 1)) == pads[i + 1]))
+                if ((HandlePadIDRollOver((short)(pads[i] - 1)) == pads[i + 1]) || (HandlePadIDRollOver((short)(pads[i] + 1)) == pads[i + 1]))
                     continue;
                 else
                     return false;
@@ -131,9 +131,9 @@ namespace VMUVUnityPlugin_NET35_v100
             return (ushort)(end - start);
         }
 
-        public static float CalculatePctDiff(float x, float y)
+        public static float CalculatePctChange(float x, float y)
         {
-            return (float)((Math.Abs(x - y) / ((x + y) / 2)));
+            return (float)((Math.Abs(x - y) / y));
         }
 
         public static Vector3 CalculateMidPointOnArc(Vector3[] refPts, Vector3 c, float offSet)
@@ -160,8 +160,8 @@ namespace VMUVUnityPlugin_NET35_v100
 
             for (int i = 0; i < pts.Length; i++)
             {
-                float xTmp = Math.Abs(CalculatePctDiff(pts[i].x, midPt.x));
-                float zTmp = Math.Abs(CalculatePctDiff(pts[i].z, midPt.z));
+                float xTmp = Math.Abs(CalculatePctChange(pts[i].x, midPt.x));
+                float zTmp = Math.Abs(CalculatePctChange(pts[i].z, midPt.z));
 
                 if (xTmp < xDiff)
                 {
