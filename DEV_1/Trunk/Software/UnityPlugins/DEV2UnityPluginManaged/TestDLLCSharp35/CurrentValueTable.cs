@@ -7,6 +7,9 @@ namespace VMUVUnityPlugin_NET35_v100
         private static DEV2Platform plat = new DEV2Platform();
         private static CalTerms[] currentCalFile;
         private static bool areCalTermsSet = false;
+        private static float drawRadius = 0.4f;
+        private static float speedMultiplier = 2.0f;
+        private static bool strafeEnabled = false;
 
         public static void SetCurrentPlatformValues(ushort[] vals)
         {
@@ -31,6 +34,39 @@ namespace VMUVUnityPlugin_NET35_v100
         {
             if (terms != null)
                 plat.SetCalibrationTerms(terms);
+        }
+
+        public static void SetDrawRadius(float rad)
+        {
+            drawRadius = rad;
+        }
+
+        public static float GetDrawRadius()
+        {
+            return drawRadius;
+        }
+
+        public static void SetSpeedMultiplier(float mult)
+        {
+            speedMultiplier = mult;
+        }
+
+        public static float GetSpeedMultiplier()
+        {
+            return speedMultiplier;
+        }
+
+        public static void SetStrafeEnabled(int en)
+        {
+            if (en == 1)
+                strafeEnabled = true;
+            else
+                strafeEnabled = false;
+        }
+
+        public static bool GetStrafeEnabled()
+        {
+            return strafeEnabled;
         }
     }
 }

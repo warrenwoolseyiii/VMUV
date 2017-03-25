@@ -48,7 +48,7 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             currentValue = 0;
             maxValue = 1;
             minValue = 4095;
-            sensitivity = 0.65f;
+            sensitivity = 0.35f;
             pctActive = 0f;
             coordinate.x = coordinate.y = coordinate.z = 0.0f;
     }

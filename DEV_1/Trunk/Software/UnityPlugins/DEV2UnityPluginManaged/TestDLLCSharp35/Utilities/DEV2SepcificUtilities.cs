@@ -178,5 +178,33 @@ namespace VMUVUnityPlugin_NET35_v100
 
             return rtn;
         }
+
+        public static ushort[] FindMinDistanceBetweenPadSets(ushort[] user, ushort[] active)
+        {
+            ushort[] minDist = new ushort[2];
+            int userLen = user.Length;
+            int activeLen = active.Length - 1;
+
+            minDist[0] = 9;
+            minDist[1] = 9;
+
+            for (int i = 0; i < userLen; i++)
+            {
+                for (int j = 0; j < activeLen; j++)
+                {
+                    ushort tmp = CalculatePadIdDeltaCCW(user[i], active[j]);
+
+                    if (tmp < minDist[0])
+                        minDist[0] = tmp;
+
+                    tmp = CalculatePadIdDeltaCW(user[i], active[j]);
+
+                    if (tmp < minDist[1])
+                        minDist[1] = tmp;
+                }   
+            }
+
+            return minDist;
+        }
     }
 }

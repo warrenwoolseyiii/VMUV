@@ -7,8 +7,19 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
         private static float translation = 0.0f;
         private static float straffe = 0.0f;
         private static float radius = 0.40f;
+        private static bool strafeEnabled = false;
         private static DEV2Platform platform = CurrentValueTable.GetCurrentPlatform();
         private static MotionStates motionSate = MotionStates.no_motion;
+
+        public static void SetNewDrawRadius(float rad)
+        {
+            radius = rad;
+        }
+
+        public static void EnableStrafe(bool enableStrafe)
+        {
+            strafeEnabled = enableStrafe;
+        }
 
         public static float GetTranslation()
         {
@@ -56,7 +67,14 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             straffe = 0;
 
             if (!ScreenForActivity())
+            {
                 return;
+            }
+            else if (!strafeEnabled)
+            {
+                motionSate = MotionStates.forward;
+                return;
+            }
 
             int numHits = GetNumActivePadsUserIsOverExcludingCenter(platform.GetActivePadIds());
             if (numHits >= 1)
@@ -170,14 +188,15 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
 
         private static void CheckForStrafeAndReverse(ushort[] padUserIsOver)
         {
-            ushort deltaCCW = 8;
-            ushort deltaCW = 8;
+            ushort deltaCCW, deltaCW;
             ushort[] activePads = platform.GetActivePadIds();
             ushort[] padsOfInterest = new ushort[(activePads.Length - 1) + padUserIsOver.Length];
             bool isLeft = false;
 
-            deltaCCW = DEV2SepcificUtilities.CalculatePadIdDeltaCCW(padUserIsOver[0], activePads[0]);
-            deltaCW = DEV2SepcificUtilities.CalculatePadIdDeltaCW(padUserIsOver[0], activePads[0]);
+            ushort[] deltas = DEV2SepcificUtilities.FindMinDistanceBetweenPadSets(padUserIsOver, activePads);
+
+            deltaCCW = deltas[0];
+            deltaCW = deltas[1];
 
             if (deltaCCW < deltaCW)
                 isLeft = true;
@@ -213,9 +232,12 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                 else
                     motionSate = MotionStates.straffe_right;
             }
-            else
+            else if (deltaCCW <= 2 || deltaCW <= 2)
             {
-                motionSate = MotionStates.backward;
+                if (isLeft)
+                    motionSate = MotionStates.straffe_left;
+                else
+                    motionSate = MotionStates.straffe_right;
             }
         }
 

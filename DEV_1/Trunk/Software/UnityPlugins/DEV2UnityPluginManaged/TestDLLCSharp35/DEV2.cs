@@ -13,6 +13,8 @@ namespace VMUVUnityPlugin_NET35_v100
             Logger.LogMessage("Attempting to start..");
             ServerProcessManager.LaunchProcess();
             CurrentValueTable.SetCalibrationTermsOnStart(DEV2Calibrator.ReadCalibrationFile());
+            StandardWalkRun.SetNewDrawRadius(CurrentValueTable.GetDrawRadius());
+            StandardWalkRun.EnableStrafe(CurrentValueTable.GetStrafeEnabled());
         }
 
         public static void OnUpdate()
@@ -54,6 +56,11 @@ namespace VMUVUnityPlugin_NET35_v100
         public static float GetStraffe()
         {
             return StandardWalkRun.GetStraffe();
+        }
+
+        public static float GetSpeed()
+        {
+            return CurrentValueTable.GetSpeedMultiplier();
         }
 
         private static void CheckCriticalModules()

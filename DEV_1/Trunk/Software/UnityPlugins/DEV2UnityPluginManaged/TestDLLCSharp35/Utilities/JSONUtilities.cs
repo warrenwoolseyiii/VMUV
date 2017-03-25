@@ -36,6 +36,13 @@ namespace VMUVUnityPlugin_NET35_v100
                 writer.WriteValue(terms.sensitivity);
             }
 
+            writer.WritePropertyName("DrawRadius");
+            writer.WriteValue(CurrentValueTable.GetDrawRadius());
+            writer.WritePropertyName("Speed X");
+            writer.WriteValue(CurrentValueTable.GetSpeedMultiplier());
+            writer.WritePropertyName("Strafe Enabled");
+            writer.WriteValue(0);
+
             writer.WriteEndObject();
 
             return sb.ToString();
@@ -46,22 +53,36 @@ namespace VMUVUnityPlugin_NET35_v100
             CalTerms[] calTerms = new CalTerms[9];
             JsonTextReader reader = new JsonTextReader(new StringReader(json));
 
-            for (int i = 0; i < calTerms.Length; i++)
+            try
             {
-                string val = GetNextJsonValue(reader);
-                calTerms[i].id = UInt16.Parse(val);
-                val = GetNextJsonValue(reader);
-                calTerms[i].maxValue = UInt16.Parse(val);
-                val = GetNextJsonValue(reader);
-                calTerms[i].minValue = UInt16.Parse(val);
-                val = GetNextJsonValue(reader);
-                calTerms[i].coordinate.x = float.Parse(val);
-                val = GetNextJsonValue(reader);
-                calTerms[i].coordinate.y = float.Parse(val);
-                val = GetNextJsonValue(reader);
-                calTerms[i].coordinate.z = float.Parse(val);
-                val = GetNextJsonValue(reader);
-                calTerms[i].sensitivity = float.Parse(val);
+                for (int i = 0; i < calTerms.Length; i++)
+                {
+                    string val = GetNextJsonValue(reader);
+                    calTerms[i].id = UInt16.Parse(val);
+                    val = GetNextJsonValue(reader);
+                    calTerms[i].maxValue = UInt16.Parse(val);
+                    val = GetNextJsonValue(reader);
+                    calTerms[i].minValue = UInt16.Parse(val);
+                    val = GetNextJsonValue(reader);
+                    calTerms[i].coordinate.x = float.Parse(val);
+                    val = GetNextJsonValue(reader);
+                    calTerms[i].coordinate.y = float.Parse(val);
+                    val = GetNextJsonValue(reader);
+                    calTerms[i].coordinate.z = float.Parse(val);
+                    val = GetNextJsonValue(reader);
+                    calTerms[i].sensitivity = float.Parse(val);
+                }
+
+                string tmp = GetNextJsonValue(reader);
+                CurrentValueTable.SetDrawRadius(float.Parse(tmp));
+                tmp = GetNextJsonValue(reader);
+                CurrentValueTable.SetSpeedMultiplier(float.Parse(tmp));
+                tmp = GetNextJsonValue(reader);
+                CurrentValueTable.SetStrafeEnabled(int.Parse(tmp));
+            }
+            catch(Exception e)
+            {
+                DEV2ExceptionHandler.TakeActionOnException(e);
             }
 
             return calTerms;
