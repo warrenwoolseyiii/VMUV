@@ -85,12 +85,12 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             {
                 ushort[] padId = GetIdOfPadUserIsOver();
                 if (padId == null)
+                {
+                    motionSate = MotionStates.backward;
                     return;
+                }
 
                 CheckForStrafeAndReverse(padId);
-
-                //if (CheckForReverse(padId))
-                    //return;
             }
         }
 
@@ -239,41 +239,9 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
                 else
                     motionSate = MotionStates.straffe_right;
             }
-        }
-
-        private static bool CheckForReverse(ushort padUserIsOver)
-        {
-            ushort deltaCCW = 8;
-            ushort deltaCW = 8;
-            ushort[] activePads = platform.GetActivePadIds();
-
-            // Always parse to the nearest neighbor for reverse, this is done because we could have multiple pads active
-            for (ushort i = 0; i < (activePads.Length - 1); i++)
-            {
-                ushort tmp = DEV2SepcificUtilities.CalculatePadIdDeltaCCW(padUserIsOver, activePads[i]);
-
-                if (tmp < deltaCCW)
-                    deltaCCW = tmp;
-
-                tmp = DEV2SepcificUtilities.CalculatePadIdDeltaCW(padUserIsOver, activePads[i]);
-
-                if (tmp < deltaCW)
-                    deltaCW = tmp;
-            }
-
-            if (deltaCCW >= 3 && deltaCCW <=5)
-            {
-                motionSate = MotionStates.backward;
-                return true;
-            }
-            else if (deltaCW >= 3 && deltaCW <= 5)
-            {
-                motionSate = MotionStates.backward;
-                return true;
-            }
             else
             {
-                return false;
+                motionSate = MotionStates.backward;
             }
         }
 

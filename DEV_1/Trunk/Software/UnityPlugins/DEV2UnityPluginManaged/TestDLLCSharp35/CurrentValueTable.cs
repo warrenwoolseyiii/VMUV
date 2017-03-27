@@ -7,9 +7,9 @@ namespace VMUVUnityPlugin_NET35_v100
         private static DEV2Platform plat = new DEV2Platform();
         private static CalTerms[] currentCalFile;
         private static bool areCalTermsSet = false;
-        private static float drawRadius = 0.4f;
-        private static float speedMultiplier = 2.0f;
-        private static bool strafeEnabled = false;
+        private static float drawRadius = 0.45f;
+        private static float speedMultiplier = 4.0f;
+        private static bool strafeEnabled = true;
 
         public static void SetCurrentPlatformValues(ushort[] vals)
         {

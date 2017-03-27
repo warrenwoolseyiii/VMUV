@@ -163,12 +163,12 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
             ushort northEastId, southEastId, southWestId, northWestId;
             Vector3 pt, center;
             Vector3[] pts = new Vector3[2];
-            float offset;
+            float radius;
 
             center = CalculateCenterCoord();
             (plat.GetPadById(8)).coordinate = center;
 
-            offset = CalculatePlatformRadius() * 0.707107f;
+            radius = CalculatePlatformRadius();
 
             northEastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(northId - 1));
             southEastId = DEV2SepcificUtilities.HandlePadIDRollOver((short)(eastId - 1));
@@ -177,22 +177,26 @@ namespace VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific
 
             pts[0] = (plat.GetPadById(northId)).coordinate;
             pts[1] = (plat.GetPadById(eastId)).coordinate;
-            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
+            //pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(pts[0], pts[1]);
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, radius);
             (plat.GetPadById(northEastId)).coordinate = pt;
 
             pts[0] = (plat.GetPadById(eastId)).coordinate;
             pts[1] = (plat.GetPadById(southId)).coordinate;
-            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
+            //pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(pts[0], pts[1]);
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, radius);
             (plat.GetPadById(southEastId)).coordinate = pt;
 
             pts[0] = (plat.GetPadById(southId)).coordinate;
             pts[1] = (plat.GetPadById(westId)).coordinate;
-            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
+            //pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(pts[0], pts[1]);
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, radius);
             (plat.GetPadById(southWestId)).coordinate = pt;
 
             pts[0] = (plat.GetPadById(westId)).coordinate;
             pts[1] = (plat.GetPadById(northId)).coordinate;
-            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, offset);
+            //pt = DEV2SepcificUtilities.GetMidPointBetweenPoints(pts[0], pts[1]);
+            pt = DEV2SepcificUtilities.CalculateMidPointOnArc(pts, center, radius);
             (plat.GetPadById(northWestId)).coordinate = pt;
         }
 

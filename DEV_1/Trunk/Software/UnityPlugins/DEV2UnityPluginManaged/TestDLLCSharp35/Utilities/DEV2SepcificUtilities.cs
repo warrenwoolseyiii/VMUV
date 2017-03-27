@@ -51,6 +51,22 @@ namespace VMUVUnityPlugin_NET35_v100
             }
         }
 
+        public static Vector3 GetHead()
+        {
+            Vector3 fusion = new Vector3();
+
+            try
+            {
+                fusion = InputTracking.GetLocalPosition(VRNode.Head);
+                return fusion;
+            }
+            catch (Exception e)
+            {
+                DEV2ExceptionHandler.TakeActionOnException(e);
+                return (new Vector3(0, 0, 0));
+            }
+        }
+
         public static ushort HandlePadIDRollOver(short currId)
         {
             if (currId > 7)
@@ -136,45 +152,16 @@ namespace VMUVUnityPlugin_NET35_v100
             return (float)((Math.Abs(x - y) / y));
         }
 
-        public static Vector3 CalculateMidPointOnArc(Vector3[] refPts, Vector3 c, float offSet)
+        public static Vector3 CalculateMidPointOnArc(Vector3[] refPts, Vector3 c, float rad)
         {
-            Vector3 midPt = GetMidPointBetweenPoints(refPts[0], refPts[1]);
-            Vector3[] pts = new Vector3[4];
             Vector3 rtn = new Vector3(0, refPts[0].y, 0);
-            float xDiff, zDiff;
+            var a = refPts[0] - c;
+            var b = refPts[1] - c;
+            var m = a + b;
 
-            pts[0].x = c.x + offSet;
-            pts[0].z = c.z + offSet;
-
-            pts[1].x = c.x + offSet;
-            pts[1].z = c.z - offSet;
-
-            pts[2].x = c.x - offSet;
-            pts[2].z = c.z - offSet;
-
-            pts[3].x = c.x - offSet;
-            pts[3].z = c.z + offSet;
-
-            xDiff = 10.0f;
-            zDiff = 10.0f;
-
-            for (int i = 0; i < pts.Length; i++)
-            {
-                float xTmp = Math.Abs(CalculatePctChange(pts[i].x, midPt.x));
-                float zTmp = Math.Abs(CalculatePctChange(pts[i].z, midPt.z));
-
-                if (xTmp < xDiff)
-                {
-                    rtn.x = pts[i].x;
-                    xDiff = xTmp;
-                }
-
-                if (zTmp < zDiff)
-                {
-                    rtn.z = pts[i].z;
-                    zDiff = zTmp;
-                }
-            }
+            m.Normalize();
+            m *= rad;
+            rtn = c + m;
 
             return rtn;
         }

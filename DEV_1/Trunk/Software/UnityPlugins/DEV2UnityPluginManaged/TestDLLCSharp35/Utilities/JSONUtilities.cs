@@ -41,7 +41,7 @@ namespace VMUVUnityPlugin_NET35_v100
             writer.WritePropertyName("Speed X");
             writer.WriteValue(CurrentValueTable.GetSpeedMultiplier());
             writer.WritePropertyName("Strafe Enabled");
-            writer.WriteValue(0);
+            writer.WriteValue(1);
 
             writer.WriteEndObject();
 
