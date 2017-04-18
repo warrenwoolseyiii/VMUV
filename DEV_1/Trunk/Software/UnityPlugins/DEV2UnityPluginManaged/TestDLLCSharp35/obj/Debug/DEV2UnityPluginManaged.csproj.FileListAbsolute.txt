@@ -6,5 +6,6 @@ C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins
 C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\TestDLLCSharp35\TestDLLCSharp35\obj\Debug\VMUVUnityPlugin_NET35_v100.pdb
 C:\Users\Warren Woolsey\Repositories\VRDemos\VRDemos\Trunk\Unity\Unity Plugins\DEV2\VMUVUnityPlugin_NET35_v100.dll
 C:\Users\Warren Woolsey\Repositories\VRDemos\VRDemos\Trunk\Unity\Unity Plugins\DEV2\VMUVUnityPlugin_NET35_v100.pdb
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\DEV2UnityPluginManaged\TestDLLCSharp35\obj\Debug\DEV2UnityPluginManaged.csprojResolveAssemblyReference.cache
 C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\DEV2UnityPluginManaged\TestDLLCSharp35\obj\Debug\VMUVUnityPlugin_NET35_v100.dll
 C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\DEV_1\Trunk\Software\UnityPlugins\DEV2UnityPluginManaged\TestDLLCSharp35\obj\Debug\VMUVUnityPlugin_NET35_v100.pdb

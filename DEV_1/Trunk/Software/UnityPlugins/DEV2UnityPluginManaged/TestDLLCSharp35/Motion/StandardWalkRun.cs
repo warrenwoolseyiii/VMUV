@@ -103,6 +103,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             }
 
             translation = GetLargestActivePadValue();
+            //translation = SumActivePads();
         }
 
         private static void HandleStraffe(int dir)
@@ -114,6 +115,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             }
 
             straffe = GetLargestActivePadValue() * dir;
+            //straffe = SumActivePads() * dir * 2/3;
         }
 
         private static void HandleReverse()
@@ -125,6 +127,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             }
 
             translation = GetLargestActivePadValue() * -1;
+            //translation = SumActivePads() * -1;
         }
 
         private static void EndMotion()
@@ -132,7 +135,7 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             motionSate = MotionStates.no_motion;
         }
 
-        private static bool ScreenForActivity()
+        public static bool ScreenForActivity()
         {
             if (!platform.IsCenterActive() || IsOnlyCenterActive())
                 return false;
@@ -254,6 +257,20 @@ namespace VMUVUnityPlugin_NET35_v100.Motion
             {
                 if (activePads[i].GetPctActive() > rtn)
                     rtn = activePads[i].GetPctActive();
+            }
+
+            return rtn;
+        }
+
+        private static float SumActivePads()
+        {
+            DEV2Pad[] activePads = platform.GetActivePads();
+            float rtn = 0f;
+
+            for (int i = 0; i < (activePads.Length - 1); i++)
+            {
+                if (activePads[i].GetPctActive() > rtn)
+                    rtn += activePads[i].GetPctActive();
             }
 
             return rtn;

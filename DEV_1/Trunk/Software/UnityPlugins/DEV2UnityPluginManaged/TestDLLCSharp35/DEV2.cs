@@ -1,5 +1,6 @@
 ﻿using VMUVUnityPlugin_NET35_v100.DEV2_Hardware_Specific;
 using VMUVUnityPlugin_NET35_v100.Motion;
+using UnityEngine;
 
 namespace VMUVUnityPlugin_NET35_v100
 {
@@ -61,6 +62,11 @@ namespace VMUVUnityPlugin_NET35_v100
         public static float GetSpeed()
         {
             return CurrentValueTable.GetSpeedMultiplier();
+        }
+
+        public static Vector3 GetAbsoluteTranslation()
+        {
+            return AbsoluteWalkRun.GetTranslation();
         }
 
         private static void CheckCriticalModules()
