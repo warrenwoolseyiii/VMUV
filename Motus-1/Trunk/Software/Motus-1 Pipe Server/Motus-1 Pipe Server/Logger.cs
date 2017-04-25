@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Motus_1_Pipe_Server
 {
     static class Logger
     {
         private static string currentDir = System.IO.Directory.GetCurrentDirectory();
-        private static string fileName = "log.txt";
-        private static string path = System.IO.Path.Combine(currentDir, fileName);
+        private static string logFileName = "log.txt";
+        private static string logFilePath = System.IO.Path.Combine(currentDir, logFileName);
+        private static string rawDataFileName = "rawData.csv";
+        private static string rawDataFilePath = System.IO.Path.Combine(currentDir, rawDataFileName);
         private static bool logFileCreated = false;
+        private static bool logRawData = false;
+        private static bool logConsolData = false;
 
         public static void CreateLogFile()
         {
@@ -19,9 +19,20 @@ namespace Motus_1_Pipe_Server
 
             try
             {
-                string[] str = {"*** New log file created ***"};
-                System.IO.File.WriteAllLines(path, str);
+                string[] str = {"*** New log file created ***", "Raw data logging enabled = " + logRawData.ToString()};
+                System.IO.File.WriteAllLines(logFilePath, str);
                 logFileCreated = true;
+
+#if DEBUG
+                logConsolData = true;
+                logRawData = true;
+#endif
+
+                if (logRawData)
+                {
+                    string[] header = { "chan 0,chan 1,chan 2,chan 3,chan 4,chan 5,chan 6,chan 7,chan 8" };
+                    System.IO.File.WriteAllLines(rawDataFilePath, header);
+                }
             }
             catch (System.IO.IOException e0)
             {
@@ -38,11 +49,37 @@ namespace Motus_1_Pipe_Server
             if (!logFileCreated)
                 return;
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(logFilePath, true))
             {
                 try
                 {
                     file.WriteLine(msg);
+
+                    if (logConsolData)
+                        Console.WriteLine(msg);
+                }
+                catch (Exception e0)
+                {
+                    // Don't print this exception because you don't have a log file to print it to..
+                }
+            }
+        }
+
+        public static bool IsLoggingRawData()
+        {
+            return logRawData;
+        }
+
+        public static void LogRawData(string data)
+        {
+            if (!logRawData)
+                return;
+
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(rawDataFilePath, true))
+            {
+                try
+                {
+                    file.WriteLine(data);
                 }
                 catch (Exception e0)
                 {

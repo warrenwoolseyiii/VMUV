@@ -112,6 +112,12 @@ namespace Motus_1_Pipe_Server
             DataReader dr = DataReader.FromBuffer(buff);
             byte[] bytes = new byte[rpt.Data.Length];
             dr.ReadBytes(bytes);
+
+            if (Logger.IsLoggingRawData())
+            {
+                ByteUtilities.SetRawDataInCnts(bytes);
+                Logger.LogRawData(ByteUtilities.ToCsvFormat());
+            }
         }
     }
 }

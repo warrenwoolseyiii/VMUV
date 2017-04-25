@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7545A934-039E-4AFC-BECD-3D17CAA79463}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Motus_1_Pipe_Server</RootNamespace>
     <AssemblyName>Motus-1 Pipe Server</AssemblyName>
@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteUtilities.cs" />
     <Compile Include="HIDInterface.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
