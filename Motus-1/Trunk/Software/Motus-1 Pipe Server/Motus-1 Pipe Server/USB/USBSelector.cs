@@ -1,6 +1,6 @@
 ﻿using Windows.Devices.HumanInterfaceDevice;
 
-namespace Motus_1_Pipe_Server
+namespace Motus_1_Pipe_Server.USB
 {
     static class USBSelector
     {

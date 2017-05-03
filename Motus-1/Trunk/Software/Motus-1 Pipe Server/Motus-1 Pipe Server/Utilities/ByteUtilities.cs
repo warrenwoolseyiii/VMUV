@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Motus_1_Pipe_Server
+namespace Motus_1_Pipe_Server.Utilities
 {
     static class ByteUtilities
     {

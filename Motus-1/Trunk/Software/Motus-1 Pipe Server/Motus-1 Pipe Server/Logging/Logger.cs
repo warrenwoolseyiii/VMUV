@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Motus_1_Pipe_Server
+namespace Motus_1_Pipe_Server.Logging
 {
     static class Logger
     {
@@ -19,14 +19,14 @@ namespace Motus_1_Pipe_Server
 
             try
             {
-                string[] str = {"*** New log file created ***", "Raw data logging enabled = " + logRawData.ToString()};
-                System.IO.File.WriteAllLines(logFilePath, str);
-                logFileCreated = true;
-
 #if DEBUG
                 logConsolData = true;
                 logRawData = true;
 #endif
+
+                string[] str = { "*** New log file created ***", "Raw data logging enabled = " + logRawData.ToString() };
+                System.IO.File.WriteAllLines(logFilePath, str);
+                logFileCreated = true;
 
                 if (logRawData)
                 {
@@ -48,6 +48,34 @@ namespace Motus_1_Pipe_Server
         {
             if (!logFileCreated)
                 return;
+
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(logFilePath, true))
+            {
+                try
+                {
+                    file.WriteLine(msg);
+
+                    if (logConsolData)
+                        Console.WriteLine(msg);
+                }
+                catch (Exception e0)
+                {
+                    // Don't print this exception because you don't have a log file to print it to..
+                }
+            }
+        }
+
+        public static void LogMessage(string[] msgs)
+        {
+            string msg = "";
+
+            if (!logFileCreated)
+                return;
+
+            foreach (string element in msgs)
+            {
+                msg += element;
+            }
 
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(logFilePath, true))
             {

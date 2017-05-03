@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Threading;
+using Motus_1_Pipe_Server.Logging;
+using Motus_1_Pipe_Server.PipeServer;
+using Motus_1_Pipe_Server.USB;
 
 namespace Motus_1_Pipe_Server
 {
@@ -10,12 +13,16 @@ namespace Motus_1_Pipe_Server
 
         static void Main(string[] args)
         {
+            Thread pipeManager = new Thread(PipeServerManager.ServerManagerThread);
+
             Initialize();
+            pipeManager.Start();
 
             while (true)
             {
                 Motus1HardwareMain();
-                Thread.Sleep(2);
+                ServiceLoggingRequests();
+                Thread.Sleep(250);
             }
         }
 
@@ -86,6 +93,31 @@ namespace Motus_1_Pipe_Server
         {
             string endTime = DateTime.Now.ToString("h:mm:ss tt");
             Logger.LogMessage("Motus-1 Pipe Server ended at " + endTime);
+        }
+
+        static void ServiceLoggingRequests()
+        {
+            if (PipeServerManager.HasTraceMessages())
+            {
+                TraceLoggerMessage[] msgs = PipeServerManager.GetTraceMessages();
+                string[] strMsg = new string[msgs.Length];
+
+                for (int i = 0; i < msgs.Length; i++)
+                    strMsg[i] = TraceLogger.TraceLoggerMessageToString(msgs[i]);
+
+                Logger.LogMessage(strMsg);
+            }
+
+            if (HIDInterface.HasTraceMessages())
+            {
+                TraceLoggerMessage[] msgs = HIDInterface.GetTraceMessages();
+                string[] strMsg = new string[msgs.Length];
+
+                for (int i = 0; i < msgs.Length; i++)
+                    strMsg[i] = TraceLogger.TraceLoggerMessageToString(msgs[i]);
+
+                Logger.LogMessage(strMsg);
+            }
         }
 
         public enum HardwareStates
