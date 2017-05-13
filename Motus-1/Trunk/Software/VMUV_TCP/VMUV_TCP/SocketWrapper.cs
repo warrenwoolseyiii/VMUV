@@ -101,9 +101,9 @@ namespace VMUV_TCP
         /// Sets the data payload for the next transmission.
         /// </summary>
         /// <param name="data"></param>
-        public void SetTransmitData(byte[] data, byte type)
+        public void SetTransmitData(byte[] data, PacketTypes type)
         {
-            txBuff = packetizer.PacketizeData(data, type);
+            txBuff = packetizer.PacketizeData(data, (byte)type);
             newTxPacketAvailable = true;
         }
 
