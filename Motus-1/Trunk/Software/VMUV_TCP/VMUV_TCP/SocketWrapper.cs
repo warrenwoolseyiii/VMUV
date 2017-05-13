@@ -60,7 +60,8 @@ namespace VMUV_TCP
             switch (config)
             { 
                 case Configuration.client:
-
+                    clientState = ClientStates.connecting;
+                    StartClient();
                     break;
                 case Configuration.server:
                     serverState = ServerStates.wait_for_connect;
@@ -80,7 +81,8 @@ namespace VMUV_TCP
             switch (config)
             {
                 case Configuration.client:
-                    // TODO:
+                    if (clientState == ClientStates.connected)
+                        ClientRead();
                     break;
                 case Configuration.server:
                     if (serverState == ServerStates.connected)
@@ -101,7 +103,7 @@ namespace VMUV_TCP
         /// <param name="data"></param>
         public void SetTransmitData(byte[] data, byte type)
         {
-            txBuff = packetizer.PacketizeData(txBuff, type);
+            txBuff = packetizer.PacketizeData(data, type);
             newTxPacketAvailable = true;
         }
 
@@ -115,6 +117,20 @@ namespace VMUV_TCP
             return null;
         }
 
+        /// <summary>
+        /// Gets the current state of the server or client socket. The Caller must cast the return value as the desired
+        /// enumeration <c>ServerState</c> or <c>ClientState</c>.
+        /// </summary>
+        /// <returns>byte representation of the server or client state.</returns>
+        public byte GetStatus()
+        {
+            if (config == Configuration.server)
+                return (byte)serverState;
+            else
+                return (byte)clientState;       
+        }
+
+        // Server specific methods
         private void StartServer()
         {
             try
@@ -123,7 +139,8 @@ namespace VMUV_TCP
                 stateObject.workSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
                     ProtocolType.Tcp);
 
-                serverState = ServerStates.idle;
+                DebugLog("Server launched on port " + port.ToString());
+
                 stateObject.workSocket.Bind(loaclEP);
                 stateObject.workSocket.Listen(100);
                 stateObject.workSocket.BeginAccept(new AsyncCallback(ServerWaitForConnectCB), stateObject.workSocket);
@@ -131,6 +148,8 @@ namespace VMUV_TCP
             catch (Exception e0)
             {
                 KillSocket();
+                serverState = ServerStates.disconnected;
+                DebugLog(e0.Message);
             }
         }
 
@@ -140,6 +159,9 @@ namespace VMUV_TCP
             {
                 stateObject.workSocket = (Socket)ar.AsyncState;
                 stateObject.workSocket = stateObject.workSocket.EndAccept(ar);
+
+                DebugLog("Server connected on port " + port.ToString());
+
                 serverState = ServerStates.syncing;
                 SyncServer();
             }
@@ -147,6 +169,7 @@ namespace VMUV_TCP
             {
                 KillSocket();
                 serverState = ServerStates.disconnected;
+                DebugLog(e0.Message);
             }
         }
 
@@ -159,6 +182,9 @@ namespace VMUV_TCP
                 greeting[0] = 0;
                 greeting[1] = 1;
                 SetTransmitData(greeting, (byte)PacketTypes.greeting);
+
+                DebugLog("Server syncing on port " + port.ToString());
+
                 ServiceServer();
             }
             else
@@ -176,6 +202,9 @@ namespace VMUV_TCP
                 {
                     newTxPacketAvailable = false;
                     serverState = ServerStates.server_busy;
+
+                    DebugLog("Server transmitting on port " + port.ToString());
+
                     stateObject.workSocket.BeginSend(txBuff, 0, txBuff.Length, 0,
                         new AsyncCallback(ServerSendCB), stateObject.workSocket);
                 }
@@ -183,6 +212,7 @@ namespace VMUV_TCP
                 {
                     numFailedTransac++;
                     serverState = ServerStates.syncing;
+                    DebugLog(e0.Message);
                 }
             }
         }
@@ -193,6 +223,9 @@ namespace VMUV_TCP
             {
                 stateObject.workSocket = (Socket)ar.AsyncState;
                 int numBytes = stateObject.workSocket.EndSend(ar);
+
+                DebugLog("Server waiting for ack on port " + port.ToString());
+
                 stateObject.workSocket.BeginReceive(stateObject.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ServerReadCB), stateObject);
             }
@@ -200,27 +233,39 @@ namespace VMUV_TCP
             {
                 numFailedTransac++;
                 serverState = ServerStates.syncing;
+                DebugLog(e0.Message);
             }
         }
 
         private void ServerReadCB(IAsyncResult ar)
         {
-            int bytesRead = stateObject.workSocket.EndReceive(ar);
-
-            if (bytesRead > 0)
+            try
             {
-                byte[] bytes = stateObject.buffer;
+                int bytesRead = stateObject.workSocket.EndReceive(ar);
 
-                if (packetizer.IsPacketValid(bytes))
+                if (bytesRead > 0)
                 {
-                    PacketTypes type = (PacketTypes)packetizer.GetPacketType(bytes);
+                    byte[] bytes = stateObject.buffer;
 
-                    if (type == PacketTypes.ack)
-                        serverState = ServerStates.connected;
-                    else if (type == PacketTypes.nack)
-                        serverState = ServerStates.disconnected;
+                    if (packetizer.IsPacketValid(bytes))
+                    {
+                        PacketTypes type = (PacketTypes)packetizer.GetPacketType(bytes);
+
+                        DebugLog("Server received " + bytesRead.ToString() + " bytes on port " + port.ToString());
+                        DebugLog("Packet type was " + type.ToString());
+
+                        if (type == PacketTypes.ack)
+                            serverState = ServerStates.connected;
+                        else if (type == PacketTypes.nack)
+                            serverState = ServerStates.disconnected;
+                        else
+                            serverState = ServerStates.syncing;
+                    }
                     else
+                    {
+                        numFailedTransac++;
                         serverState = ServerStates.syncing;
+                    }
                 }
                 else
                 {
@@ -228,10 +273,152 @@ namespace VMUV_TCP
                     serverState = ServerStates.syncing;
                 }
             }
-            else
+            catch (Exception e0)
             {
                 numFailedTransac++;
                 serverState = ServerStates.syncing;
+                DebugLog(e0.Message);
+            }
+        }
+
+        // Client specific methods
+        private void StartClient()
+        {
+            try
+            {
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, port);
+                stateObject.workSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
+                    ProtocolType.Tcp);
+
+                DebugLog("Client launched on port " + port.ToString());
+
+                stateObject.workSocket.BeginConnect(remoteEP, new AsyncCallback(ClientConnectCB),
+                    stateObject.workSocket);
+            }
+            catch (Exception e0)
+            {
+                KillSocket();
+                clientState = ClientStates.disconnected;
+                DebugLog(e0.Message);
+            }
+        }
+
+        private void ClientConnectCB(IAsyncResult ar)
+        {
+            try
+            {
+                stateObject.workSocket = (Socket)ar.AsyncState;
+                stateObject.workSocket.EndConnect(ar);
+                clientState = ClientStates.connected;
+
+                DebugLog("Client connected on port " + port.ToString());
+
+                ClientRead();
+            }
+            catch (Exception e0)
+            {
+                clientState = ClientStates.connected;
+                DebugLog(e0.Message);
+            }
+        }
+
+        private void ClientRead()
+        {
+            try
+            {
+                clientState = ClientStates.receiving;
+
+                DebugLog("Client reading on port " + port.ToString());
+
+                stateObject.workSocket.BeginReceive(stateObject.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ClientReadCB), stateObject);
+            }
+            catch (Exception e0)
+            {
+                numFailedTransac++;
+                clientState = ClientStates.connected;
+                DebugLog(e0.Message);
+            }
+        }
+
+        private void ClientReadCB(IAsyncResult ar)
+        {
+            try
+            {
+                stateObject = (StateObject)ar.AsyncState;
+                int bytesRead = stateObject.workSocket.EndReceive(ar);
+
+                if (bytesRead > 0)
+                {
+                    byte[] bytes = stateObject.buffer;
+
+                    if (packetizer.IsPacketValid(bytes))
+                    {
+                        PacketTypes type = (PacketTypes)packetizer.GetPacketType(bytes);
+
+                        DebugLog("Client received valid packet on port " + port.ToString());
+                        DebugLog("Client received " + bytesRead.ToString() + " bytes of packet type " + type.ToString());
+
+                        ClientRespond(true);
+                    }
+                    else
+                    {
+                        DebugLog("Client received invalid packet on port " + port.ToString());
+                        DebugLog("Client received " + bytesRead.ToString() + " bytes");
+
+                        ClientRespond(false);
+                    }
+                }
+            }
+            catch (Exception e0)
+            {
+                numFailedTransac++;
+                clientState = ClientStates.connected;
+                DebugLog(e0.Message);
+            }
+        }
+
+        private void ClientRespond(bool ack)
+        {
+            PacketTypes type;
+
+            if (ack)
+                type = PacketTypes.ack;
+            else
+                type = PacketTypes.nack;
+
+            byte[] packet = packetizer.PacketizeData(null, (byte)type);
+
+            try
+            {
+                DebugLog("Client responding with " + type.ToString() + " on port " + port.ToString());
+
+                stateObject.workSocket.BeginSend(packet, 0, packet.Length, 0,
+                    new AsyncCallback(ClientRespondCB), stateObject.workSocket);
+            }
+            catch (Exception e0)
+            {
+                numFailedTransac++;
+                clientState = ClientStates.connected;
+                DebugLog(e0.Message);
+            }
+        }
+
+        private void ClientRespondCB(IAsyncResult ar)
+        {
+            try
+            {
+                stateObject.workSocket = (Socket)ar.AsyncState;
+                int bytesSent = stateObject.workSocket.EndSend(ar);
+                clientState = ClientStates.connected;
+
+                ClientRead();
+            }
+            catch (Exception e0)
+            {
+                numFailedTransac++;
+                clientState = ClientStates.connected;
+                DebugLog(e0.Message);
             }
         }
 
@@ -269,6 +456,13 @@ namespace VMUV_TCP
             }
 
             return rtn;
+        }
+
+        private void DebugLog(string s)
+        {
+#if DEBUG
+            Console.WriteLine(s);
+#endif
         }
     }
 
@@ -322,7 +516,7 @@ namespace VMUV_TCP
         idle,
         connecting,
         connected,
-        client_busy,
+        receiving,
         disconnected
     }
 }

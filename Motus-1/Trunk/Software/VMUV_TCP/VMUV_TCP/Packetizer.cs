@@ -9,8 +9,12 @@ namespace VMUV_TCP
 
         public byte[] PacketizeData(byte[] payload, byte type)
         {
-            byte[] packet = new byte[numOverHeadBytes + payload.Length];
-            short len = (short)(payload.Length & 0xffff);
+            short len = 0;
+
+            if (payload != null)
+                len = (short)(payload.Length & 0xffff);
+
+            byte[] packet = new byte[numOverHeadBytes + len];
             short chkSum = CalculateCheckSumFromPayload(payload);
 
             packet[0] = sync1;
@@ -19,11 +23,11 @@ namespace VMUV_TCP
             packet[3] = (byte)((len >> 8) & 0xff);
             packet[4] = (byte)(len & 0xff);
 
-            for (int i = 0; i < payload.Length; i++)
+            for (int i = 0; i < len; i++)
                 packet[5 + i] = payload[i];
 
             packet[5 + len] = (byte)((chkSum >> 8) & 0xff);
-            packet[6 + len] = (byte)(len & 0xff);
+            packet[6 + len] = (byte)(chkSum & 0xff);
 
             return packet;
         }
@@ -32,8 +36,11 @@ namespace VMUV_TCP
         {
             short chkSum = 0;
 
-            for (int i = 0; i < payload.Length; i++)
-                chkSum += (short)(payload[i] & 0xff);
+            if (payload != null)
+            {
+                for (int i = 0; i < payload.Length; i++)
+                    chkSum += (short)(payload[i] & 0xff);
+            }
 
             return chkSum;
         }
@@ -58,6 +65,10 @@ namespace VMUV_TCP
                 return false;
 
             byte[] payload = new byte[len];
+
+            for (int i = 0; i < len; i++)
+                payload[i] = packet[5 + i];
+
             short calcChkSum = CalculateCheckSumFromPayload(payload);
             short recChkSum = (short)packet[len + 5];
             recChkSum <<= 8;
