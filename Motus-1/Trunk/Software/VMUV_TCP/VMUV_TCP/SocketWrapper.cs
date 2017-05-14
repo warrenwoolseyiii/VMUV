@@ -128,15 +128,14 @@ namespace VMUV_TCP
         }
 
         /// <summary>
-        /// Blocking method that allows the client to exit the connection in a clean manner. Use <c>RequestClientReconnect</c> to
+        /// Method that allows the client to exit the connection in a clean manner. Use <c>RequestClientReconnect</c> to
         /// reconnect the client after calling this method.
         /// </summary>
         public void RequestClientDisconnect()
         {
-            clientDisconnectReq = true;
-
-            //while (clientState != ClientStates.disconnected_idle)
-                //Service();
+            DestroySocket(stateObject.workSocket);
+            clientState = ClientStates.disconnected_idle;
+            clientDisconnectReq = false;
         }
 
         /// <summary>
@@ -146,6 +145,8 @@ namespace VMUV_TCP
         /// Returns false otherwise.</returns>
         public bool RequestClientReconnect()
         {
+            RequestClientDisconnect();
+
             if (clientState != ClientStates.disconnected_idle)
                 return false;
 
@@ -419,7 +420,7 @@ namespace VMUV_TCP
 
                 if (clientDisconnectReq)
                 {
-                    ClientRespond(false);
+                    RequestClientDisconnect();
                 }
                 else if (numBytesRead > 0)
                 {
@@ -437,13 +438,12 @@ namespace VMUV_TCP
                         DebugLog("Client received invalid packet on port " + port.ToString());
                         DebugLog("Client received " + numBytesRead.ToString() + " bytes");
 
-                        ClientRespond(false);
                         ClientHandleWorkSocketError();
                     }
                 }
                 else
                 {
-                    ClientRead();
+                    ClientHandleWorkSocketError();
                 }
             }
             catch (SocketException e0)
@@ -529,7 +529,7 @@ namespace VMUV_TCP
             try
             {
                 tgt.Shutdown(SocketShutdown.Both);
-                tgt.Disconnect(true);
+                //tgt.Disconnect(true);
             }
             catch (Exception e0) { }    // Doesn't really matter what happens here just try to kill the socket gracefully.
 

@@ -7,6 +7,27 @@ namespace VMUV_TCP
     {
         static void Main(string[] args)
         {
+            //UnityTest();
+            SelfTest();
+        }
+
+        static void UnityTest()
+        {
+            SocketWrapper server = new SocketWrapper(Configuration.server);
+            byte[] testPacket = { 0x69, 0xff, 0xee, 0x21 };
+
+            server.Initialize();
+
+            while (true)
+            {
+                server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
+                server.Service();
+                Thread.Sleep(25);
+            }
+        }
+
+        static void SelfTest()
+        {
             SocketWrapper server = new SocketWrapper(Configuration.server);
             SocketWrapper client = new SocketWrapper(Configuration.client);
             byte[] testPacket = { 0x69, 0xff, 0xee, 0x21 };
