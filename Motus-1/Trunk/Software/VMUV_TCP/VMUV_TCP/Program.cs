@@ -7,30 +7,19 @@ namespace VMUV_TCP
     {
         static void Main(string[] args)
         {
-            SocketWrapper defaultServer = new SocketWrapper(Configuration.server);
-            SocketWrapper auxServer1 = new SocketWrapper(Configuration.server, ValidPorts.auxPort1);
-            SocketWrapper defaultClient = new SocketWrapper(Configuration.client);
-            byte[] testPacket = { 0x69, 0xff, 0xee, 0x98, 0x12 };
+            SocketWrapper server = new SocketWrapper(Configuration.server);
+            SocketWrapper client = new SocketWrapper(Configuration.client);
+            byte[] testPacket = { 0x69, 0xff, 0xee, 0x21 };
 
-            defaultServer.Initialize();
-            defaultClient.Initialize();
-            //auxServer1.Initialize();
+            server.Initialize();
+            client.Initialize();
 
-            while (true)
+            for (int i = 0; i < 100; i++)
             {
-                ServerStates serverState;
-                ClientStates clientState;
-
-                defaultServer.Service();
-                defaultClient.Service();
-                //auxServer1.Service();
-
-                serverState = (ServerStates)defaultServer.GetStatus();
-                defaultServer.SetTransmitData(testPacket, PacketTypes.raw_data);
-
-                //serverState = (ServerStates)auxServer1.GetStatus();
-                clientState = (ClientStates)defaultClient.GetStatus();
-                Thread.Sleep(25);
+                server.SetTransmitData(testPacket, PacketTypes.raw_data);
+                server.Service();
+                client.Service();
+                Thread.Sleep(100);
             }
         }
     }
