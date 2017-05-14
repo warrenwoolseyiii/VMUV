@@ -87,5 +87,19 @@ namespace VMUV_TCP
             else
                 return 0xff;
         }
+
+        public byte[] UnpackData(byte[] packet)
+        {
+            short len = (short)(packet[3] & 0xff);
+            len <<= 8;
+            len |= (short)(packet[4] & 0xff);
+
+            byte[] rtn = new byte[len];
+
+            for (short i = 0; i < len; i++)
+                rtn[i] = packet[5 + i];
+
+            return rtn;   
+        }
     }
 }

@@ -1,555 +1,232 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Timers;
 
 namespace VMUV_TCP
 {
     public class SocketWrapper
     {
-        private int port;
-        private const int dataLenInBytes = StateObject.BufferSize;
-        private Configuration config;
-        private ServerStates serverState = ServerStates.not_init;
-        private ClientStates clientState = ClientStates.not_init;
-        private byte[] txBuff = null;
         private Packetizer packetizer = new Packetizer();
-        private bool newTxPacketAvailable = false;
-        private bool newRxPacketAvailable = false;
-        private StateObject stateObject = new StateObject();
-        private bool clientDisconnectReq = false;
-        private Socket listener;
+        private Socket listener = null;
+        private const int port = 11069;
+        private byte[] txData = { 0 };  // Do this incase Start() is called before the user sets any data
+        private byte[] rxData = { 0 };  // Do this incase GetRxData() is called before the user gets any data
+        private Configuration config;
+        private bool clientIsBusy = false;
 
         /// <summary>
-        /// Creates an instance of <c>SocketWrapper</c> configured according to the parameter con. 
-        /// Sets the port number to the default port number.
+        /// Version number of the current release.
         /// </summary>
-        /// <param name="con"></param>
-        public SocketWrapper(Configuration con)
+        public const string version = "1.0.0";
+
+        /// <summary>
+        /// Instantiates a new instance of <c>SocketWrapper</c> configured as either a client or a server.
+        /// </summary>
+        /// <param name="configuration"></param>
+        public SocketWrapper(Configuration configuration)
         {
-            config = con;
-            port = ValidPorts.minPortNum;
+            config = configuration;
         }
 
         /// <summary>
-        /// Creates an instance of <c>SocketWrapper</c> configured according to the parameter con. 
-        /// Sets the port number to the parameter portNum so long as it is valid.
+        /// Sets the data from <c>payload</c> into the transmit data buffer.
         /// </summary>
-        /// <param name="con"></param>
-        /// <param name="portNum"></param>
-        public SocketWrapper(Configuration con, int portNum)
+        /// <param name="payload"></param>
+        /// <param name="type"></param>
+        public void ServerSetTxData(byte[] payload, PacketTypes type)
         {
-            config = con;
-
-            if (IsPortValid(portNum))
-                port = portNum;
-            else
-                port = ValidPorts.minPortNum;
+            txData = packetizer.PacketizeData(payload, (byte)type);
         }
 
         /// <summary>
-        /// Initializes the socket object within the wrapper. Depending on your <c>Configuration</c> this socket will be initailized 
-        /// as a server or a client.
+        /// Acquires the most recently received valid data payload.
         /// </summary>
-        public void Initialize()
+        /// <returns>byte buffer with a copy of the most recently receieved valid data payload.</returns>
+        public byte[] ClientGetRxData()
         {
-            switch (config)
-            { 
-                case Configuration.client:
-                    StartClient();
-                    break;
-                case Configuration.server:
-                    StartServer();
-                    break;
-                default:
-
-                    break;
-            }
+            return rxData;
         }
 
         /// <summary>
-        /// This function must be called from the main thread to process any pending transactions for the <c>SocketWrapper</c>.
+        /// Call this method only once after instantiation of the <c>SocketWrapper</c> object. This will start the 
+        /// server listener for incoming connections.
         /// </summary>
-        public void Service()
+        public void StartServer()
         {
-            switch (config)
-            {
-                case Configuration.client:
-                    if (clientState == ClientStates.connected)
-                        ClientRead();
-                    else if (clientState == ClientStates.disconnected)
-                        Initialize();
-                    else if (clientState == ClientStates.connect_failed)
-                        Initialize();
-                    break;
-                case Configuration.server:
-                    if (serverState == ServerStates.connected)
-                        ServiceServer();
-                    else if (serverState == ServerStates.disconnected)
-                        Initialize();
-                    break;
-                default:
-                    break;
-            }
-        }
+            if (config != Configuration.server)
+                return;
 
-        /// <summary>
-        /// Sets the data payload for the next transmission.
-        /// </summary>
-        /// <param name="data"></param>
-        public void SetServerTransmitData(byte[] data, PacketTypes type)
-        {
-            txBuff = packetizer.PacketizeData(data, (byte)type);
-            newTxPacketAvailable = true;
-        }
-
-        /// <summary>
-        /// TODO
-        /// </summary>
-        /// <returns></returns>
-        public byte[] GetReceiveData()
-        {
-            // TODO:
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the current state of the server or client socket. The Caller must cast the return value as the desired
-        /// enumeration <c>ServerState</c> or <c>ClientState</c>.
-        /// </summary>
-        /// <returns>byte representation of the server or client state.</returns>
-        public byte GetStatus()
-        {
-            if (config == Configuration.server)
-                return (byte)serverState;
-            else
-                return (byte)clientState;       
-        }
-
-        /// <summary>
-        /// Method that allows the client to exit the connection in a clean manner. Use <c>RequestClientReconnect</c> to
-        /// reconnect the client after calling this method.
-        /// </summary>
-        public void RequestClientDisconnect()
-        {
-            DestroySocket(stateObject.workSocket);
-            clientState = ClientStates.disconnected_idle;
-            clientDisconnectReq = false;
-        }
-
-        /// <summary>
-        /// Will attempt to reconnect the client after <c>RequestClientDisconnect</c> has been called.
-        /// </summary>
-        /// <returns>Returns true if the client state is proper for a reconnect request.
-        /// Returns false otherwise.</returns>
-        public bool RequestClientReconnect()
-        {
-            RequestClientDisconnect();
-
-            if (clientState != ClientStates.disconnected_idle)
-                return false;
-
-            clientState = ClientStates.connect_failed;
-            Service();
-
-            return true;
-        }
-
-        // Server specific methods
-        private void ServerHandleWorkSocketError()
-        {
-            DestroySocket(stateObject.workSocket);
+            IPEndPoint localEP = new IPEndPoint(IPAddress.Loopback, port);
 
             try
             {
+                listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                listener.Bind(localEP);
                 listener.Listen(100);
-                listener.BeginAccept(new AsyncCallback(ServerWaitForConnectCB), listener);
-                serverState = ServerStates.wait_for_connect;
-
-                DebugLog("Server listening on port " + port.ToString());
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void StartServer()
-        {
-            try
-            {
-                IPEndPoint loaclEP = new IPEndPoint(IPAddress.Loopback, port);
-                listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
-                    ProtocolType.Tcp);
-
-                DebugLog("Server launched on port " + port.ToString());
-
-                listener.Bind(loaclEP);
-                listener.Listen(100);
-                listener.BeginAccept(new AsyncCallback(ServerWaitForConnectCB), listener);
-                serverState = ServerStates.wait_for_connect;
-            }
-            catch (SocketException e0)
-            {
-                DebugLog(e0.Message + e0.StackTrace);
-                DebugLog("Server listener crashed, changing ports...");
-
-                DestroySocket(listener);
-                listener = null;
-                IncrementToNextValidPort();
-                serverState = ServerStates.disconnected;
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void ServerWaitForConnectCB(IAsyncResult ar)
-        {
-            try
-            {
-                stateObject.workSocket = (Socket)ar.AsyncState;
-                stateObject.workSocket = stateObject.workSocket.EndAccept(ar);
-                serverState = ServerStates.connected;
-
-                DebugLog("Server work socket connected on port " + port.ToString());
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Server listener failed to end accept on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                ServerHandleWorkSocketError();
+                listener.BeginAccept(new AsyncCallback(AcceptCB), listener);
             }
             catch (Exception e0)
             {
-                DebugLog(e0.Message);
+                DebugPrint(e0.Message + e0.StackTrace);
             }
         }
 
-        private void ServiceServer()
+        /// <summary>
+        /// Call this method in from the main thread to start the next client read process.
+        /// </summary>
+        public void ClientStartRead()
         {
-            if (newTxPacketAvailable)
-            {
-                try
-                {
-                    newTxPacketAvailable = false;
-                    stateObject.workSocket.BeginSend(txBuff, 0, txBuff.Length, 0,
-                        new AsyncCallback(ServerSendCB), stateObject.workSocket);
-                    serverState = ServerStates.server_busy;
+            if (clientIsBusy || (config != Configuration.client))
+                return;
 
-                    DebugLog("Server transmitting on port " + port.ToString());
-                }
-                catch (SocketException e0)
-                {
-                    DebugLog("Server attempted send failed on port " + port.ToString());
-                    DebugLog(e0.Message + e0.StackTrace);
-                    ServerHandleWorkSocketError();
-                }
-                catch (Exception e1)
-                {
-                    DebugLog(e1.Message + e1.StackTrace);
-                }
+            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, port);
+
+            try
+            {
+                clientIsBusy = true;
+
+                Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                client.BeginConnect(remoteEP, new AsyncCallback(ConnectCB), client);
+            }
+            catch (Exception e0)
+            {
+                DebugPrint(e0.Message + e0.StackTrace);
+                clientIsBusy = false;
             }
         }
 
-        private void ServerSendCB(IAsyncResult ar)
+        /// <summary>
+        /// Call this method once to end server listening activities.
+        /// </summary>
+        public void End()
+        {
+            switch (config)
+            {
+                case Configuration.server:
+                    break;
+                case Configuration.client:
+                    break;
+            }
+        }
+
+        private void AcceptCB(IAsyncResult ar)
         {
             try
             {
-                stateObject.workSocket = (Socket)ar.AsyncState;
+                Socket local = (Socket)ar.AsyncState;
+                Socket handler = listener.EndAccept(ar);
 
-                int numBytes = stateObject.workSocket.EndSend(ar);
-
-                DebugLog("Server sent " + numBytes.ToString() + " on port " + port.ToString());
-
-                stateObject.workSocket.BeginReceive(stateObject.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ServerReadCB), stateObject);
-
-                DebugLog("Server waiting for ack on port " + port.ToString());
+                Send(handler, txData);
             }
-            catch (SocketException e0)
+            catch (Exception e0)
             {
-                DebugLog("Server attempted read failed on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                ServerHandleWorkSocketError();
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
+                DebugPrint(e0.Message + e0.StackTrace);
             }
         }
 
-        private void ServerReadCB(IAsyncResult ar)
+        private void Send(Socket handler, byte[] data)
         {
             try
             {
-                int numBytesRead = stateObject.workSocket.EndReceive(ar);
+                handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCB), handler);
+            }
+            catch (Exception e0)
+            {
+                DebugPrint(e0.Message + e0.StackTrace);
+            }
+        }
 
-                DebugLog("Server received " + numBytesRead.ToString() + " bytes on port " + port.ToString());
+        private void SendCB(IAsyncResult ar)
+        {
+            try
+            {
+                Socket handler = (Socket)ar.AsyncState;
+                int numBytesSent = handler.EndSend(ar);
+
+                handler.Shutdown(SocketShutdown.Both);
+                handler.Close();
+            }
+            catch (Exception e0)
+            {
+                DebugPrint(e0.Message + e0.StackTrace);
+            }
+
+            ResetServer();
+        }
+
+        private void ResetServer()
+        {
+            try
+            {
+                listener.Listen(100);
+                listener.BeginAccept(new AsyncCallback(AcceptCB), listener);
+            }
+            catch (Exception e0)
+            {
+                DebugPrint(e0.Message + e0.StackTrace);
+            }
+        }
+
+        private void ConnectCB(IAsyncResult ar)
+        {
+            try
+            {
+                Socket client = (Socket)ar.AsyncState;
+
+                client.EndConnect(ar);
+                Read(client);
+            }
+            catch (Exception e0)
+            {
+                DebugPrint(e0.Message + e0.StackTrace);
+                clientIsBusy = false;
+            }
+        }
+
+        private void Read(Socket client)
+        {
+            StateObject state = new StateObject();
+
+            try
+            {
+                state.workSocket = client;
+                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCB), state);
+            }
+            catch (Exception e0)
+            {
+                DebugPrint(e0.Message + e0.StackTrace);
+                clientIsBusy = false;
+            }
+        }
+
+        private void ReadCB(IAsyncResult ar)
+        {
+            try
+            {
+                StateObject state = (StateObject)ar.AsyncState;
+                Socket client = state.workSocket;
+                int numBytesRead = client.EndReceive(ar);
 
                 if (numBytesRead > 0)
                 {
-                    if (packetizer.IsPacketValid(stateObject.buffer))
+                    if (state.packetizer.IsPacketValid(state.buffer))
                     {
-                        PacketTypes type = (PacketTypes)packetizer.GetPacketType(stateObject.buffer);
-
-                        DebugLog("Packet was valid and type is " + type.ToString());
-
-                        if (type != PacketTypes.ack)
-                            ServerHandleWorkSocketError();
-                        else
-                            serverState = ServerStates.connected;
-                    }
-                    else
-                    {
-                        ServerHandleWorkSocketError();
+                        rxData = state.packetizer.UnpackData(state.buffer);
                     }
                 }
-                else
-                {
-                    serverState = ServerStates.connected;
-                }
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Server attempted read failed on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                ServerHandleWorkSocketError();
             }
             catch (Exception e0)
             {
-                DebugLog(e0.Message);
+                DebugPrint(e0.Message + e0.StackTrace);
+                clientIsBusy = false;
             }
+
+            clientIsBusy = false;
         }
 
-        // Client specific methods
-        private void ClientHandleWorkSocketError()
-        {
-            DestroySocket(stateObject.workSocket);
-            clientState = ClientStates.connect_failed;
-        }
-
-        private void StartClient()
-        {
-            try
-            {
-                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, port);
-                listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
-                    ProtocolType.Tcp);
-
-                DebugLog("Client attempting to connect on port " + port.ToString());
-
-                listener.BeginConnect(remoteEP, new AsyncCallback(ClientConnectCB),
-                    listener);
-                clientState = ClientStates.connecting;
-            }
-            catch (SocketException e0)
-            {
-                DebugLog(e0.Message + e0.StackTrace);
-                DebugLog("Client connector crashed, changing ports...");
-
-                DestroySocket(listener);
-                listener = null;
-                IncrementToNextValidPort();
-                clientState = ClientStates.disconnected;
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void ClientConnectCB(IAsyncResult ar)
-        {
-            try
-            {
-                stateObject.workSocket = (Socket)ar.AsyncState;
-                stateObject.workSocket.EndConnect(ar);
-                clientState = ClientStates.connected;
-
-                DebugLog("Client connected on port " + port.ToString());
-
-                ClientRead();
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Client work socket connection failed on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                DebugLog("Attempting to reconnect...");
-                ClientHandleWorkSocketError();
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void ClientRead()
-        {
-            try
-            {
-                stateObject.workSocket.BeginReceive(stateObject.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ClientReadCB), stateObject);
-                clientState = ClientStates.receiving;
-
-                DebugLog("Client attempting to read on port " + port.ToString());
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Client work socket read attempet failed on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                ClientHandleWorkSocketError();
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void ClientReadCB(IAsyncResult ar)
-        {
-            try
-            {
-                stateObject = (StateObject)ar.AsyncState;
-
-                int numBytesRead = stateObject.workSocket.EndReceive(ar);
-
-                DebugLog("Client read " + numBytesRead.ToString() + " bytes on port " + port.ToString());
-
-                if (clientDisconnectReq)
-                {
-                    RequestClientDisconnect();
-                }
-                else if (numBytesRead > 0)
-                {
-                    if (packetizer.IsPacketValid(stateObject.buffer))
-                    {
-                        PacketTypes type = (PacketTypes)packetizer.GetPacketType(stateObject.buffer);
-
-                        DebugLog("Client received valid packet on port " + port.ToString());
-                        DebugLog("Client received " + numBytesRead.ToString() + " bytes of packet type " + type.ToString());
-
-                        ClientRespond(true);
-                    }
-                    else
-                    {
-                        DebugLog("Client received invalid packet on port " + port.ToString());
-                        DebugLog("Client received " + numBytesRead.ToString() + " bytes");
-
-                        ClientHandleWorkSocketError();
-                    }
-                }
-                else
-                {
-                    ClientHandleWorkSocketError();
-                }
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Client work socket read attempet failed on port " + port.ToString());
-                ClientHandleWorkSocketError();
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void ClientRespond(bool ack)
-        {
-            PacketTypes type;
-
-            if (ack)
-                type = PacketTypes.ack;
-            else
-                type = PacketTypes.nack;
-
-            byte[] packet = packetizer.PacketizeData(null, (byte)type);
-
-            try
-            {
-                stateObject.workSocket.BeginSend(packet, 0, packet.Length, 0,
-                    new AsyncCallback(ClientRespondCB), stateObject.workSocket);
-
-                DebugLog("Client responding with " + type.ToString() + " on port " + port.ToString());
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Client work socket write attempt failed on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                ClientHandleWorkSocketError();
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        private void ClientRespondCB(IAsyncResult ar)
-        {
-            try
-            {
-                stateObject.workSocket = (Socket)ar.AsyncState;
-
-                int numBytesSent = stateObject.workSocket.EndSend(ar);
-
-                DebugLog("Client sent " + numBytesSent.ToString() + " on port " + port.ToString());
-
-                if (clientDisconnectReq)
-                {
-                    DestroySocket(stateObject.workSocket);
-                    clientState = ClientStates.disconnected_idle;
-                    clientDisconnectReq = false;
-                }
-                else
-                {
-                    clientState = ClientStates.connected;
-                    ClientRead();
-                }
-            }
-            catch (SocketException e0)
-            {
-                DebugLog("Client work socket write attempt failed on port " + port.ToString());
-                DebugLog(e0.Message + e0.StackTrace);
-                ClientHandleWorkSocketError();
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
-        // Joint methods
-        private void DestroySocket(Socket tgt)
-        {
-            DebugLog("Attempting to destroy socket on port " + port);
-
-            try
-            {
-                tgt.Shutdown(SocketShutdown.Both);
-                //tgt.Disconnect(true);
-            }
-            catch (Exception e0) { }    // Doesn't really matter what happens here just try to kill the socket gracefully.
-
-            tgt.Close();
-        }
-
-        private bool IsPortValid(int portNum)
-        {
-            return ((portNum <= ValidPorts.maxPortNum) && (portNum >= ValidPorts.minPortNum));
-        }
-
-        private void IncrementToNextValidPort()
-        {
-            port++;
-
-            if (!IsPortValid(port))
-                port = ValidPorts.minPortNum;
-        }
-
-        private void DebugLog(string s)
+        private void DebugPrint(string s)
         {
 #if DEBUG
             Console.WriteLine(s);
@@ -558,25 +235,12 @@ namespace VMUV_TCP
     }
 
     /// <summary>
-    /// Contains the number, and values of the different port numbers utilized by 
-    /// the socket connection.
-    /// </summary>
-    public struct ValidPorts
-    {
-        public const int numValidPorts = 1000;
-        public const int minPortNum = 11000;
-        public const int maxPortNum = 12000;
-    }
-
-    /// <summary>
     /// The various types of packets that can be sent and received. Must be cast into a byte to be packetized properly.
     /// </summary>
     public enum PacketTypes
     {
-        greeting,
-        raw_data,
-        ack,
-        nack
+        test,
+        raw_data
     }
 
     /// <summary>
@@ -586,25 +250,5 @@ namespace VMUV_TCP
     {
         server,
         client
-    }
-
-    public enum ServerStates
-    {
-        not_init,
-        wait_for_connect,
-        connected,
-        server_busy,
-        disconnected
-    }
-
-    public enum ClientStates
-    {
-        not_init,
-        connecting,
-        connect_failed,
-        connected,
-        receiving,
-        disconnected,
-        disconnected_idle
     }
 }

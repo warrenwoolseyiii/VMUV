@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace VMUV_TCP
 {
@@ -7,69 +8,37 @@ namespace VMUV_TCP
     {
         static void Main(string[] args)
         {
-            //UnityTest();
-            SelfTest();
-        }
-
-        static void UnityTest()
-        {
-            SocketWrapper server = new SocketWrapper(Configuration.server);
-            byte[] testPacket = { 0x69, 0xff, 0xee, 0x21 };
-
-            server.Initialize();
-
-            while (true)
-            {
-                server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
-                server.Service();
-                Thread.Sleep(25);
-            }
+            //SelfTest();
+            UnityTest();
         }
 
         static void SelfTest()
         {
             SocketWrapper server = new SocketWrapper(Configuration.server);
             SocketWrapper client = new SocketWrapper(Configuration.client);
-            byte[] testPacket = { 0x69, 0xff, 0xee, 0x21 };
+            byte[] testNigga = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
 
-            server.Initialize();
-            client.Initialize();
-
-            // chat for a bit
-            for (int i = 0; i < 100; i++)
-            {
-                server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
-                server.Service();
-                client.Service();
-                Thread.Sleep(100);
-            }
-
-            // disconnect
-            server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
-            client.RequestClientDisconnect();
-
-            while ((ClientStates)client.GetStatus() != ClientStates.disconnected_idle)
-            {
-                server.Service();
-                Thread.Sleep(100);
-                client.Service();
-            }
-
-            // idle
-            for (int i = 0; i < 100; i++)
-            {
-                Thread.Sleep(100);
-                server.Service();
-            }
-
-            // try to reconnect
-            client.RequestClientReconnect();
+            server.ServerSetTxData(testNigga, PacketTypes.test);
+            server.StartServer();
 
             while (true)
             {
-                server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
-                server.Service();
-                client.Service();
+                client.ClientStartRead();
+                Console.WriteLine("Got " + client.ClientGetRxData().Length.ToString() + " bytes");
+                Thread.Sleep(500);
+            }
+        }
+
+        static void UnityTest()
+        {
+            SocketWrapper server = new SocketWrapper(Configuration.server);
+            byte[] testNigga = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+
+            server.ServerSetTxData(testNigga, PacketTypes.test);
+            server.StartServer();
+
+            while (true)
+            {
                 Thread.Sleep(100);
             }
         }
