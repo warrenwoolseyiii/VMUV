@@ -81,7 +81,7 @@ namespace VMUV_TCP
                     else if (clientState == ClientStates.disconnected)
                         Initialize();
                     else if (clientState == ClientStates.connect_failed)
-                        ClientReconnect();
+                        Initialize();
                     break;
                 case Configuration.server:
                     if (serverState == ServerStates.connected)
@@ -90,7 +90,6 @@ namespace VMUV_TCP
                         Initialize();
                     break;
                 default:
-
                     break;
             }
         }
@@ -99,7 +98,7 @@ namespace VMUV_TCP
         /// Sets the data payload for the next transmission.
         /// </summary>
         /// <param name="data"></param>
-        public void SetTransmitData(byte[] data, PacketTypes type)
+        public void SetServerTransmitData(byte[] data, PacketTypes type)
         {
             txBuff = packetizer.PacketizeData(data, (byte)type);
             newTxPacketAvailable = true;
@@ -129,18 +128,50 @@ namespace VMUV_TCP
         }
 
         /// <summary>
-        /// Forces the current socket instance to disconnect regardless of the state.
+        /// Blocking method that allows the client to exit the connection in a clean manner. Use <c>RequestClientReconnect</c> to
+        /// reconnect the client after calling this method.
         /// </summary>
-        public void ForceDisconnect()
+        public void RequestClientDisconnect()
         {
             clientDisconnectReq = true;
+
+            //while (clientState != ClientStates.disconnected_idle)
+                //Service();
+        }
+
+        /// <summary>
+        /// Will attempt to reconnect the client after <c>RequestClientDisconnect</c> has been called.
+        /// </summary>
+        /// <returns>Returns true if the client state is proper for a reconnect request.
+        /// Returns false otherwise.</returns>
+        public bool RequestClientReconnect()
+        {
+            if (clientState != ClientStates.disconnected_idle)
+                return false;
+
+            clientState = ClientStates.connect_failed;
+            Service();
+
+            return true;
         }
 
         // Server specific methods
         private void ServerHandleWorkSocketError()
         {
             DestroySocket(stateObject.workSocket);
-            serverState = ServerStates.wait_for_connect;
+
+            try
+            {
+                listener.Listen(100);
+                listener.BeginAccept(new AsyncCallback(ServerWaitForConnectCB), listener);
+                serverState = ServerStates.wait_for_connect;
+
+                DebugLog("Server listening on port " + port.ToString());
+            }
+            catch (Exception e1)
+            {
+                DebugLog(e1.Message + e1.StackTrace);
+            }
         }
 
         private void StartServer()
@@ -329,34 +360,6 @@ namespace VMUV_TCP
             }
         }
 
-        private void ClientReconnect()
-        {
-            try
-            {
-                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, port);
-
-                DebugLog("Client attempting to connect on port " + port.ToString());
-
-                listener.BeginConnect(remoteEP, new AsyncCallback(ClientConnectCB),
-                    listener);
-                clientState = ClientStates.connecting;
-            }
-            catch (SocketException e0)
-            {
-                DebugLog(e0.Message + e0.StackTrace);
-                DebugLog("Client connector crashed, changing ports...");
-
-                DestroySocket(listener);
-                listener = null;
-                IncrementToNextValidPort();
-                clientState = ClientStates.disconnected;
-            }
-            catch (Exception e1)
-            {
-                DebugLog(e1.Message + e1.StackTrace);
-            }
-        }
-
         private void ClientConnectCB(IAsyncResult ar)
         {
             try
@@ -496,7 +499,8 @@ namespace VMUV_TCP
 
                 if (clientDisconnectReq)
                 {
-                    clientState = ClientStates.not_init;
+                    DestroySocket(stateObject.workSocket);
+                    clientState = ClientStates.disconnected_idle;
                     clientDisconnectReq = false;
                 }
                 else
@@ -600,6 +604,7 @@ namespace VMUV_TCP
         connect_failed,
         connected,
         receiving,
-        disconnected
+        disconnected,
+        disconnected_idle
     }
 }

@@ -14,9 +14,39 @@ namespace VMUV_TCP
             server.Initialize();
             client.Initialize();
 
+            // chat for a bit
             for (int i = 0; i < 100; i++)
             {
-                server.SetTransmitData(testPacket, PacketTypes.raw_data);
+                server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
+                server.Service();
+                client.Service();
+                Thread.Sleep(100);
+            }
+
+            // disconnect
+            server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
+            client.RequestClientDisconnect();
+
+            while ((ClientStates)client.GetStatus() != ClientStates.disconnected_idle)
+            {
+                server.Service();
+                Thread.Sleep(100);
+                client.Service();
+            }
+
+            // idle
+            for (int i = 0; i < 100; i++)
+            {
+                Thread.Sleep(100);
+                server.Service();
+            }
+
+            // try to reconnect
+            client.RequestClientReconnect();
+
+            while (true)
+            {
+                server.SetServerTransmitData(testPacket, PacketTypes.raw_data);
                 server.Service();
                 client.Service();
                 Thread.Sleep(100);
