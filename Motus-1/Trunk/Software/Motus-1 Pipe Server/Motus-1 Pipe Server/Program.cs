@@ -9,12 +9,12 @@ namespace Motus_1_Pipe_Server
 {
     class Program
     {
+        private static string version = "1.0.0";
         private static HardwareStates hwState = HardwareStates.find_device;
+        private static SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
 
         static void Main(string[] args)
         {
-            SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
-
             Initialize();
             tcpServer.StartServer();
 
@@ -31,7 +31,9 @@ namespace Motus_1_Pipe_Server
         {
             string startTime = DateTime.Now.ToString("h:mm:ss tt");
             Logger.CreateLogFile();
+            Logger.LogMessage("Motus-1 Pipe Server version: " + version);
             Logger.LogMessage("Motus-1 Pipe Server started at " + startTime);
+            Logger.LogMessage("VMUV_TCP version: " + SocketWrapper.version);
         }
 
         static void Motus1HardwareMain()
@@ -100,7 +102,18 @@ namespace Motus_1_Pipe_Server
         {
             if (HIDInterface.HasTraceMessages())
             {
-                TraceLoggerMessage[] msgs = HIDInterface.GetTraceMessages();
+                Logging.TraceLoggerMessage[] msgs = HIDInterface.GetTraceMessages();
+                string[] strMsg = new string[msgs.Length];
+
+                for (int i = 0; i < msgs.Length; i++)
+                    strMsg[i] = TraceLogger.TraceLoggerMessageToString(msgs[i]);
+
+                Logger.LogMessage(strMsg);
+            }
+
+            if (tcpServer.HasTraceMessages())
+            {
+                VMUV_TCP.TraceLoggerMessage[] msgs = tcpServer.GetTraceMessages();
                 string[] strMsg = new string[msgs.Length];
 
                 for (int i = 0; i < msgs.Length; i++)

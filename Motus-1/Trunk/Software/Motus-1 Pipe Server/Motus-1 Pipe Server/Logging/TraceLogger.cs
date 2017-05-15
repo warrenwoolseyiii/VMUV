@@ -1,4 +1,6 @@
-﻿namespace Motus_1_Pipe_Server.Logging
+﻿using VMUV_TCP;
+
+namespace Motus_1_Pipe_Server.Logging
 {
     class TraceLogger
     {
@@ -89,6 +91,11 @@
         }
 
         public static string TraceLoggerMessageToString(TraceLoggerMessage msg)
+        {
+            return (msg.moduleName + ": " + msg.methodName + ": " + msg.message);
+        }
+
+        public static string TraceLoggerMessageToString(VMUV_TCP.TraceLoggerMessage msg)
         {
             return (msg.moduleName + ": " + msg.methodName + ": " + msg.message);
         }
