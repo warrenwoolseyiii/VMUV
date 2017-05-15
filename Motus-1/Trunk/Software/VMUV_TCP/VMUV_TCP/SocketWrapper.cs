@@ -7,12 +7,14 @@ namespace VMUV_TCP
     public class SocketWrapper
     {
         private Packetizer packetizer = new Packetizer();
+        private TraceLogger traceLogger = new TraceLogger();
         private Socket listener = null;
         private const int port = 11069;
         private byte[] txData = { 0 };  // Do this incase Start() is called before the user sets any data
         private byte[] rxData = { 0 };  // Do this incase GetRxData() is called before the user gets any data
         private Configuration config;
         private bool clientIsBusy = false;
+        private string moduleName = "SocketWrapper.cs";
 
         /// <summary>
         /// Version number of the current release.
@@ -53,6 +55,8 @@ namespace VMUV_TCP
         /// </summary>
         public void StartServer()
         {
+            string methodName = "StartServer";
+
             if (config != Configuration.server)
                 return;
 
@@ -60,15 +64,22 @@ namespace VMUV_TCP
 
             try
             {
+                string msg = "TCP Server successfully started on port " + port.ToString();
+
                 listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 listener.Bind(localEP);
                 listener.Listen(100);
                 listener.BeginAccept(new AsyncCallback(AcceptCB), listener);
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
         }
 
@@ -77,6 +88,8 @@ namespace VMUV_TCP
         /// </summary>
         public void ClientStartRead()
         {
+            string methodName = "ClientStartRead";
+
             if (clientIsBusy || (config != Configuration.client))
                 return;
 
@@ -92,27 +105,37 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
                 clientIsBusy = false;
             }
         }
 
         /// <summary>
-        /// Call this method once to end server listening activities.
+        /// Returns all stored trace messages within the <c>TraceLogger</c> object. Call this method after first determining if the 
+        /// <c>TraceLogger</c> object has any stored messages using the <c>HasTraceMessages</c> method.
         /// </summary>
-        public void End()
+        /// <returns>A list of <c>TraceLoggerMessage</c> elements.</returns>
+        public TraceLoggerMessage[] GetTraceMessages()
         {
-            switch (config)
-            {
-                case Configuration.server:
-                    break;
-                case Configuration.client:
-                    break;
-            }
+            return traceLogger.GetAllMessages();
+        }
+
+        /// <summary>
+        /// Returns true if there are unread messages stored in the <c>TraceLogger</c> object.
+        /// </summary>
+        /// <returns>True if unread messages are available. False otherwise.</returns>
+        public bool HasTraceMessages()
+        {
+            return traceLogger.HasMessages();
         }
 
         private void AcceptCB(IAsyncResult ar)
         {
+            string methodName = "AcceptCB";
+
             try
             {
                 Socket local = (Socket)ar.AsyncState;
@@ -122,24 +145,34 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
         }
 
         private void Send(Socket handler, byte[] data)
         {
+            string methodName = "Send";
+
             try
             {
                 handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCB), handler);
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
         }
 
         private void SendCB(IAsyncResult ar)
         {
+            string methodName = "SendCB";
+
             try
             {
                 Socket handler = (Socket)ar.AsyncState;
@@ -150,7 +183,10 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
 
             ResetServer();
@@ -158,6 +194,8 @@ namespace VMUV_TCP
 
         private void ResetServer()
         {
+            string methodName = "ResetServer";
+
             try
             {
                 listener.Listen(100);
@@ -165,12 +203,16 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
         }
 
         private void ConnectCB(IAsyncResult ar)
         {
+            string methodName = "ConnectCB";
             try
             {
                 Socket client = (Socket)ar.AsyncState;
@@ -180,7 +222,10 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
                 clientIsBusy = false;
             }
         }
@@ -188,6 +233,7 @@ namespace VMUV_TCP
         private void Read(Socket client)
         {
             StateObject state = new StateObject();
+            string methodName = "Read";
 
             try
             {
@@ -196,13 +242,18 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
                 clientIsBusy = false;
             }
         }
 
         private void ReadCB(IAsyncResult ar)
         {
+            string methodName = "ReadCB";
+
             try
             {
                 StateObject state = (StateObject)ar.AsyncState;
@@ -219,7 +270,10 @@ namespace VMUV_TCP
             }
             catch (Exception e0)
             {
-                DebugPrint(e0.Message + e0.StackTrace);
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
                 clientIsBusy = false;
             }
 
