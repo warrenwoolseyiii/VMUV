@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using System.Threading;
 using Motus_1_Pipe_Server.Logging;
-using Motus_1_Pipe_Server.PipeServer;
 using Motus_1_Pipe_Server.USB;
+using VMUV_TCP;
 
 namespace Motus_1_Pipe_Server
 {
@@ -13,16 +13,17 @@ namespace Motus_1_Pipe_Server
 
         static void Main(string[] args)
         {
-            Thread pipeManager = new Thread(PipeServerManager.ServerManagerThread);
+            SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
 
             Initialize();
-            pipeManager.Start();
+            tcpServer.StartServer();
 
             while (true)
             {
                 Motus1HardwareMain();
+                tcpServer.ServerSetTxData(DataStorage.DataStorageTable.GetCurrentData(), PacketTypes.raw_data);
                 ServiceLoggingRequests();
-                Thread.Sleep(250);
+                Thread.Sleep(25);
             }
         }
 
@@ -97,17 +98,6 @@ namespace Motus_1_Pipe_Server
 
         static void ServiceLoggingRequests()
         {
-            if (PipeServerManager.HasTraceMessages())
-            {
-                TraceLoggerMessage[] msgs = PipeServerManager.GetTraceMessages();
-                string[] strMsg = new string[msgs.Length];
-
-                for (int i = 0; i < msgs.Length; i++)
-                    strMsg[i] = TraceLogger.TraceLoggerMessageToString(msgs[i]);
-
-                Logger.LogMessage(strMsg);
-            }
-
             if (HIDInterface.HasTraceMessages())
             {
                 TraceLoggerMessage[] msgs = HIDInterface.GetTraceMessages();
