@@ -9,9 +9,10 @@ namespace Motus_1_Pipe_Server
 {
     class Program
     {
-        private static string version = "1.0.1";
+        private static string version = "1.0.2";
         private static HardwareStates hwState = HardwareStates.find_device;
         private static SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
+        private static int devicePollCounter = 0;
 
         static void Main(string[] args)
         {
@@ -56,8 +57,11 @@ namespace Motus_1_Pipe_Server
                         hwState = HardwareStates.find_device;
                     break;
                 case HardwareStates.device_enumerated:
-                    Thread.Sleep(1000);
-                    PollDevice();
+                    if (devicePollCounter++ > 1000)
+                    {
+                        devicePollCounter = 0;
+                        PollDevice();
+                    }
 
                     if (!HIDInterface.DeviceIsPresent())
                     {

@@ -1,0 +1,8 @@
+*** New log file created ***
+Raw data logging enabled = False
+Motus-1 Pipe Server version: 1.0.2
+Motus-1 Pipe Server started at 3:44:59 PM
+VMUV_TCP version: 1.0.2
+HIDInterface.cs: FindDevice: Motus-1 is present!
+SocketWrapper.cs: StartServer: TCP Server successfully started on port 11069
+HIDInterface.cs: EnumerateDevice: Motus-1 enumeration success!

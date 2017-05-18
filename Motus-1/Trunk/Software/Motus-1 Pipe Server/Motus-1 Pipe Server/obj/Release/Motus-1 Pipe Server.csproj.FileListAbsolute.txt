@@ -1,0 +1,9 @@
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\Motus-1 Pipe Server.exe.config
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\Motus-1 Pipe Server.exe
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\Motus-1 Pipe Server.pdb
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\System.Runtime.WindowsRuntime.dll
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\VMUV_TCP.dll
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\Windows.winmd
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\bin\Release\VMUV_TCP.pdb
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\obj\Release\Motus-1 Pipe Server.exe
+C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus-1 Pipe Server\Motus-1 Pipe Server\obj\Release\Motus-1 Pipe Server.pdb
