@@ -9,7 +9,20 @@ namespace VMUV_TCP
         static void Main(string[] args)
         {
             //SelfTest();
-            UnityTest();
+            //UnityTest();
+            ThroughtputTest();
+        }
+
+        static void ThroughtputTest()
+        {
+            SocketWrapper client = new SocketWrapper(Configuration.client);
+
+            while (true)
+            {
+                Thread.Sleep(1);
+                client.ClientStartRead();
+            }
+
         }
 
         static void SelfTest()

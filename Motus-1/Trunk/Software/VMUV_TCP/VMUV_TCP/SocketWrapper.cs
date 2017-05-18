@@ -10,16 +10,20 @@ namespace VMUV_TCP
         private TraceLogger traceLogger = new TraceLogger();
         private Socket listener = null;
         private const int port = 11069;
-        private byte[] txData = { 0 };  // Do this incase Start() is called before the user sets any data
-        private byte[] rxData = { 0 };  // Do this incase GetRxData() is called before the user gets any data
+        private byte[] txDataPing = { 0 };  // Do this incase Start() is called before the user sets any data
+        private byte[] txDataPong = { 0 };  // Do this incase Start() is called before the user sets any data
+        private byte[] rxDataPing = { 0 };  // Do this incase GetRxData() is called before the user gets any data
+        private byte[] rxDataPong = { 0 };  // Do this incase GetRxData() is called before the user gets any data
+        private bool usePing = true;
         private Configuration config;
         private bool clientIsBusy = false;
         private string moduleName = "SocketWrapper.cs";
+        private int numPacketsRead = 0;
 
         /// <summary>
         /// Version number of the current release.
         /// </summary>
-        public const string version = "1.0.0";
+        public const string version = "1.0.2";
 
         /// <summary>
         /// Instantiates a new instance of <c>SocketWrapper</c> configured as either a client or a server.
@@ -37,7 +41,16 @@ namespace VMUV_TCP
         /// <param name="type"></param>
         public void ServerSetTxData(byte[] payload, PacketTypes type)
         {
-            txData = packetizer.PacketizeData(payload, (byte)type);
+            if (usePing)
+            {
+                txDataPing = packetizer.PacketizeData(payload, (byte)type);
+                usePing = false;
+            }
+            else
+            {
+                txDataPong = packetizer.PacketizeData(payload, (byte)type);
+                usePing = true;
+            }
         }
 
         /// <summary>
@@ -46,7 +59,14 @@ namespace VMUV_TCP
         /// <returns>byte buffer with a copy of the most recently receieved valid data payload.</returns>
         public byte[] ClientGetRxData()
         {
-            return rxData;
+            if (usePing)
+            {
+                return rxDataPong;
+            }
+            else
+            {
+                return rxDataPing;
+            }
         }
 
         /// <summary>
@@ -141,7 +161,10 @@ namespace VMUV_TCP
                 Socket local = (Socket)ar.AsyncState;
                 Socket handler = listener.EndAccept(ar);
 
-                Send(handler, txData);
+                if (usePing)
+                    Send(handler, txDataPong);
+                else
+                    Send(handler, txDataPing);
             }
             catch (Exception e0)
             {
@@ -264,7 +287,19 @@ namespace VMUV_TCP
                 {
                     if (state.packetizer.IsPacketValid(state.buffer))
                     {
-                        rxData = state.packetizer.UnpackData(state.buffer);
+                        if (usePing)
+                        {
+                            rxDataPing = state.packetizer.UnpackData(state.buffer);
+                            usePing = false;
+                        }
+                        else
+                        {
+                            rxDataPong = state.packetizer.UnpackData(state.buffer);
+                            usePing = true;
+                        }
+                        
+                        numPacketsRead++;
+                        DebugPrint(numPacketsRead.ToString());
                     }
                 }
             }
