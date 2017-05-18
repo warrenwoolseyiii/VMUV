@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using Motus_1_Plugin.Logging;
 using Motus_1_Plugin.TCP;
+using Motus_1_Plugin.Logging;
 
 namespace Motus_1_Plugin
 {
@@ -33,7 +33,15 @@ namespace Motus_1_Plugin
 
         public static Vector3 GetXZVector()
         {
-            return DataStorage.DataStorage.GetXZVector();
+            Vector3 xz = DataStorage.DataStorage.GetXZVector();
+            Quaternion rot = Orientation.Orienter.GetOffset();
+
+            return rot * xz;
+        }
+
+        public static void OrientMotus()
+        {
+            Orientation.Orienter.CalculateNewOffset();
         }
     }
 }

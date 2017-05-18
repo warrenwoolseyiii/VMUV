@@ -56,6 +56,7 @@
     <Compile Include="DataStorage\SensorPad.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\TraceLogger.cs" />
+    <Compile Include="Orientation\Orienter.cs" />
     <Compile Include="PluginInterface.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
