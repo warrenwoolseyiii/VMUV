@@ -15,8 +15,10 @@ namespace Motus_1_Pipe_Server.USB
     {
         private static bool deviceIsEnumerated = false;
         private static bool deviceIsPresent = false;
+        private static bool storeNextDataPt = false;
         private static HidDevice device = null;
         private static TraceLogger hidLogger = new TraceLogger(128);
+        private static RawDataFilter accumulator = new RawDataFilter();
         private static string moduleName = "HIDInterface.cs";
 
         public static bool DeviceIsEnumerated()
@@ -112,7 +114,7 @@ namespace Motus_1_Pipe_Server.USB
             device.Dispose();
         }
 
-        private static byte[] GetHidReport(HidInputReportReceivedEventArgs args)
+        private static void GetHidReport(HidInputReportReceivedEventArgs args)
         {
             // TODO: For now we only have one report so we can get away with not parsing the type or numeric control
             HidInputReport rpt = args.Report;
@@ -120,19 +122,36 @@ namespace Motus_1_Pipe_Server.USB
             DataReader dr = DataReader.FromBuffer(buff);
             byte[] bytes = new byte[rpt.Data.Length];
             dr.ReadBytes(bytes);
-            DataStorageTable.SetCurrentData(bytes);
+            //DataStorageTable.SetCurrentData(bytes);
 
-            return bytes;
+            ByteUtilities.SetRawDataInCnts(bytes);
+            short[] formatted = ByteUtilities.GetRawDataInCnts();
+
+            accumulator.AccumulateNextSample(formatted);
+
+            if (accumulator.accumLimitReached)
+            {
+                short[] avg = accumulator.GetAverageStorage();
+                byte[] avgBytes = ByteUtilities.ConvertInt16ToByte(avg);
+                ByteUtilities.SetRawDataInCnts(avgBytes);
+                short[] test = ByteUtilities.GetRawDataInCnts();
+
+                DataStorageTable.SetCurrentData(avgBytes);
+                storeNextDataPt = true;
+            }
         }
 
         private static void USBInterruptTransferHandler(HidDevice sender, HidInputReportReceivedEventArgs args)
         {
-            byte[] bytes = GetHidReport(args);
+            GetHidReport(args);
 
-            if (Logger.IsLoggingRawData())
+            if (Logger.IsLoggingRawData() && storeNextDataPt)
             {
+                byte[] bytes = DataStorageTable.GetCurrentData();
                 ByteUtilities.SetRawDataInCnts(bytes);
                 Logger.LogRawData(ByteUtilities.ToCsvFormat());
+
+                storeNextDataPt = false;
             }
         }
 

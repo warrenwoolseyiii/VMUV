@@ -9,7 +9,7 @@ namespace Motus_1_Pipe_Server
 {
     class Program
     {
-        private static string version = "1.0.0";
+        private static string version = "1.0.1";
         private static HardwareStates hwState = HardwareStates.find_device;
         private static SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
 
@@ -23,7 +23,7 @@ namespace Motus_1_Pipe_Server
                 Motus1HardwareMain();
                 tcpServer.ServerSetTxData(DataStorage.DataStorageTable.GetCurrentData(), PacketTypes.raw_data);
                 ServiceLoggingRequests();
-                Thread.Sleep(25);
+                Thread.Sleep(5);
             }
         }
 

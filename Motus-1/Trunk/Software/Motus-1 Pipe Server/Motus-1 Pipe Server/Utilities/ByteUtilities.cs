@@ -41,6 +41,21 @@ namespace Motus_1_Pipe_Server.Utilities
             return rawDataInCnts;
         }
 
+
+        static public byte[] ConvertInt16ToByte(Int16[] ints)
+        {
+            byte[] rtn = new byte[(ints.Length * 2) + 1];
+
+            int i, j = 0;
+            for (i = 1; j < ints.Length; j++, i += 2)
+            {
+                rtn[i] = (byte)(ints[j] & 0xff);
+                rtn[i + 1] = (byte)((ints[j] >> 8) & 0xff);
+            }
+
+            return rtn;
+        }
+
         static private Int16 ConvertBytesToInt16(byte[] bytes, int ndx)
         {
             try
