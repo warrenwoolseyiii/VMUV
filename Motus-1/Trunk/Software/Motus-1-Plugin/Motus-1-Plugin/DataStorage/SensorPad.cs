@@ -4,8 +4,8 @@ namespace Motus_1_Plugin.DataStorage
     class SensorPad
     {
         public float activeThreshold;
-        public short maxAllowable = 1500;
-        public short minAllowable = 1000;
+        public short maxAllowable = 3300;
+        public short minAllowable = 250;
 
         private int id;
         private short currentVal;
@@ -21,7 +21,7 @@ namespace Motus_1_Plugin.DataStorage
             minVal = minAllowable;
             currentVal = -1;
             pctActive = 0;
-            activeThreshold = 0.95f;
+            activeThreshold = 0.45f;
             isActive = false;
         }
 
@@ -41,7 +41,7 @@ namespace Motus_1_Plugin.DataStorage
         public float GetUnitVector()
         {
             if (isActive)
-                return 1.0f;
+                return pctActive;
             else
                 return 0;
         }

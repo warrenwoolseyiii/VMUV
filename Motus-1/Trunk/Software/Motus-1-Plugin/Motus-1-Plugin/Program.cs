@@ -16,7 +16,7 @@ namespace Motus_1_Plugin
                 PluginInterface.Service();
                 Vector3 nib = PluginInterface.GetXZVector();
                 Console.WriteLine(nib.x.ToString() + "," + nib.z.ToString());
-                Thread.Sleep(100);
+                Thread.Sleep(5);
             }
         }
     }

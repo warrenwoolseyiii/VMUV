@@ -10,7 +10,6 @@ namespace Motus_1_Plugin.TCP
         public static void Service()
         {
             client.ClientStartRead();
-
             byte[] dataBytes = client.ClientGetRxData();
             ByteUtilities.SetRawDataInCnts(dataBytes);
             short[] dataShort = ByteUtilities.GetRawDataInCnts();
