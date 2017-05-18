@@ -8,13 +8,12 @@ namespace Motus_1_Plugin.Orientation
     {
         private static Quaternion currentOffset = new Quaternion();
 
-        public static void CalculateNewOffset()
+        public static void SnapMotusToGameAxes()
         {
             Vector3 xz = DataStorage.DataStorage.GetXZVector();
 
             if (xz.magnitude > 0)
             {
-                Vector3 headPos = InputTracking.GetLocalPosition(VRNode.Head);
                 Quaternion headRot = InputTracking.GetLocalRotation(VRNode.CenterEye);
                 Vector3 playerRotation = headRot.eulerAngles;
                 Quaternion padDirect = Quaternion.LookRotation(xz);
@@ -24,16 +23,7 @@ namespace Motus_1_Plugin.Orientation
                 playerRotation.z = 0;
 
                 Vector3 newRotation = playerRotation - padDirectE;
-                Quaternion qpoop = Quaternion.Euler(newRotation);
-                Vector3 testmyshit = qpoop.eulerAngles;
-
-                Debug.Log(playerRotation.ToString());
-                Debug.Log(headPos.ToString());
-                Debug.Log(padDirectE.ToString());
-                Debug.Log(testmyshit.ToString());
-                Debug.Log(newRotation.ToString());
-
-                currentOffset = qpoop; 
+                currentOffset = Quaternion.Euler(newRotation);
             }
         }
 

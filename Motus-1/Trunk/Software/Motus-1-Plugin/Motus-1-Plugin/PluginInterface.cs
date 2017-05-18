@@ -41,7 +41,7 @@ namespace Motus_1_Plugin
 
         public static void OrientMotus()
         {
-            Orientation.Orienter.CalculateNewOffset();
+            Orientation.Orienter.SnapMotusToGameAxes();
         }
     }
 }
