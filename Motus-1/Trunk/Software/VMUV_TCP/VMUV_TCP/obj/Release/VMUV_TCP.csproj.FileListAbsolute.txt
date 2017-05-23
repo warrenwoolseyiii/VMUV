@@ -1,6 +1,0 @@
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\bin\Release\VMUV_TCP.dll.config
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\bin\Release\VMUV_TCP.dll
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\bin\Release\VMUV_TCP.pdb
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\obj\Release\VMUV_TCP.csprojResolveAssemblyReference.cache
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\obj\Release\VMUV_TCP.dll
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\obj\Release\VMUV_TCP.pdb

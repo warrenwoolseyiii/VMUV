@@ -21,7 +21,7 @@ namespace Motus_1_Plugin.DataStorage
             minVal = minAllowable;
             currentVal = -1;
             pctActive = 0;
-            activeThreshold = 0.45f;
+            activeThreshold = 0.75f;
             isActive = false;
         }
 

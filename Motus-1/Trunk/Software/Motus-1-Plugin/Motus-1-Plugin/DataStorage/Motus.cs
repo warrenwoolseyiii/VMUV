@@ -13,6 +13,8 @@ namespace Motus_1_Plugin.DataStorage
         {
             for (int i = 0; i < numSensors; i++)
                 sensorPads[i] = new SensorPad(i);
+
+            sensorPads[8].activeThreshold = 0.45f;
         }
 
         public void SetAllSensorValues(short[] data)

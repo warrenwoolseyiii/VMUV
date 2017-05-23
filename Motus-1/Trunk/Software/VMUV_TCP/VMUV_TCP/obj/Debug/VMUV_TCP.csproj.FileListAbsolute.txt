@@ -1,5 +1,0 @@
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\bin\Debug\VMUV_TCP.exe.config
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\bin\Debug\VMUV_TCP.exe
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\bin\Debug\VMUV_TCP.pdb
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\obj\Debug\VMUV_TCP.exe
-C:\Users\Warren Woolsey\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\VMUV_TCP\VMUV_TCP\obj\Debug\VMUV_TCP.pdb
