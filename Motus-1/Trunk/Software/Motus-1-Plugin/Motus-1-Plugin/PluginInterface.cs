@@ -6,8 +6,19 @@ namespace Motus_1_Plugin
 {
     public static class PluginInterface
     {
-        public const string versionInfo = "1.0.3";
+        /// <summary>
+        /// The current version of the unity plugin.
+        /// </summary>
+        public const string versionInfo = "1.0.5";
+
+        /// <summary>
+        /// Use this property to enable sterring that is coupled to the user's head.
+        /// </summary>
         public static bool enableHeadSteering = false;
+
+        /// <summary>
+        /// Not implemented.
+        /// </summary>
         public static bool enableHandSteering = false;
 
         /// <summary>
@@ -66,7 +77,7 @@ namespace Motus_1_Plugin
             if (enableHeadSteering)
                 steering = Orientation.Orienter.ApplyHeadSteeringRotation();
             else if (enableHandSteering)
-                steering = Orientation.Orienter.ApplyHandSteeringRotation();
+            { }    //steering = Orientation.Orienter.ApplyHandSteeringRotation();
 
             Vector3 newOffset = axesOffset.eulerAngles + steering.eulerAngles;
 
@@ -80,6 +91,16 @@ namespace Motus_1_Plugin
         public static void OrientMotus()
         {
             Orientation.Orienter.SnapMotusToGameAxes();
+        }
+
+        /// <summary>
+        /// This method will acquire the local (room scale) offset of the motus-1 device so that you can factor that into your in-game representation
+        /// of the motus-1.
+        /// </summary>
+        /// <returns>Room Scale position of the motus-1 platform in vector3 format.</returns>
+        public static Vector3 GetDeviceLocationInRoomScaleCoordinate()
+        {
+            return Orientation.Orienter.GetDeviceLocalPosition();
         }
     }
 }

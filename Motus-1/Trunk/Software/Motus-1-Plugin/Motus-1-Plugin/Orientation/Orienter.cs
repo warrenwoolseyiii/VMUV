@@ -28,6 +28,8 @@ namespace Motus_1_Plugin.Orientation
                 Vector3 newRotation = playerRotation - padDirectE;
                 currentOffset = Quaternion.Euler(newRotation);
                 steeringOffset = new Vector3();
+
+                DataStorage.DataStorage.SetMotusRoomScaleCoordinate();
             }
         }
 
@@ -43,41 +45,27 @@ namespace Motus_1_Plugin.Orientation
 
             if (xz.magnitude > 0)
             {
-                Vector3 leftH = InputTracking.GetLocalPosition(VRNode.LeftHand);
-                Vector3 rightH = InputTracking.GetLocalPosition(VRNode.RightHand);
-                Vector3 head = InputTracking.GetLocalPosition(VRNode.Head);
-                var HtoLH = leftH - head;
-                var HtoRH = rightH - head;
-                var HtoLHplusHtoRH = HtoLH + HtoRH;
-                Vector3 LookXandY = (HtoLHplusHtoRH) / Vector3.SqrMagnitude(HtoLHplusHtoRH);
+                Vector3 leftH = InputTracking.GetLocalRotation(VRNode.LeftHand).eulerAngles;
+                Vector3 rightH = InputTracking.GetLocalRotation(VRNode.RightHand).eulerAngles;
+                Vector3 playerRotation = new Vector3();
 
-                LookXandY.y = 0;
-                LookXandY = Quaternion.Euler(LookXandY).eulerAngles;
+                playerRotation.y = (leftH.y + rightH.y) / 2;
+                playerRotation.Normalize();
 
-                LookXandY.x = 0;
-                LookXandY.z = 0;
-
-                Vector3 steering = LookXandY - latchPadDirectE - currentOffset.eulerAngles - steeringOffset;
+                Vector3 steering = playerRotation - latchPadDirectE - currentOffset.eulerAngles - steeringOffset;
 
                 rtn = Quaternion.Euler(steering);
             }
             else
             {
-                Vector3 leftH = InputTracking.GetLocalPosition(VRNode.LeftHand);
-                Vector3 rightH = InputTracking.GetLocalPosition(VRNode.RightHand);
-                Vector3 head = InputTracking.GetLocalPosition(VRNode.Head);
-                var HtoLH = leftH - head;
-                var HtoRH = rightH - head;
-                var HtoLHplusHtoRH = HtoLH + HtoRH;
-                Vector3 LookXandY = (HtoLHplusHtoRH) / Vector3.SqrMagnitude(HtoLHplusHtoRH);
+                Vector3 leftH = InputTracking.GetLocalRotation(VRNode.LeftHand).eulerAngles;
+                Vector3 rightH = InputTracking.GetLocalRotation(VRNode.RightHand).eulerAngles;
+                Vector3 playerRotation = new Vector3();
 
-                LookXandY.y = 0;
-                LookXandY = Quaternion.Euler(LookXandY).eulerAngles;
+                playerRotation.y = (leftH.y + rightH.y) / 2;
+                playerRotation.Normalize();
 
-                LookXandY.x = 0;
-                LookXandY.z = 0;
-
-                steeringOffset = LookXandY - latchPadDirectE - currentOffset.eulerAngles;
+                steeringOffset = playerRotation - latchPadDirectE - currentOffset.eulerAngles;
             }
 
             return rtn;
@@ -114,5 +102,9 @@ namespace Motus_1_Plugin.Orientation
             return rtn;
         }
 
+        public static Vector3 GetDeviceLocalPosition()
+        {
+            return DataStorage.DataStorage.GetMotusRoomScaleCoodinate();
+        }
     }
 }

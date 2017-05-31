@@ -37,5 +37,15 @@ namespace Motus_1_Plugin.DataStorage
         {
             return motus.GetXZVector();
         }
+
+        public static void SetMotusRoomScaleCoordinate()
+        {
+            motus.SetRoomScaleCoordinates();
+        }
+
+        public static Vector3 GetMotusRoomScaleCoodinate()
+        {
+            return motus.deviceRoomScaleCoordinates;
+        }
     }
 }

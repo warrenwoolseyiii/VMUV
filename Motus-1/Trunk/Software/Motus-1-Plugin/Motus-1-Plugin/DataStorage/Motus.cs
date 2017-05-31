@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 
 namespace Motus_1_Plugin.DataStorage
 {
@@ -6,6 +7,7 @@ namespace Motus_1_Plugin.DataStorage
     {
         public const int numSensors = 9;
         public SensorPad[] sensorPads = new SensorPad[numSensors];
+        public Vector3 deviceRoomScaleCoordinates = new Vector3();
 
         private const float sin45 = 0.707f;
 
@@ -49,6 +51,12 @@ namespace Motus_1_Plugin.DataStorage
             rtn.Normalize();
 
             return rtn;
+        }
+
+        public void SetRoomScaleCoordinates()
+        {
+            deviceRoomScaleCoordinates = InputTracking.GetLocalPosition(VRNode.CenterEye);
+            deviceRoomScaleCoordinates.y = 0;
         }
     }
 }

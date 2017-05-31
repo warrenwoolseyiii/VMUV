@@ -8,9 +8,9 @@ namespace VMUV_TCP
     {
         static void Main(string[] args)
         {
-            //SelfTest();
+            SelfTest();
             //UnityTest();
-            ThroughtputTest();
+            //ThroughtputTest();
         }
 
         static void ThroughtputTest()

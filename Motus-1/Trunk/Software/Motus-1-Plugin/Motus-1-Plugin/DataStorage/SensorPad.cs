@@ -1,4 +1,5 @@
-﻿
+﻿#define Test
+
 namespace Motus_1_Plugin.DataStorage
 {
     class SensorPad
@@ -17,12 +18,22 @@ namespace Motus_1_Plugin.DataStorage
         public SensorPad(int id)
         {
             this.id = id;
+
+#if Test
+            maxAllowable = 3000;
+            minAllowable = 800;
+#endif
+
             maxVal = maxAllowable;
             minVal = minAllowable;
             currentVal = -1;
             pctActive = 0;
             activeThreshold = 0.75f;
             isActive = false;
+
+#if Test
+            activeThreshold = 0.45f;
+#endif
         }
 
         public void SetCurrentValue(short val)
