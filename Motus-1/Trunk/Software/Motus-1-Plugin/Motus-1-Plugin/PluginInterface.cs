@@ -12,7 +12,7 @@ namespace Motus_1_Plugin
         public const string versionInfo = "1.0.5";
 
         /// <summary>
-        /// Use this property to enable sterring that is coupled to the user's head.
+        /// Set this property to true to enable steering via the user's look rotation.
         /// </summary>
         public static bool enableHeadSteering = false;
 
@@ -21,20 +21,27 @@ namespace Motus_1_Plugin
         /// </summary>
         public static bool enableHandSteering = false;
 
+        private static bool isInitalized = false;
+
         /// <summary>
-        /// This methoud should be called only once upon startup from the character controll script. It initializes the log file for the
-        /// motus-1 plugin.
+        /// Initialize should be called only once upon startup from the character controll script. It initializes the log file for the
+        /// motus-1 plugin and sets all properties and fields to known states.
         /// </summary>
         public static void Initialize()
         {
-            Logging.Logger.CreateLogFile();
-            Logging.Logger.LogMessage("Unity Motus Plugin v" + versionInfo);
-            Logging.Logger.LogMessage("Client side TCP v" + VMUV_TCP.SocketWrapper.version);
+            if (!isInitalized)
+            {
+                Logging.Logger.CreateLogFile();
+                Logging.Logger.LogMessage("Unity Motus Plugin v" + versionInfo);
+                Logging.Logger.LogMessage("Client side TCP v" + VMUV_TCP.SocketWrapper.version);
+
+                isInitalized = true;
+            }
         }
 
         /// <summary>
-        /// This method must be called from the Update function of the script which employs character movement. Service handles all communications with 
-        /// hardware device and provides movement data from the motus-1.
+        /// Service must be called from the Update function of the script which employs character movement. Service handles all communications with 
+        /// hardware device and provides movement data from the motus-1. Service also handles all logging from the various sub-modules of the plugin.
         /// </summary>
         public static void Service()
         {
@@ -53,8 +60,9 @@ namespace Motus_1_Plugin
         }
 
         /// <summary>
-        /// This method will return the current translation vector from the motus-1 device. Use this method to update the user's movement in 
-        /// game space.
+        /// GetXZVector will return the current translation vector from the motus-1 device. Use this method to update the user's movement in 
+        /// game space. The XZ vector is analogous to a typical 'left' joystick type movement in a traditional gamepad control stream. The XZ
+        /// vector controlls forward, backward, and lateral movement of the character.
         /// </summary>
         /// <returns></returns>
         public static Vector3 GetXZVector()
@@ -65,8 +73,10 @@ namespace Motus_1_Plugin
         }
 
         /// <summary>
-        /// This method will return the rotation of the character according to the motus-1 and steering if set. Each update on the character
-        /// script should call this method and set the localRotation property of the charcter to the return quaternion from this method.
+        /// GetCharacterRotation returns a quaternion representing the rotation that the character has with respect to the game space coordinate frame.
+        /// GetCharacterRotation must be called in conjunction with GetZXVector to allow the user to properly orient the character and the motus-1 device within
+        /// game space. If any form of steering is enabled, GetCharacterRotation also applies any steering vector to the character. Steering motion is analogous to
+        /// 'right' joystick type motion in a tradtional gamepad control scheme.
         /// </summary>
         /// <returns>Character rotation.</returns>
         public static Quaternion GetCharacterRotation()
@@ -85,8 +95,9 @@ namespace Motus_1_Plugin
         }
 
         /// <summary>
-        /// This method will orient the motus hardware device to the in game coordinate system. Instruct the user to take a step forward on the 
-        /// device, while they are engaged in the stepping action call this method to snap the hardware to the coordinate system.
+        /// OrientMotus must be called at least once at the beginning of the application to orient the motus-1 hardware with the game space coodinates. This
+        /// orientation will be represented in the GetCharacterRotation quaternion. Please note that the motus-1 hardware may not function correctly if 
+        /// OrientMotus is never called.
         /// </summary>
         public static void OrientMotus()
         {
@@ -94,8 +105,8 @@ namespace Motus_1_Plugin
         }
 
         /// <summary>
-        /// This method will acquire the local (room scale) offset of the motus-1 device so that you can factor that into your in-game representation
-        /// of the motus-1.
+        /// GetDeviceLocationInRoomScaleCoordinate will return the local (room scale) offset of the motus-1 device so that you can factor that into your 
+        /// in-game representation of the motus-1 hardware and display it in the proper location.
         /// </summary>
         /// <returns>Room Scale position of the motus-1 platform in vector3 format.</returns>
         public static Vector3 GetDeviceLocationInRoomScaleCoordinate()
