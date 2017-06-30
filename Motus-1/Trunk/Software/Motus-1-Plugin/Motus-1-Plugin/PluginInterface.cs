@@ -9,7 +9,7 @@ namespace Motus_1_Plugin
         /// <summary>
         /// The current version of the unity plugin.
         /// </summary>
-        public const string versionInfo = "1.0.5";
+        public const string versionInfo = "1.1.0";
 
         /// <summary>
         /// Set this property to true to enable steering via the user's look rotation.
@@ -20,6 +20,16 @@ namespace Motus_1_Plugin
         /// Not implemented.
         /// </summary>
         public static bool enableHandSteering = false;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public static bool enableVivTrackerSteering = false;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public static bool isViveTrackerPresent = false;
 
         private static bool isInitalized = false;
 
@@ -87,7 +97,9 @@ namespace Motus_1_Plugin
             if (enableHeadSteering)
                 steering = Orientation.Orienter.ApplyHeadSteeringRotation();
             else if (enableHandSteering)
-            { }    //steering = Orientation.Orienter.ApplyHandSteeringRotation();
+                steering = Orientation.Orienter.ApplyHandSteeringRotation();
+            else if (enableVivTrackerSteering)
+                steering = Orientation.Orienter.ApplyViveTrackerRotation();
 
             Vector3 newOffset = axesOffset.eulerAngles + steering.eulerAngles;
 
@@ -112,6 +124,16 @@ namespace Motus_1_Plugin
         public static Vector3 GetDeviceLocationInRoomScaleCoordinate()
         {
             return Orientation.Orienter.GetDeviceLocalPosition();
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        public static void SetViveTrackerOrientation(Vector3 position, Vector3 rotation)
+        {
+            Orientation.Orienter.SetViveTrackerRotation(position, rotation);
         }
     }
 }

@@ -9,6 +9,8 @@ namespace Motus_1_Plugin.Orientation
         private static Quaternion currentOffset = new Quaternion();
         private static Vector3 latchPadDirectE = new Vector3();
         private static Vector3 steeringOffset = new Vector3();
+        private static Vector3 trackerPos = new Vector3();
+        private static Vector3 trackerRot = new Vector3();
 
         public static void SnapMotusToGameAxes()
         {
@@ -50,7 +52,6 @@ namespace Motus_1_Plugin.Orientation
                 Vector3 playerRotation = new Vector3();
 
                 playerRotation.y = (leftH.y + rightH.y) / 2;
-                playerRotation.Normalize();
 
                 Vector3 steering = playerRotation - latchPadDirectE - currentOffset.eulerAngles - steeringOffset;
 
@@ -100,6 +101,41 @@ namespace Motus_1_Plugin.Orientation
             }
 
             return rtn;
+        }
+
+        public static Quaternion ApplyViveTrackerRotation()
+        {
+            Vector3 xz = DataStorage.DataStorage.GetXZVector();
+            Quaternion rtn = new Quaternion();
+
+            if (xz.magnitude > 0)
+            {
+                Vector3 playerRotation = trackerRot;
+
+                playerRotation.x = 0;
+                playerRotation.z = 0;
+
+                Vector3 steering = playerRotation - latchPadDirectE - currentOffset.eulerAngles - steeringOffset;
+
+                rtn = Quaternion.Euler(steering);
+            }
+            else
+            {
+                Vector3 playerRotation = trackerRot;
+
+                playerRotation.x = 0;
+                playerRotation.z = 0;
+
+                steeringOffset = playerRotation - latchPadDirectE - currentOffset.eulerAngles;
+            }
+
+            return rtn;
+        }
+
+        public static void SetViveTrackerRotation(Vector3 pos, Vector3 rot)
+        {
+            trackerPos = pos;
+            trackerRot = rot;
         }
 
         public static Vector3 GetDeviceLocalPosition()
