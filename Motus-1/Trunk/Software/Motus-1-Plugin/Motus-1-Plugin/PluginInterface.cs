@@ -22,12 +22,13 @@ namespace Motus_1_Plugin
         public static bool enableHandSteering = false;
 
         /// <summary>
-        /// TODO
+        /// Set this property to true to enable steering via the user's look rotation. This value will only become active
+        /// if isViveTrackerPresent is also set to true.
         /// </summary>
-        public static bool enableVivTrackerSteering = false;
+        public static bool enableViveTrackerSteering = false;
 
         /// <summary>
-        /// TODO
+        /// Set thie property to true if the vive tracker is present in your application
         /// </summary>
         public static bool isViveTrackerPresent = false;
 
@@ -94,12 +95,19 @@ namespace Motus_1_Plugin
             Quaternion axesOffset = Orientation.Orienter.GetOffset();
             Quaternion steering = new Quaternion();
 
-            if (enableHeadSteering)
-                steering = Orientation.Orienter.ApplyHeadSteeringRotation();
-            else if (enableHandSteering)
-                steering = Orientation.Orienter.ApplyHandSteeringRotation();
-            else if (enableVivTrackerSteering)
-                steering = Orientation.Orienter.ApplyViveTrackerRotation();
+            try
+            {
+                if (enableHeadSteering)
+                    steering = Orientation.Orienter.ApplyHeadSteeringRotation();
+                else if (enableHandSteering)
+                    steering = Orientation.Orienter.ApplyHandSteeringRotation();
+                else if (enableViveTrackerSteering && isViveTrackerPresent)
+                    steering = Orientation.Orienter.ApplyViveTrackerRotation();
+            }
+            catch (System.NotImplementedException e0)
+            {
+                Logging.Logger.LogMessage("PluginInterface.cs" + ": " + "GetCharacterRotation" + ": " + e0.ToString());
+            }
 
             Vector3 newOffset = axesOffset.eulerAngles + steering.eulerAngles;
 
@@ -127,7 +135,8 @@ namespace Motus_1_Plugin
         }
 
         /// <summary>
-        /// TODO
+        /// Pass the vive tracker orientation information from the vive tracker object in game to the motus-1 plugin. To see an example
+        /// of the implementation of this function see the ExampleViveTrackerScript.cs in the motus-1 directory.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
