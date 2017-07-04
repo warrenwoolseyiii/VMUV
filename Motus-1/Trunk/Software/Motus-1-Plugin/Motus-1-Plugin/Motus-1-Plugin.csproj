@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Acceleration Models\HumanWalkingAccModel.cs" />
     <Compile Include="DataStorage\DataStorage.cs" />
     <Compile Include="DataStorage\Motus.cs" />
     <Compile Include="DataStorage\SensorPad.cs" />
