@@ -11,12 +11,30 @@ namespace Motus_1_Plugin.Acceleration_Models
         private int _accRate = 1;
         private int _decRate = 1;
 
+        /// <summary>
+        /// Set the acceleration and deceleration rates via the non default constructor. accRate and decRate can be set to values ranging
+        /// from 1 to 90, where 1 being the slowest and 90 being the fastest.
+        /// </summary>
+        /// <param name="accRate"></param>
+        /// <param name="decRate"></param>
         public HumanWalkingAccModel(int accRate, int decRate)
         {
+            if (accRate < 1)
+                accRate = 1;
+
+            if (decRate < 1)
+                decRate = 1;
+
             _accRate = accRate;
             _decRate = decRate;
         }
 
+        /// <summary>
+        /// Runs the acceleration model, simply pass the motus-1 xz vector which has been previously rotated (see ExampleMovementScript.cs) as the argument
+        /// into this method and it will return the accelerated or decelerated value.
+        /// </summary>
+        /// <param name="currentVector"></param>
+        /// <returns></returns>
         public Vector3 RunModel(Vector3 currentVector)
         {
             DetermineNextState(currentVector);
