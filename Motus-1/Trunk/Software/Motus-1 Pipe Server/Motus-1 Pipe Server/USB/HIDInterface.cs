@@ -122,8 +122,11 @@ namespace Motus_1_Pipe_Server.USB
             DataReader dr = DataReader.FromBuffer(buff);
             byte[] bytes = new byte[rpt.Data.Length];
             dr.ReadBytes(bytes);
-            //DataStorageTable.SetCurrentData(bytes);
+            DataStorageTable.SetCurrentData(bytes);
 
+            // For now I want to send data as fast as possible to the caller so we will not use
+            // the accumulator.
+            /* TODO: Not using the accumulator atm.
             ByteUtilities.SetRawDataInCnts(bytes);
             short[] formatted = ByteUtilities.GetRawDataInCnts();
 
@@ -138,7 +141,7 @@ namespace Motus_1_Pipe_Server.USB
 
                 DataStorageTable.SetCurrentData(avgBytes);
                 storeNextDataPt = true;
-            }
+            }*/
         }
 
         private static void USBInterruptTransferHandler(HidDevice sender, HidInputReportReceivedEventArgs args)
