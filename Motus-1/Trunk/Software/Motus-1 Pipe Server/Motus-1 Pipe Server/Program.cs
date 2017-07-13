@@ -9,7 +9,7 @@ namespace Motus_1_Pipe_Server
 {
     class Program
     {
-        private static string version = "1.0.2";
+        private static string version = "1.0.3";
         private static HardwareStates hwState = HardwareStates.find_device;
         private static SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
         private static int devicePollCounter = 0;
