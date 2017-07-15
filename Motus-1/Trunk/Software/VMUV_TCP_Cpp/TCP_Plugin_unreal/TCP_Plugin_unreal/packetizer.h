@@ -1,7 +1,7 @@
 #pragma once
-
 #ifndef PACKETIZER_H
 #define PACKETIZER_H
+
 #include <vector>
 using std::vector;
 

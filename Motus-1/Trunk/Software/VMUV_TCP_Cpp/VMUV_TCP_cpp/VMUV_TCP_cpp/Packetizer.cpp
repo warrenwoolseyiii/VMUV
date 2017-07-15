@@ -58,14 +58,14 @@ bool VMUV_TCP::packetizer::IsPacketValid(unsigned char * packet)
 	unsigned char type = packet[2];
 
 	short len = (short)(packet[3]);
-	len <<= 8;
+	len << 8;
 	len |= (short)(packet[4] & 0xff);
 	
     if (len > BUFF_SIZE)
         return false;
 
     short recChkSum = packet[5 + len];
-    recChkSum <<= 8;
+    recChkSum << 8;
     recChkSum |= packet[6 + len];
 
     short calcChkSum = CalculateCheckSumFromPayload(packet, len);
