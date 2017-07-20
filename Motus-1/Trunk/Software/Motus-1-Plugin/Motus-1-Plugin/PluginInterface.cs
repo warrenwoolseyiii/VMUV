@@ -9,7 +9,7 @@ namespace Motus_1_Plugin
         /// <summary>
         /// The current version of the unity plugin.
         /// </summary>
-        public const string versionInfo = "1.1.1";
+        public const string versionInfo = "1.1.2";
 
         /// <summary>
         /// Set this property to true to enable steering via the user's look rotation.
@@ -32,7 +32,13 @@ namespace Motus_1_Plugin
         /// </summary>
         public static bool isViveTrackerPresent = false;
 
+        /// <summary>
+        /// TODO:
+        /// </summary>
+        public static bool autoOrientEnable = true;
+
         private static bool isInitalized = false;
+        private static bool autoOrientComplete = false;
 
         /// <summary>
         /// Initialize should be called only once upon startup from the character controll script. It initializes the log file for the
@@ -68,6 +74,9 @@ namespace Motus_1_Plugin
 
                 Logging.Logger.LogMessage(strMsg);
             }
+
+            if (autoOrientEnable && !autoOrientComplete)
+                OrientMotus();
         }
 
         /// <summary>
@@ -121,7 +130,23 @@ namespace Motus_1_Plugin
         /// </summary>
         public static void OrientMotus()
         {
-            Orientation.Orienter.SnapMotusToGameAxes();
+            Vector3 xz = DataStorage.DataStorage.GetXZVector();
+
+            // Orient the Motus-1 device and then reset the xz vector to prevent any weirdness.
+            if (xz.magnitude > 0)
+            {
+                Orientation.Orienter.SnapMotusToGameAxes();
+
+                short[] data = new short[9];
+                for (int i = 0; i < data.Length; i++)
+                    data[i] = 0;
+
+                DataStorage.DataStorage.SetCurrentData(data);
+                DataStorage.DataStorage.SetCurrentData(data);
+
+                if (autoOrientEnable)
+                    autoOrientComplete = true;
+            }
         }
 
         /// <summary>

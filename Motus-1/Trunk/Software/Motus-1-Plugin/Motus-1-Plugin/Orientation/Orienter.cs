@@ -42,6 +42,10 @@ namespace Motus_1_Plugin.Orientation
             }
         }
 
+        /// <summary>
+        /// Getter for the in game offset rotation.
+        /// </summary>
+        /// <returns></returns>
         public static Quaternion GetOffset()
         {
             return inGameOffset;
@@ -159,12 +163,22 @@ namespace Motus_1_Plugin.Orientation
             return rtn;
         }
 
+        /// <summary>
+        /// Setter for the internal vive tracker position and rotation in room space. This method is used from the vive tracker interface script
+        /// to relay the position and rotation of the device to the plugin.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="rot"></param>
         public static void SetViveTrackerRotation(Vector3 pos, Vector3 rot)
         {
             trackerPos = pos;
             trackerRot = rot;
         }
 
+        /// <summary>
+        /// Getter for the room scale coordinates of the Motus-1 device.
+        /// </summary>
+        /// <returns></returns>
         public static Vector3 GetDeviceLocalPosition()
         {
             return DataStorage.DataStorage.GetMotusRoomScaleCoodinate();
