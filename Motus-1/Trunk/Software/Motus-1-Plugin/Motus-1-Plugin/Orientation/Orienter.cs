@@ -6,11 +6,15 @@ namespace Motus_1_Plugin.Orientation
 {
     static class Orienter
     {
+        public static bool useViveTracker = false;
+        public static bool useHeadSet = true;
+        public static bool useHands = false;
+
         private static Quaternion inGameOffset = new Quaternion();
-        private static Vector3 latchPadDirectionEuler = new Vector3();
-        private static Vector3 steeringOffset = new Vector3();
+        private static Quaternion latchPadDirection = new Quaternion();
+        private static Quaternion steeringOffset = new Quaternion();
         private static Vector3 trackerPos = new Vector3();
-        private static Vector3 trackerRot = new Vector3();
+        private static Quaternion trackerRot = new Quaternion(0, 0, 0, 1);
 
         /// <summary>
         /// Oreints the motus-1 platform and its user to the game axes. This function should be utilize to ensure the x and z axes of the 
@@ -19,7 +23,7 @@ namespace Motus_1_Plugin.Orientation
         public static void SnapMotusToGameAxes()
         {
             Vector3 xz = DataStorage.DataStorage.GetXZVector();
-            steeringOffset = new Vector3();
+            steeringOffset = new Quaternion(0, 0, 0, 1);
 
             // We only want to reset the offset if the player is actually moving otherwise the offset
             // is basically undefined.
@@ -27,16 +31,24 @@ namespace Motus_1_Plugin.Orientation
             {
                 // Get the player rotation based on the direction the headset is looking. We assume the player is looking forward.
                 // We only care about the rotation about the y axis, so zero out everything else.
-                Vector3 playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye).eulerAngles;
-                playerRotation.x = 0;
-                playerRotation.z = 0;
+                Quaternion playerRotation = new Quaternion(0, 0, 0, 1);
+
+                if (useViveTracker)
+                    playerRotation = trackerRot;
+                else
+                    playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye);
+
+                Vector3 playerRotationEuler = playerRotation.eulerAngles;
+
+                playerRotationEuler.x = 0;
+                playerRotationEuler.z = 0;
+                playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 // Set the new latch rotation based on the way the player is 'looking' with thier step.
-                latchPadDirectionEuler = Quaternion.LookRotation(xz).eulerAngles;
+                latchPadDirection = Quaternion.LookRotation(xz);
 
                 // The actual rotation is the difference between the player's forward look and the motus generated forward 'look'.
-                Vector3 newRotation = playerRotation - latchPadDirectionEuler;
-                inGameOffset = Quaternion.Euler(newRotation);
+                inGameOffset = playerRotation * Quaternion.Inverse(latchPadDirection);
 
                 DataStorage.DataStorage.SetMotusRoomScaleCoordinate();
             }
@@ -98,29 +110,33 @@ namespace Motus_1_Plugin.Orientation
         public static Quaternion ApplyHeadSteeringRotation()
         {
             Vector3 xz = DataStorage.DataStorage.GetXZVector();
-            Quaternion rtn = new Quaternion();
+            Quaternion rtn = new Quaternion(0, 0, 0, 1);
 
             // We can only 'steer' if we are actually moving.
             if (xz.magnitude > 0)
             {
                 // Get the absolute rotation of the player in roomspace.
-                Vector3 playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye).eulerAngles;
+                Quaternion playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye);
+                Vector3 playerRotationEuler = playerRotation.eulerAngles;
+
                 playerRotation.x = 0;
                 playerRotation.z = 0;
+                playerRotation = Quaternion.Euler(playerRotationEuler);
 
-                // The steering rotation is the player's absolute rotation minus all preset offsets between the motus-1, player, and game coordinates.
-                Vector3 steering = playerRotation - latchPadDirectionEuler - inGameOffset.eulerAngles - steeringOffset;
-                rtn = Quaternion.Euler(steering);
+                rtn = playerRotation * Quaternion.Inverse(steeringOffset);
             }
             else
             {
                 // Get the absolute rotation of the player in roomspace.
-                Vector3 playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye).eulerAngles;
+                Quaternion playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye);
+                Vector3 playerRotationEuler = playerRotation.eulerAngles;
+
                 playerRotation.x = 0;
                 playerRotation.z = 0;
+                playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 // Calculate the steeringOffset so that when we are done steering our new offset is correct.
-                steeringOffset = playerRotation - latchPadDirectionEuler - inGameOffset.eulerAngles;
+                steeringOffset = playerRotation;
             }
 
             return rtn;
@@ -135,31 +151,34 @@ namespace Motus_1_Plugin.Orientation
         public static Quaternion ApplyViveTrackerRotation()
         {
             Vector3 xz = DataStorage.DataStorage.GetXZVector();
-            Quaternion rtn = new Quaternion();
+            Quaternion rtn = new Quaternion(0, 0, 0, 1);
 
-            // We can only 'steer' if we are moving.
+            // We can only 'steer' if we are actually moving.
             if (xz.magnitude > 0)
             {
-                // Get the player's absolute rotation in space by acquiring the trackers rotation about the y axis.
-                Vector3 playerRotation = trackerRot;
+                // Get the absolute rotation of the player in roomspace.
+                Quaternion playerRotation = trackerRot;
+                Vector3 playerRotationEuler = playerRotation.eulerAngles;
+
                 playerRotation.x = 0;
                 playerRotation.z = 0;
+                playerRotation = Quaternion.Euler(playerRotationEuler);
 
-                // The steering rotation is the player's absolute rotation minus all preset offsets between the motus-1, player, and game coordinates.
-                Vector3 steering = playerRotation - latchPadDirectionEuler - inGameOffset.eulerAngles - steeringOffset;
-                rtn = Quaternion.Euler(steering);
+                rtn = playerRotation * Quaternion.Inverse(steeringOffset);
             }
             else
             {
-                // Get the player's absolute rotation in space by acquiring the trackers rotation about the y axis.
-                Vector3 playerRotation = trackerRot;
+                // Get the absolute rotation of the player in roomspace.
+                Quaternion playerRotation = trackerRot;
+                Vector3 playerRotationEuler = playerRotation.eulerAngles;
+
                 playerRotation.x = 0;
                 playerRotation.z = 0;
+                playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 // Calculate the steeringOffset so that when we are done steering our new offset is correct.
-                steeringOffset = playerRotation - latchPadDirectionEuler - inGameOffset.eulerAngles;
+                steeringOffset = playerRotation;
             }
-
             return rtn;
         }
 
@@ -169,7 +188,7 @@ namespace Motus_1_Plugin.Orientation
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="rot"></param>
-        public static void SetViveTrackerRotation(Vector3 pos, Vector3 rot)
+        public static void SetViveTrackerRotation(Vector3 pos, Quaternion rot)
         {
             trackerPos = pos;
             trackerRot = rot;
