@@ -9,7 +9,7 @@ namespace Motus_1_Plugin
         /// <summary>
         /// The current version of the unity plugin.
         /// </summary>
-        public const string versionInfo = "1.1.2";
+        public const string versionInfo = "1.2.0";
 
         /// <summary>
         /// Set this property to true to enable steering via the user's look rotation.
