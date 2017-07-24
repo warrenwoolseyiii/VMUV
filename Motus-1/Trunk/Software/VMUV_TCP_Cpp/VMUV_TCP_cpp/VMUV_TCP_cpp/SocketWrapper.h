@@ -28,7 +28,7 @@ namespace VMUV_TCP
 
 	private:
 		packetizer packetizer;
-		TraceLogger traceLogger; //TODO figure out what in the world is causing this file not to recognize my TraceLogger class
+		TraceLogger traceLogger; 
 		SOCKET listener = NULL;
 		const int port = 11069;
 		unsigned char txDataPing [BUFF_SIZE] = { 0 };  // Do this incase Start() is called before the user sets any data
