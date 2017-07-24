@@ -5,10 +5,16 @@
 #include "packetizer.h"
 #include <WinSock2.h>
 #include <string>
+#include <iostream>
 #include <vector>
 #pragma comment(lib,"WS2_32")
 using std::string;
+using std::cout;
+using std::endl;
 using std::vector;
+
+#define NETWORK_ERROR -1
+#define NETWORK_OK 0
 
 namespace VMUV_TCP
 {
@@ -23,7 +29,7 @@ namespace VMUV_TCP
 		test,
 		raw_data
 	};
-	
+
 	class socketWrapper
 	{
 	public:
@@ -33,12 +39,13 @@ namespace VMUV_TCP
 		void serverSetTxData(vector<unsigned char> payload, PacketTypes type);
 		vector<unsigned char> clientGetRxData() const;
 		void startServer();
+		void clientStartRead();
 		
 		vector<unsigned char> getTxDataPing() const;
 		vector<unsigned char> getTxDataPong() const;
 	private:
 		packetizer packetMaker;
-		SOCKET listenter;
+		SOCKET listener, client;
 		const int port = 11069;
 		vector<unsigned char> txDataPing;
 		vector<unsigned char> txDataPong;
@@ -50,6 +57,8 @@ namespace VMUV_TCP
 		string moduleName = "SocketWrapper.cpp";
 		int numPacketsRead = 0;
 		const string version = "1.0.2";
+
+		void reportError(int, const char*);
 	};
 }
 

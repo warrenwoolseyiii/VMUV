@@ -80,6 +80,16 @@ int main()
 	cout << endl;
 
 	cout << endl;
+
+	////////////////Testing socketWrapper::startServer()/////////////////////
+	testWrapper.startServer();
+
+	//need to make a separate program to test the client side of the socketWrapper class
+	socketWrapper clientWrapper(Configuration::client);
+	clientWrapper.clientStartRead();
+
+
+
 	while (true)
 	{ }
 
