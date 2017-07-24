@@ -3,6 +3,10 @@
 
 VMUV_TCP::socketWrapper::socketWrapper(Configuration configuration) : config(configuration)
 {
+	txDataPing.reserve(256);
+	txDataPong.reserve(256);
+	rxDataPing.reserve(256);
+	rxDataPong.reserve(256);
 }
 
 string VMUV_TCP::socketWrapper::getVersion() const
@@ -34,6 +38,10 @@ vector<unsigned char> VMUV_TCP::socketWrapper::clientGetRxData() const
 		return rxDataPing;
 }
 
+void VMUV_TCP::socketWrapper::startServer()
+{
+}
+
 vector<unsigned char> VMUV_TCP::socketWrapper::getTxDataPing() const
 {
 	return txDataPing;
@@ -43,3 +51,4 @@ vector<unsigned char> VMUV_TCP::socketWrapper::getTxDataPong() const
 {
 	return txDataPong;
 }
+

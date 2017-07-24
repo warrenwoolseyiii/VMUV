@@ -3,8 +3,10 @@
 #define SOCKETWRAPPER_H
 
 #include "packetizer.h"
+#include <WinSock2.h>
 #include <string>
 #include <vector>
+#pragma comment(lib,"WS2_32")
 using std::string;
 using std::vector;
 
@@ -30,12 +32,13 @@ namespace VMUV_TCP
 		string getVersion() const;
 		void serverSetTxData(vector<unsigned char> payload, PacketTypes type);
 		vector<unsigned char> clientGetRxData() const;
-		
+		void startServer();
 		
 		vector<unsigned char> getTxDataPing() const;
 		vector<unsigned char> getTxDataPong() const;
 	private:
 		packetizer packetMaker;
+		SOCKET listenter;
 		const int port = 11069;
 		vector<unsigned char> txDataPing;
 		vector<unsigned char> txDataPong;
