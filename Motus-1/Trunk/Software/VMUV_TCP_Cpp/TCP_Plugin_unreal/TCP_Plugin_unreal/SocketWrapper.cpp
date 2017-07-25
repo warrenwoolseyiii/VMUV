@@ -16,6 +16,8 @@ string VMUV_TCP::socketWrapper::getVersion() const
 
 void VMUV_TCP::socketWrapper::serverSetTxData(vector<unsigned char> payload, PacketTypes type)
 {
+	if (config == Configuration::client)
+		return;
 	if (usePing)
 	{
 		txDataPing.clear();
@@ -30,8 +32,28 @@ void VMUV_TCP::socketWrapper::serverSetTxData(vector<unsigned char> payload, Pac
 	}
 }
 
+void VMUV_TCP::socketWrapper::setRxData(vector<unsigned char> payload, PacketTypes type)
+{
+	if (config == Configuration::server)
+		return;
+	if (usePing)
+	{
+		rxDataPing.clear();
+		rxDataPing = packetMaker.packetizeData(payload, static_cast<int>(type));
+		usePing = false;
+	}
+	else
+	{
+		rxDataPong.clear();
+		rxDataPong = packetMaker.packetizeData(payload, static_cast<int>(type));
+		usePing = true;
+	}
+}
+
 vector<unsigned char> VMUV_TCP::socketWrapper::clientGetRxData() const
 {
+	if (config == Configuration::server)
+		return vector<unsigned char>();
 	if (usePing)
 		return rxDataPong;
 	else
@@ -120,21 +142,6 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	sockVersion = MAKEWORD(1, 0, 1);
 	WSAStartup(sockVersion, &wsaData);
 
-	/*//het the hostent from the user's computer(esentially doing a loopback)
-	LPHOSTENT hostEntry;
-	char swHostName[255];
-	gethostname(swHostName, 255);
-	hostEntry = gethostbyname(swHostName);
-
-	if (!hostEntry)
-	{
-		nret = WSAGetLastError();
-		reportError(nret, "gethostbyaddr()");
-
-		WSACleanup();
-		return;
-	}*/
-
 	//initiallize the client socket
 	client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -153,9 +160,9 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	serverInfo.sin_addr.s_addr = loopBackIpAddr;//*((LPIN_ADDR)*hostEntry->h_addr_list);
 	serverInfo.sin_port = htons(port);
 	cout << "server info initiallized" << endl;
+	
 	//connect to the server!
 	nret = connect(client, (LPSOCKADDR)&serverInfo, sizeof(serverInfo));
-	cout << "do we get to here?" << endl;
 	if (nret == SOCKET_ERROR)
 	{
 		nret = WSAGetLastError();
@@ -165,6 +172,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 		return;
 	}
 
+	//get a data packet from the tcp connection
 	nret = recv(client, readBuff, 7 + 19, 0);
 	if (nret == SOCKET_ERROR)
 	{
@@ -174,9 +182,16 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 		WSACleanup();
 		return;
 	}
+	if (nret != 26)
+	{
+		closesocket(client);
+		WSACleanup();
+		return;
+	}
+		
 	
 	vector<unsigned char> packet, data;
-	for (int i = 0; i < nret; i++)
+	for (int i = 0; i < 7 + 19; i++)
 		packet.push_back(readBuff[i]);
 
 	cout << "got :" << nret << " bytes..." << endl;
@@ -185,14 +200,14 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	{
 		data = packetMaker.unpackData(packet);
 
-		for (int j = 0; j < (int)data.size() - 1; j += 2)
-		{
-			unsigned short tmp = (unsigned short)data[j+1];
-			tmp <<= 8;
-			tmp |= (unsigned short)data[j];
-			cout << tmp << endl;
-		}
+		setRxData(data, PacketTypes::raw_data);
 	}
+	
+}
+
+bool VMUV_TCP::socketWrapper::getUsePing() const
+{
+	return usePing;
 }
 
 vector<unsigned char> VMUV_TCP::socketWrapper::getTxDataPing() const

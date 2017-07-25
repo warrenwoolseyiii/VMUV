@@ -37,10 +37,12 @@ namespace VMUV_TCP
 
 		string getVersion() const;
 		void serverSetTxData(vector<unsigned char> payload, PacketTypes type);
+		void setRxData(vector<unsigned char> payload, PacketTypes type);
 		vector<unsigned char> clientGetRxData() const;
 		void startServer();
 		void clientStartRead();
 		
+		bool getUsePing() const;
 		vector<unsigned char> getTxDataPing() const;
 		vector<unsigned char> getTxDataPong() const;
 	private:

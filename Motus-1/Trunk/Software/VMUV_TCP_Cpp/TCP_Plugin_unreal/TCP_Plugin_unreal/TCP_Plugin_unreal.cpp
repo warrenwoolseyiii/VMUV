@@ -15,8 +15,8 @@ using std::vector;
 int main()
 {
 	
-	/*
-	vector<unsigned char> someData;
+	
+	/*vector<unsigned char> someData;
 	for (int i = 0; i < 8; i++)
 		someData.push_back(i);
 	
@@ -81,19 +81,37 @@ int main()
 
 	cout << endl;
 
+	////////////////Testing setRxData() and clientGetRxData()/////////////////////
+	cout << "Can our socket wrapper write to the buffer?" << endl;
+	socketWrapper testClientWrapper(Configuration::client);
+	testClientWrapper.setRxData(someData, PacketTypes::raw_data);
+	vector<unsigned char> clientWrapperData = testClientWrapper.clientGetRxData();     //working here!!!
+	cout << "rxData: ";
+	for (int i = 0; i < static_cast<int>(clientWrapperData.size()); i++)
+		cout << static_cast<int>(clientWrapperData[i]) << " ";
+	cout << endl;*/
+
 	////////////////Testing socketWrapper::startServer()/////////////////////
 	//testWrapper.startServer();
 
-	//need to make a separate program to test the client side of the socketWrapper class
-	socketWrapper clientWrapper(Configuration::client);
-	clientWrapper.clientStartRead();
-	*/
 
+
+
+	/////////////////Testing Client////////////////////////////
 	socketWrapper clientWrapper(Configuration::client);
 
 	while (true)
 	{
 		clientWrapper.clientStartRead();
+		vector<unsigned char> data = clientWrapper.clientGetRxData();
+		cout << "Use ping?: " << clientWrapper.getUsePing() << endl;
+		for (int j = 0; j < (int)data.size() - 1; j += 2)
+		{
+			unsigned short tmp = (unsigned short)data[j + 1];
+			tmp <<= 8;
+			tmp |= (unsigned short)data[j];
+			cout << tmp << endl;
+		}
 	}
 
     return 0;
