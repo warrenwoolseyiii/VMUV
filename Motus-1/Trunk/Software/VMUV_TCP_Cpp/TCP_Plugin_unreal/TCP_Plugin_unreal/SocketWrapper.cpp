@@ -182,6 +182,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 		WSACleanup();
 		return;
 	}
+	//error check in case the server is sending wonky packets
 	if (nret != 26)
 	{
 		closesocket(client);
@@ -194,6 +195,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	for (int i = 0; i < 7 + 19; i++)
 		packet.push_back(readBuff[i]);
 
+	//check packet validity and set it to the rxData
 	cout << "got :" << nret << " bytes..." << endl;
 	bool rtn = packetMaker.isPacketValid(packet);
 	if (rtn)
