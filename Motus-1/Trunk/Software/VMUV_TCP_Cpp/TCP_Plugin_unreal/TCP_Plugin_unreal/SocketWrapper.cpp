@@ -149,7 +149,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	//prepare for connection by filling sockaddr struct with info about the server
 	SOCKADDR_IN serverInfo;
 	serverInfo.sin_family = AF_INET;
-	serverInfo.sin_addr = *((LPIN_ADDR)*hostEntry->h_addr_list);
+	serverInfo.sin_addr.s_addr = loopBackIpAddr;//*((LPIN_ADDR)*hostEntry->h_addr_list);
 	serverInfo.sin_port = htons(port);
 	cout << "server info initiallized" << endl;
 	//connect to the server!

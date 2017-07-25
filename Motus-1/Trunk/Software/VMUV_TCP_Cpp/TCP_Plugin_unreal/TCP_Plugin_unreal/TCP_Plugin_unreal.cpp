@@ -1,6 +1,5 @@
 // TCP_Plugin_unreal.cpp : Defines the entry point for the console application.
 //
-
 #include "stdafx.h"
 #include "packetizer.h"
 #include "SocketWrapper.h"
@@ -82,7 +81,7 @@ int main()
 	cout << endl;
 
 	////////////////Testing socketWrapper::startServer()/////////////////////
-	testWrapper.startServer();
+	//testWrapper.startServer();
 
 	//need to make a separate program to test the client side of the socketWrapper class
 	socketWrapper clientWrapper(Configuration::client);
@@ -95,4 +94,3 @@ int main()
 
     return 0;
 }
-

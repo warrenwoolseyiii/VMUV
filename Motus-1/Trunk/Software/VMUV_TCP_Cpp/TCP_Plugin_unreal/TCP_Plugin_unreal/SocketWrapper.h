@@ -47,6 +47,7 @@ namespace VMUV_TCP
 		packetizer packetMaker;
 		SOCKET listener, client;
 		const int port = 11069;
+		const int loopBackIpAddr = 16777343;
 		vector<unsigned char> txDataPing;
 		vector<unsigned char> txDataPong;
 		vector<unsigned char> rxDataPing;
@@ -56,7 +57,7 @@ namespace VMUV_TCP
 		bool clientIsBusy = false;
 		string moduleName = "SocketWrapper.cpp";
 		int numPacketsRead = 0;
-		const string version = "1.0.2";
+		const string version = "1.0.0";
 
 		void reportError(int, const char*);
 	};
