@@ -21,7 +21,7 @@ short VMUV_TCP::packetizer::calculateCheckSum(vector<unsigned char> payload)
 	if (payload.size() != 0)
 	{
 		for (int i = 0; i < static_cast<int>(payload.size()); i++)
-			chksum += static_cast<short>(payload[i] & 0xff);
+			chksum += (short)(payload[i]);
 	}
 	
 	return chksum;
@@ -46,9 +46,9 @@ bool VMUV_TCP::packetizer::isPacketValid(vector<unsigned char> packet)
 	if (len > BUFF_SIZE)
 		return false;
 
-	short chkSum = packet[5 + len];
-	chkSum << 8;
-	chkSum |= packet[6 + len];
+	short chkSum = (short)packet[5 + len];
+	chkSum <<= 8;
+	chkSum |= (short)packet[6 + len];
 
 	vector<unsigned char> extractedPayload;
 

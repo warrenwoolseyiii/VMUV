@@ -15,6 +15,7 @@ using std::vector;
 int main()
 {
 	
+	/*
 	vector<unsigned char> someData;
 	for (int i = 0; i < 8; i++)
 		someData.push_back(i);
@@ -86,11 +87,14 @@ int main()
 	//need to make a separate program to test the client side of the socketWrapper class
 	socketWrapper clientWrapper(Configuration::client);
 	clientWrapper.clientStartRead();
+	*/
 
-
+	socketWrapper clientWrapper(Configuration::client);
 
 	while (true)
-	{ }
+	{
+		clientWrapper.clientStartRead();
+	}
 
     return 0;
 }

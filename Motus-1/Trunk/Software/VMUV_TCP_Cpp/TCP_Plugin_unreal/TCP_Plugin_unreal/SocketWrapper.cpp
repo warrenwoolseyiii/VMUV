@@ -115,6 +115,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	WORD sockVersion;
 	WSADATA wsaData;
 	int nret;
+	char readBuff[256];
 
 	sockVersion = MAKEWORD(1, 0, 1);
 	WSAStartup(sockVersion, &wsaData);
@@ -164,6 +165,34 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 		return;
 	}
 
+	nret = recv(client, readBuff, 7 + 19, 0);
+	if (nret == SOCKET_ERROR)
+	{
+		nret = WSAGetLastError();
+		reportError(nret, "connect()");
+
+		WSACleanup();
+		return;
+	}
+	
+	vector<unsigned char> packet, data;
+	for (int i = 0; i < 26; i++)
+		packet.push_back(readBuff[i]);
+
+	cout << "got :" << nret << " bytes..." << endl;
+	bool rtn = packetMaker.isPacketValid(packet);
+	if (rtn)
+	{
+		data = packetMaker.unpackData(packet);
+
+		for (int j = 1; j < (int)data.size(); j += 2)
+		{
+			short tmp = (short)data[j+1];
+			tmp <<= 8;
+			tmp |= (short)data[j];
+			cout << tmp << endl;
+		}
+	}
 }
 
 vector<unsigned char> VMUV_TCP::socketWrapper::getTxDataPing() const
