@@ -21,7 +21,7 @@ short VMUV_TCP::packetizer::calculateCheckSum(vector<unsigned char> payload)
 	if (payload.size() != 0)
 	{
 		for (int i = 0; i < static_cast<int>(payload.size()); i++)
-			chksum += (short)(payload[i]);
+			chksum += (unsigned short)(payload[i]);
 	}
 	
 	return chksum;
@@ -39,16 +39,16 @@ bool VMUV_TCP::packetizer::isPacketValid(vector<unsigned char> packet)
 		return false;
 
 	unsigned char  type = packet[2];
-	short len = static_cast<short>(packet[3]);
+	short len = static_cast<unsigned short>(packet[3]);
 	len << 8;
-	len |= static_cast<short>(packet[4] & 0xff);
+	len |= static_cast<unsigned short>(packet[4] & 0xff);
 
 	if (len > BUFF_SIZE)
 		return false;
 
-	short chkSum = (short)packet[5 + len];
+	unsigned short chkSum = (unsigned short)packet[5 + len];
 	chkSum <<= 8;
-	chkSum |= (short)packet[6 + len];
+	chkSum |= (unsigned short)packet[6 + len];
 
 	vector<unsigned char> extractedPayload;
 
@@ -94,13 +94,13 @@ vector<unsigned char> VMUV_TCP::packetizer::packetizeData(vector<unsigned char> 
 
 vector<unsigned char> VMUV_TCP::packetizer::unpackData(vector<unsigned char> packet)
 {
-	short len = static_cast<short>(packet[3] & 0xff);
+	short len = static_cast<unsigned short>(packet[3] & 0xff);
 	len << 8;
-	len |= static_cast<short>(packet[4] & 0xff);
+	len |= static_cast<unsigned short>(packet[4] & 0xff);
 
 	vector<unsigned char> unpackedData;
 
-	for (short i = 0; i < len; i++)
+	for (unsigned short i = 0; i < len; i++)
 		unpackedData.push_back(packet[i + 5]);
 	
 	return unpackedData;

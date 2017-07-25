@@ -120,7 +120,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	sockVersion = MAKEWORD(1, 0, 1);
 	WSAStartup(sockVersion, &wsaData);
 
-	//het the hostent from the user's computer(esentially doing a loopback)
+	/*//het the hostent from the user's computer(esentially doing a loopback)
 	LPHOSTENT hostEntry;
 	char swHostName[255];
 	gethostname(swHostName, 255);
@@ -133,7 +133,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 
 		WSACleanup();
 		return;
-	}
+	}*/
 
 	//initiallize the client socket
 	client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -176,7 +176,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	}
 	
 	vector<unsigned char> packet, data;
-	for (int i = 0; i < 26; i++)
+	for (int i = 0; i < nret; i++)
 		packet.push_back(readBuff[i]);
 
 	cout << "got :" << nret << " bytes..." << endl;
@@ -185,11 +185,11 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	{
 		data = packetMaker.unpackData(packet);
 
-		for (int j = 1; j < (int)data.size(); j += 2)
+		for (int j = 0; j < (int)data.size() - 1; j += 2)
 		{
-			short tmp = (short)data[j+1];
+			unsigned short tmp = (unsigned short)data[j+1];
 			tmp <<= 8;
-			tmp |= (short)data[j];
+			tmp |= (unsigned short)data[j];
 			cout << tmp << endl;
 		}
 	}
