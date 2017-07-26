@@ -179,6 +179,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 		nret = WSAGetLastError();
 		reportError(nret, "connect()");
 
+		closesocket(client);
 		WSACleanup();
 		return;
 	}
