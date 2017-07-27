@@ -197,7 +197,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 		packet.push_back(readBuff[i]);
 
 	//check packet validity and set it to the rxData
-	cout << "got :" << nret << " bytes..." << endl;
+	cout << "got: " << nret << " bytes..." << endl;
 	bool rtn = packetMaker.isPacketValid(packet);
 	if (rtn)
 	{
