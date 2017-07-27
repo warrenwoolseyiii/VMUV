@@ -40,7 +40,7 @@ bool VMUV_TCP::packetizer::isPacketValid(vector<unsigned char> packet)
 
 	unsigned char  type = packet[2];
 	short len = static_cast<unsigned short>(packet[3]);
-	len << 8;
+	len <<= 8;
 	len |= static_cast<unsigned short>(packet[4] & 0xff);
 
 	if (len > BUFF_SIZE)
@@ -95,7 +95,7 @@ vector<unsigned char> VMUV_TCP::packetizer::packetizeData(vector<unsigned char> 
 vector<unsigned char> VMUV_TCP::packetizer::unpackData(vector<unsigned char> packet)
 {
 	short len = static_cast<unsigned short>(packet[3] & 0xff);
-	len << 8;
+	len <<= 8;
 	len |= static_cast<unsigned short>(packet[4] & 0xff);
 
 	vector<unsigned char> unpackedData;
