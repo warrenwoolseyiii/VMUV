@@ -177,7 +177,7 @@ void VMUV_TCP::socketWrapper::clientStartRead()
 	if (nret == SOCKET_ERROR)
 	{
 		nret = WSAGetLastError();
-		reportError(nret, "connect()");
+		reportError(nret, "recv()");
 
 		closesocket(client);
 		WSACleanup();
@@ -229,7 +229,7 @@ void VMUV_TCP::socketWrapper::reportError(int errorCode, const char *whichFunc)
 
 	ZeroMemory(errorBuff, 92);     //clears 92 units of memory starting at the location of errorBuff
 
-	sprintf(errorBuff, "Call to %s returned error %d!", (char *)whichFunc, errorCode);  //stores error in errorBuff
+	sprintf_s(errorBuff, "Call to %s returned error %d!", (char *)whichFunc, errorCode);  //stores error in errorBuff
 
 	WCHAR errorMessage[92];
 	for (int i = 0; i < 92; i++)						//converting regular chars to wide chars so they can be output using messagebox which uses unicode
