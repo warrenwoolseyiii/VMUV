@@ -14,6 +14,7 @@ string VMUV_TCP::socketWrapper::getVersion() const
 	return version;
 }
 
+//not used for client application
 void VMUV_TCP::socketWrapper::serverSetTxData(vector<unsigned char> payload, PacketTypes type)
 {
 	if (config == Configuration::client)
@@ -60,6 +61,7 @@ vector<unsigned char> VMUV_TCP::socketWrapper::clientGetRxData() const
 		return rxDataPing;
 }
 
+//not used for client application
 void VMUV_TCP::socketWrapper::startServer()
 {
 	if (config == Configuration::client)

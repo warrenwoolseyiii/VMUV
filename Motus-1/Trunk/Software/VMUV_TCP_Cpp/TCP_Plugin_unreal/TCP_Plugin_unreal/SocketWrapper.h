@@ -36,10 +36,10 @@ namespace VMUV_TCP
 		socketWrapper(Configuration configuration);
 
 		string getVersion() const;
-		void serverSetTxData(vector<unsigned char> payload, PacketTypes type);
+		void serverSetTxData(vector<unsigned char> payload, PacketTypes type);	//not used for client application
 		void setRxData(vector<unsigned char> payload, PacketTypes type);
 		vector<unsigned char> clientGetRxData() const;
-		void startServer();
+		void startServer();	//not used for client application
 		void clientStartRead();
 		
 		bool getUsePing() const;
@@ -50,8 +50,8 @@ namespace VMUV_TCP
 		SOCKET listener, client;
 		const int port = 11069;
 		const int loopBackIpAddr = 16777343;
-		vector<unsigned char> txDataPing;
-		vector<unsigned char> txDataPong;
+		vector<unsigned char> txDataPing;  //not used for client application
+		vector<unsigned char> txDataPong;  //not used for client application
 		vector<unsigned char> rxDataPing;
 		vector<unsigned char> rxDataPong;
 		bool usePing = true;
