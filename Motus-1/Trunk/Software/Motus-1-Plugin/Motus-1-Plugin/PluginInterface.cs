@@ -9,7 +9,7 @@ namespace Motus_1_Plugin
         /// <summary>
         /// The current version of the unity plugin.
         /// </summary>
-        public const string versionInfo = "1.1.1";
+        public const string versionInfo = "1.2.0";
 
         /// <summary>
         /// Set this property to true to enable steering via the user's look rotation.
@@ -28,11 +28,22 @@ namespace Motus_1_Plugin
         public static bool enableViveTrackerSteering = false;
 
         /// <summary>
-        /// Set thie property to true if the vive tracker is present in your application
+        /// Set this property to true if the vive tracker is present in your application
         /// </summary>
         public static bool isViveTrackerPresent = false;
 
+        /// <summary>
+        /// Set this property to true to enable auto orientation.
+        /// </summary>
+        public static bool autoOrientEnable = false;
+
+        /// <summary>
+        /// Set this property to true to re-orient the player and motus-1 in gamespace.
+        /// </summary>
+        public static bool orientMotus = false;
+
         private static bool isInitalized = false;
+        private static bool autoOrientComplete = false;
 
         /// <summary>
         /// Initialize should be called only once upon startup from the character controll script. It initializes the log file for the
@@ -68,6 +79,19 @@ namespace Motus_1_Plugin
 
                 Logging.Logger.LogMessage(strMsg);
             }
+
+            Orientation.Orienter.useHands = enableHandSteering;
+            Orientation.Orienter.useHeadSet = enableHeadSteering;
+            Orientation.Orienter.useViveTracker = enableViveTrackerSteering;
+
+            if (autoOrientEnable && !autoOrientComplete)
+                orientMotus = true;
+
+            if (orientMotus)
+            {
+                OrientMotus();
+                orientMotus = false;
+            }
         }
 
         /// <summary>
@@ -93,7 +117,7 @@ namespace Motus_1_Plugin
         public static Quaternion GetCharacterRotation()
         {
             Quaternion axesOffset = Orientation.Orienter.GetOffset();
-            Quaternion steering = new Quaternion();
+            Quaternion steering = new Quaternion(0, 0, 0, 1);
 
             try
             {
@@ -109,19 +133,7 @@ namespace Motus_1_Plugin
                 Logging.Logger.LogMessage("PluginInterface.cs" + ": " + "GetCharacterRotation" + ": " + e0.ToString());
             }
 
-            Vector3 newOffset = axesOffset.eulerAngles + steering.eulerAngles;
-
-            return Quaternion.Euler(newOffset);
-        }
-
-        /// <summary>
-        /// OrientMotus must be called at least once at the beginning of the application to orient the motus-1 hardware with the game space coodinates. This
-        /// orientation will be represented in the GetCharacterRotation quaternion. Please note that the motus-1 hardware may not function correctly if 
-        /// OrientMotus is never called.
-        /// </summary>
-        public static void OrientMotus()
-        {
-            Orientation.Orienter.SnapMotusToGameAxes();
+            return (axesOffset * steering);
         }
 
         /// <summary>
@@ -140,9 +152,30 @@ namespace Motus_1_Plugin
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
-        public static void SetViveTrackerOrientation(Vector3 position, Vector3 rotation)
+        public static void SetViveTrackerOrientation(Vector3 position, Quaternion rotation)
         {
             Orientation.Orienter.SetViveTrackerRotation(position, rotation);
+        }
+
+        private static void OrientMotus()
+        {
+            Vector3 xz = DataStorage.DataStorage.GetXZVector();
+
+            // Orient the Motus-1 device and then reset the xz vector to prevent any weirdness.
+            if (xz.magnitude > 0)
+            {
+                Orientation.Orienter.SnapMotusToGameAxes();
+
+                short[] data = new short[9];
+                for (int i = 0; i < data.Length; i++)
+                    data[i] = 0;
+
+                DataStorage.DataStorage.SetCurrentData(data);
+                DataStorage.DataStorage.SetCurrentData(data);
+
+                if (autoOrientEnable)
+                    autoOrientComplete = true;
+            }
         }
     }
 }
