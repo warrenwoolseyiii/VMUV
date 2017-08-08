@@ -119,8 +119,8 @@ namespace Motus_1_Plugin.Orientation
                 Quaternion playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye);
                 Vector3 playerRotationEuler = playerRotation.eulerAngles;
 
-                playerRotation.x = 0;
-                playerRotation.z = 0;
+                playerRotationEuler.x = 0;
+                playerRotationEuler.z = 0;
                 playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 rtn = playerRotation * Quaternion.Inverse(steeringOffset);
@@ -131,8 +131,8 @@ namespace Motus_1_Plugin.Orientation
                 Quaternion playerRotation = InputTracking.GetLocalRotation(VRNode.CenterEye);
                 Vector3 playerRotationEuler = playerRotation.eulerAngles;
 
-                playerRotation.x = 0;
-                playerRotation.z = 0;
+                playerRotationEuler.x = 0;
+                playerRotationEuler.z = 0;
                 playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 // Calculate the steeringOffset so that when we are done steering our new offset is correct.
@@ -160,8 +160,8 @@ namespace Motus_1_Plugin.Orientation
                 Quaternion playerRotation = trackerRot;
                 Vector3 playerRotationEuler = playerRotation.eulerAngles;
 
-                playerRotation.x = 0;
-                playerRotation.z = 0;
+                playerRotationEuler.x = 0;
+                playerRotationEuler.z = 0;
                 playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 rtn = playerRotation * Quaternion.Inverse(steeringOffset);
@@ -172,8 +172,8 @@ namespace Motus_1_Plugin.Orientation
                 Quaternion playerRotation = trackerRot;
                 Vector3 playerRotationEuler = playerRotation.eulerAngles;
 
-                playerRotation.x = 0;
-                playerRotation.z = 0;
+                playerRotationEuler.x = 0;
+                playerRotationEuler.z = 0;
                 playerRotation = Quaternion.Euler(playerRotationEuler);
 
                 // Calculate the steeringOffset so that when we are done steering our new offset is correct.
