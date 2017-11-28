@@ -1,11 +1,11 @@
 ﻿
 namespace VMUV_TCP
 {
-    class Packetizer
+    public class Packetizer
     {
-        private const byte sync1 = 0x69;
-        private const byte sync2 = 0xee;
-        private const int numOverHeadBytes = 7;
+        public const byte sync1 = 0x69;
+        public const byte sync2 = 0xee;
+        public const int numOverHeadBytes = 7;
 
         public byte[] PacketizeData(byte[] payload, byte type)
         {
