@@ -1,50 +1,54 @@
 ﻿
+using System;
+using System.Collections.Generic;
+
 namespace VMUV_TCP
 {
-    class TraceLogger
+    public class TraceLogger
     {
-        private uint buffSize, buffHead, buffTail;
-        private TraceLoggerMessage[] msgBuff;
+        private List<TraceLoggerMessage> messageList;
+        private int _numMessagesQueued;
+        private int _maxListSize = 32;
 
         public TraceLogger()
         {
-            buffHead = buffTail = 0;
-            buffSize = 32;
-            msgBuff = new TraceLoggerMessage[buffSize];
+            messageList = new List<TraceLoggerMessage>(_maxListSize);
+            _numMessagesQueued = 0;
         }
 
-        public TraceLogger(uint bufferSize)
+        public TraceLogger(int maximumListSize)
         {
-            buffHead = buffTail = 0;
-            buffSize = bufferSize;
-            msgBuff = new TraceLoggerMessage[buffSize];
-        }
+            _numMessagesQueued = 0;
+            _maxListSize = maximumListSize;
 
-        public uint GetBuffSize()
-        {
-            return buffSize;
+            try
+            {
+                messageList = new List<TraceLoggerMessage>(_maxListSize);
+            }
+            catch (ArgumentOutOfRangeException e0)
+            {
+                messageList = new List<TraceLoggerMessage>(32);
+            }
         }
 
         public int GetNumMessagesQueued()
         {
-            uint head = buffHead % buffSize;
-            uint tail = buffTail % buffSize;
+            return _numMessagesQueued;
+        }
 
-            if (head < tail)
-                head += buffSize;
-
-            return ((int)head - (int)tail);
+        public int GetBuffSize()
+        {
+            return messageList.Capacity;
         }
 
         public bool HasMessages()
         {
-            return (GetNumMessagesQueued() > 0);
+            return (_numMessagesQueued > 0);
         }
 
-        private bool IsRoomInBuff()
+        public bool IsRoomInBuff()
         {
-            int numMsgsQueued = GetNumMessagesQueued();
-            return ((numMsgsQueued >= 0) && (numMsgsQueued < buffSize));
+            return _numMessagesQueued < messageList.Capacity;
         }
 
         public bool QueueMessage(TraceLoggerMessage msg)
@@ -52,39 +56,57 @@ namespace VMUV_TCP
             if (!IsRoomInBuff())
                 return false;
 
-            msgBuff[buffHead % buffSize] = msg;
-            buffHead++;
-
+            messageList.Add(msg);
+            _numMessagesQueued++;
             return true;
         }
 
         public TraceLoggerMessage DeQueueMessage()
         {
-            TraceLoggerMessage rtn = msgBuff[buffTail % buffSize];
-            buffTail++;
-
-            return rtn;
+            TraceLoggerMessage rtn;
+            if (_numMessagesQueued > 0)
+            {
+                rtn = messageList[--_numMessagesQueued];
+                messageList.RemoveAt(_numMessagesQueued);
+                return rtn;
+            }
+            throw new IndexOutOfRangeException();
         }
 
         public TraceLoggerMessage BuildMessage(string modName, string method, string msg)
         {
-            TraceLoggerMessage rtn = new TraceLoggerMessage();
-
-            rtn.moduleName = modName;
-            rtn.methodName = method;
-            rtn.message = msg;
+            TraceLoggerMessage rtn = new TraceLoggerMessage
+            {
+                moduleName = modName,
+                methodName = method,
+                message = msg
+            };
 
             return rtn;
         }
 
         public TraceLoggerMessage[] GetAllMessages()
         {
-            int size = GetNumMessagesQueued();
-            TraceLoggerMessage[] rtn = new TraceLoggerMessage[size];
+            TraceLoggerMessage[] rtn = messageList.ToArray();
+            try
+            {
+                if (_numMessagesQueued > 0)
+                {
+                    for (int i = _numMessagesQueued - 1; i >= 0; i--)
+                        messageList.RemoveAt(i);
+                }
+            }
+            catch (ArgumentOutOfRangeException e0)
+            {
+                // force the list to remove everything
+                messageList.TrimExcess();
+                for (int i = 0; i < messageList.Capacity; i++)
+                    messageList.RemoveAt(i);
 
-            for (int i = 0; i < size; i++)
-                rtn[i] = DeQueueMessage();
+                messageList.Capacity = _maxListSize;
+            }
 
+            _numMessagesQueued = 0;
             return rtn;
         }
 

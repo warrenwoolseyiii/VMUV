@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Security;
 
 namespace VMUV_TCP
 {
@@ -23,7 +24,7 @@ namespace VMUV_TCP
         /// <summary>
         /// Version number of the current release.
         /// </summary>
-        public const string version = "1.0.2";
+        public const string version = "1.1.0";
 
         /// <summary>
         /// Instantiates a new instance of <c>SocketWrapper</c> configured as either a client or a server.
@@ -41,15 +42,26 @@ namespace VMUV_TCP
         /// <param name="type"></param>
         public void ServerSetTxData(byte[] payload, PacketTypes type)
         {
-            if (usePing)
+            string methodName = "ServerSetTxData";
+            try
             {
-                txDataPing = packetizer.PacketizeData(payload, (byte)type);
-                usePing = false;
+                if (usePing)
+                {
+                    txDataPing = packetizer.PacketizeData(payload, (byte)type);
+                    usePing = false;
+                }
+                else
+                {
+                    txDataPong = packetizer.PacketizeData(payload, (byte)type);
+                    usePing = true;
+                }
             }
-            else
+            catch (ArgumentOutOfRangeException e0)
             {
-                txDataPong = packetizer.PacketizeData(payload, (byte)type);
-                usePing = true;
+                string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
         }
 
@@ -60,13 +72,9 @@ namespace VMUV_TCP
         public byte[] ClientGetRxData()
         {
             if (usePing)
-            {
                 return rxDataPong;
-            }
             else
-            {
                 return rxDataPing;
-            }
         }
 
         /// <summary>
@@ -80,23 +88,70 @@ namespace VMUV_TCP
             if (config != Configuration.server)
                 return;
 
-            IPEndPoint localEP = new IPEndPoint(IPAddress.Loopback, port);
-
             try
             {
+                IPEndPoint localEP = new IPEndPoint(IPAddress.Loopback, port);
                 string msg = "TCP Server successfully started on port " + port.ToString();
 
                 listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
                 listener.Bind(localEP);
                 listener.Listen(100);
                 listener.BeginAccept(new AsyncCallback(AcceptCB), listener);
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e0)
             {
                 string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ArgumentOutOfRangeException e1)
+            {
+                string msg = e1.Message + e1.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SecurityException e4)
+            {
+                string msg = e4.Message + e4.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (NotSupportedException e5)
+            {
+                string msg = e5.Message + e5.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (InvalidOperationException e6)
+            {
+                string msg = e6.Message + e6.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
@@ -113,22 +168,65 @@ namespace VMUV_TCP
             if (clientIsBusy || (config != Configuration.client))
                 return;
 
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, port);
-
             try
             {
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Loopback, port);
                 clientIsBusy = true;
-
                 Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
                 client.BeginConnect(remoteEP, new AsyncCallback(ConnectCB), client);
+                return;
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e0)
             {
                 string msg = e0.Message + e0.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
+            }
+            catch (ArgumentOutOfRangeException e1)
+            {
+                string msg = e1.Message + e1.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SecurityException e4)
+            {
+                string msg = e4.Message + e4.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (InvalidOperationException e6)
+            {
+                string msg = e6.Message + e6.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            finally
+            {
                 clientIsBusy = false;
             }
         }
@@ -166,9 +264,51 @@ namespace VMUV_TCP
                 else
                     Send(handler, txDataPing);
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e0)
             {
                 string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ArgumentOutOfRangeException e1)
+            {
+                string msg = e1.Message + e1.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (NotSupportedException e5)
+            {
+                string msg = e5.Message + e5.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (InvalidOperationException e6)
+            {
+                string msg = e6.Message + e6.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
@@ -183,9 +323,37 @@ namespace VMUV_TCP
             {
                 handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCB), handler);
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e0)
             {
                 string msg = e0.Message + e0.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ArgumentOutOfRangeException e1)
+            {
+                string msg = e1.Message + e1.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e4)
+            {
+                string msg = e4.Message + e4.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
@@ -204,9 +372,23 @@ namespace VMUV_TCP
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
             }
-            catch (Exception e0)
+            catch (SocketException e2)
             {
-                string msg = e0.Message + e0.StackTrace;
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e4)
+            {
+                string msg = e4.Message + e4.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
@@ -224,9 +406,44 @@ namespace VMUV_TCP
                 listener.Listen(100);
                 listener.BeginAccept(new AsyncCallback(AcceptCB), listener);
             }
-            catch (Exception e0)
+            catch (ArgumentOutOfRangeException e1)
             {
-                string msg = e0.Message + e0.StackTrace;
+                string msg = e1.Message + e1.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (NotSupportedException e5)
+            {
+                string msg = e5.Message + e5.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (InvalidOperationException e6)
+            {
+                string msg = e6.Message + e6.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
@@ -243,12 +460,50 @@ namespace VMUV_TCP
                 client.EndConnect(ar);
                 Read(client);
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e1)
             {
-                string msg = e0.Message + e0.StackTrace;
+                string msg = e1.Message + e1.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ArgumentException e5)
+            {
+                string msg = e5.Message + e5.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (InvalidOperationException e6)
+            {
+                string msg = e6.Message + e6.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            finally
+            {
                 clientIsBusy = false;
             }
         }
@@ -263,12 +518,43 @@ namespace VMUV_TCP
                 state.workSocket = client;
                 client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCB), state);
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e1)
             {
-                string msg = e0.Message + e0.StackTrace;
+                string msg = e1.Message + e1.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ArgumentOutOfRangeException e5)
+            {
+                string msg = e5.Message + e5.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            finally
+            {
                 clientIsBusy = false;
             }
         }
@@ -303,13 +589,47 @@ namespace VMUV_TCP
                     }
                 }
             }
-            catch (Exception e0)
+            catch (ArgumentNullException e1)
             {
-                string msg = e0.Message + e0.StackTrace;
+                string msg = e1.Message + e1.StackTrace;
 
                 traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
                 DebugPrint(msg);
-                clientIsBusy = false;
+            }
+            catch (SocketException e2)
+            {
+                string msg = e2.Message + e2.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ObjectDisposedException e3)
+            {
+                string msg = e3.Message + e3.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (ArgumentException e5)
+            {
+                string msg = e5.Message + e5.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (InvalidOperationException e6)
+            {
+                string msg = e6.Message + e6.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
+            }
+            catch (Exception e7)
+            {
+                string msg = e7.Message + e7.StackTrace;
+
+                traceLogger.QueueMessage(traceLogger.BuildMessage(moduleName, methodName, msg));
+                DebugPrint(msg);
             }
 
             clientIsBusy = false;
