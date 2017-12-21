@@ -1,7 +1,8 @@
 ﻿using Motus_1_Plugin.TCP;
 using Motus_1_Plugin.Logging;
 using Motus_1_Plugin.VMUV_Hardware.Motus_1;
-using VMUV_TCP;
+using VMUV_TCP_CSharp;
+using Trace_Logger_CSharp;
 
 namespace Motus_1_Plugin
 {
