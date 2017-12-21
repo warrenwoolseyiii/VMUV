@@ -1,16 +1,13 @@
 ﻿using System;
-using UnityEngine;
 
 namespace Motus_1_Plugin.Logging
 {
     static class Logger
     {
         private static string currentDir = System.IO.Directory.GetCurrentDirectory();
-        private static string logFileName = "log.txt";
+        private static string logFileName = "vmuv_log.txt";
         private static string logFilePath = System.IO.Path.Combine(currentDir, logFileName);
         private static bool logFileCreated = false;
-        private static bool logConsolData = false;
-        private static bool logUnityConsoleData = false;
 
         public static void CreateLogFile()
         {
@@ -18,12 +15,6 @@ namespace Motus_1_Plugin.Logging
 
             try
             {
-#if DEBUG
-                logConsolData = true;
-#else
-                logUnityConsoleData = true;
-#endif
-
                 string[] str = { "*** New log file created ***" };
                 System.IO.File.WriteAllLines(logFilePath, str);
                 logFileCreated = true;
@@ -48,11 +39,6 @@ namespace Motus_1_Plugin.Logging
                 try
                 {
                     file.WriteLine(msg);
-
-                    if (logConsolData)
-                        Console.WriteLine(msg);
-                    else if (logUnityConsoleData)
-                        Debug.Log(msg);
                 }
                 catch (Exception e0)
                 {
@@ -78,11 +64,6 @@ namespace Motus_1_Plugin.Logging
                 try
                 {
                     file.WriteLine(msg);
-
-                    if (logConsolData)
-                        Console.WriteLine(msg);
-                    else if (logUnityConsoleData)
-                        Debug.Log(msg);
                 }
                 catch (Exception e0)
                 {

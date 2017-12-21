@@ -5,20 +5,19 @@ using Windows.Devices.Enumeration;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Foundation;
 using Windows.Storage.Streams;
-using Motus_1_Pipe_Server.Logging;
-using Motus_1_Pipe_Server.Utilities;
-using Motus_1_Pipe_Server.DataStorage;
+using Motus_1_Server.DataStorage;
+using Motus_1_Server.Logging;
+using VMUV_TCP;
+using VMUV_Comms_Protocol;
 
-namespace Motus_1_Pipe_Server.USB
+namespace Motus_1_Server.USB
 {
     static class HIDInterface
     {
         private static bool deviceIsEnumerated = false;
         private static bool deviceIsPresent = false;
-        private static bool storeNextDataPt = false;
         private static HidDevice device = null;
         private static TraceLogger hidLogger = new TraceLogger(128);
-        private static RawDataFilter accumulator = new RawDataFilter();
         private static string moduleName = "HIDInterface.cs";
 
         public static bool DeviceIsEnumerated()
@@ -116,45 +115,45 @@ namespace Motus_1_Pipe_Server.USB
 
         private static void GetHidReport(HidInputReportReceivedEventArgs args)
         {
-            // TODO: For now we only have one report so we can get away with not parsing the type or numeric control
+            // For now there is only one data type
+            string methodName = "GetHidReport";
             HidInputReport rpt = args.Report;
             IBuffer buff = rpt.Data;
             DataReader dr = DataReader.FromBuffer(buff);
             byte[] bytes = new byte[rpt.Data.Length];
             dr.ReadBytes(bytes);
-            DataStorageTable.SetCurrentData(bytes);
-
-            // For now I want to send data as fast as possible to the caller so we will not use
-            // the accumulator.
-            /* TODO: Not using the accumulator atm.
-            ByteUtilities.SetRawDataInCnts(bytes);
-            short[] formatted = ByteUtilities.GetRawDataInCnts();
-
-            accumulator.AccumulateNextSample(formatted);
-
-            if (accumulator.accumLimitReached)
+            Motus_1_RawDataPacket packet = new Motus_1_RawDataPacket();
+            try
             {
-                short[] avg = accumulator.GetAverageStorage();
-                byte[] avgBytes = ByteUtilities.ConvertInt16ToByte(avg);
-                ByteUtilities.SetRawDataInCnts(avgBytes);
-                short[] test = ByteUtilities.GetRawDataInCnts();
-
-                DataStorageTable.SetCurrentData(avgBytes);
-                storeNextDataPt = true;
-            }*/
+                // Have to remove a bonus byte on the payload
+                byte[] parsed = new byte[bytes.Length - 1];
+                for (int i = 0; i < parsed.Length; i++)
+                    parsed[i] = bytes[i + 1];
+                packet.Serialize(parsed);
+                DataStorageTable.SetCurrentMotus1RawData(packet);
+            }
+            catch (ArgumentException e0)
+            {
+                string msg = e0.Message + e0.StackTrace;
+                hidLogger.QueueMessage(hidLogger.BuildMessage(moduleName, methodName,
+                    msg));
+            }
+            catch (IndexOutOfRangeException e1)
+            {
+                string msg = e1.Message + e1.StackTrace;
+                hidLogger.QueueMessage(hidLogger.BuildMessage(moduleName, methodName,
+                    msg));
+            }
         }
 
-        private static void USBInterruptTransferHandler(HidDevice sender, HidInputReportReceivedEventArgs args)
+        private static void USBInterruptTransferHandler(HidDevice sender, 
+            HidInputReportReceivedEventArgs args)
         {
             GetHidReport(args);
-
-            if (Logger.IsLoggingRawData() && storeNextDataPt)
+            if (Logger.IsLoggingRawData())
             {
-                byte[] bytes = DataStorageTable.GetCurrentData();
-                ByteUtilities.SetRawDataInCnts(bytes);
-                Logger.LogRawData(ByteUtilities.ToCsvFormat());
-
-                storeNextDataPt = false;
+                Motus_1_RawDataPacket packet = DataStorageTable.GetCurrentMotus1RawData();
+                Logger.LogRawData(packet.ToString());
             }
         }
 

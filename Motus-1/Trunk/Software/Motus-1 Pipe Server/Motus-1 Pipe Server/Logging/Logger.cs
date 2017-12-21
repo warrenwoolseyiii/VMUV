@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Motus_1_Pipe_Server.Logging
+namespace Motus_1_Server.Logging
 {
     static class Logger
     {

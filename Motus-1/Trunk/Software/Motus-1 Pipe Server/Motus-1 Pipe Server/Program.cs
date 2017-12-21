@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Threading;
-using Motus_1_Pipe_Server.Logging;
-using Motus_1_Pipe_Server.USB;
+using Motus_1_Server.Logging;
+using Motus_1_Server.USB;
+using Motus_1_Server.DataStorage;
 using VMUV_TCP;
+using VMUV_Comms_Protocol;
 
-namespace Motus_1_Pipe_Server
+namespace Motus_1_Server
 {
     class Program
     {
-        private static string version = "1.0.3";
+        private static string version = "1.0.6";
         private static HardwareStates hwState = HardwareStates.find_device;
         private static SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
         private static int devicePollCounter = 0;
@@ -22,9 +24,10 @@ namespace Motus_1_Pipe_Server
             while (true)
             {
                 Motus1HardwareMain();
-                tcpServer.ServerSetTxData(DataStorage.DataStorageTable.GetCurrentData(), PacketTypes.raw_data);
+                Motus_1_RawDataPacket packet = DataStorageTable.GetCurrentMotus1RawData();
+                tcpServer.ServerSetTxData(packet.Payload, (byte)packet.Type);
                 ServiceLoggingRequests();
-                Thread.Sleep(5);
+                Thread.Sleep(2);
             }
         }
 
@@ -106,7 +109,7 @@ namespace Motus_1_Pipe_Server
         {
             if (HIDInterface.HasTraceMessages())
             {
-                Logging.TraceLoggerMessage[] msgs = HIDInterface.GetTraceMessages();
+                TraceLoggerMessage[] msgs = HIDInterface.GetTraceMessages();
                 string[] strMsg = new string[msgs.Length];
 
                 for (int i = 0; i < msgs.Length; i++)
@@ -117,7 +120,7 @@ namespace Motus_1_Pipe_Server
 
             if (tcpServer.HasTraceMessages())
             {
-                VMUV_TCP.TraceLoggerMessage[] msgs = tcpServer.GetTraceMessages();
+                TraceLoggerMessage[] msgs = tcpServer.GetTraceMessages();
                 string[] strMsg = new string[msgs.Length];
 
                 for (int i = 0; i < msgs.Length; i++)

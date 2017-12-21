@@ -15,6 +15,8 @@ namespace VMUV_TCP
         private byte[] txDataPong = { 0 };  // Do this incase Start() is called before the user sets any data
         private byte[] rxDataPing = { 0 };  // Do this incase GetRxData() is called before the user gets any data
         private byte[] rxDataPong = { 0 };  // Do this incase GetRxData() is called before the user gets any data
+        private byte rxTypePing;
+        private byte rxTypePong;
         private bool usePing = true;
         private Configuration config;
         private bool clientIsBusy = false;
@@ -24,8 +26,7 @@ namespace VMUV_TCP
         /// <summary>
         /// Version number of the current release.
         /// </summary>
-        public const string version = "1.1.0";
-
+        public const string version = "1.1.1";
         /// <summary>
         /// Instantiates a new instance of <c>SocketWrapper</c> configured as either a client or a server.
         /// </summary>
@@ -40,7 +41,7 @@ namespace VMUV_TCP
         /// </summary>
         /// <param name="payload"></param>
         /// <param name="type"></param>
-        public void ServerSetTxData(byte[] payload, PacketTypes type)
+        public void ServerSetTxData(byte[] payload, byte type)
         {
             string methodName = "ServerSetTxData";
             try
@@ -75,6 +76,18 @@ namespace VMUV_TCP
                 return rxDataPong;
             else
                 return rxDataPing;
+        }
+
+        /// <summary>
+        /// Acquires the most recently received payload type.
+        /// </summary>
+        /// <returns>byte with the most recent payload type. </returns>
+        public byte ClientGetRxType()
+        {
+            if (usePing)
+                return rxTypePong;
+            else
+                return rxTypePing;
         }
 
         /// <summary>
@@ -576,11 +589,13 @@ namespace VMUV_TCP
                         if (usePing)
                         {
                             rxDataPing = state.packetizer.UnpackData(state.buffer);
+                            rxTypePing = state.packetizer.GetPacketType(state.buffer);
                             usePing = false;
                         }
                         else
                         {
                             rxDataPong = state.packetizer.UnpackData(state.buffer);
+                            rxTypePong = state.packetizer.GetPacketType(state.buffer);
                             usePing = true;
                         }
                         
@@ -641,15 +656,6 @@ namespace VMUV_TCP
             Console.WriteLine(s);
 #endif
         }
-    }
-
-    /// <summary>
-    /// The various types of packets that can be sent and received. Must be cast into a byte to be packetized properly.
-    /// </summary>
-    public enum PacketTypes
-    {
-        test,
-        raw_data
     }
 
     /// <summary>

@@ -1,32 +1,35 @@
-﻿
-namespace Motus_1_Pipe_Server.DataStorage
-{
-    static class DataStorageTable
-    {
-        private static byte[] currentDataPing = new byte[1];
-        private static byte[] currentDataPong = new byte[2];
-        private static bool usePing = true;
+﻿using VMUV_Comms_Protocol;
 
-        public static void SetCurrentData(byte[] data)
+namespace Motus_1_Server.DataStorage
+{
+    class DataStorageTable
+    {
+        private static Motus_1_RawDataPacket _currentMotus1RawDataPing 
+            = new Motus_1_RawDataPacket();
+        private static Motus_1_RawDataPacket _currentMotus1RawDataPong 
+            = new Motus_1_RawDataPacket();
+        private static bool _useMotus1RawDataPing = true;
+
+        public static void SetCurrentMotus1RawData(Motus_1_RawDataPacket data)
         {
-            if (usePing)
+            if (_useMotus1RawDataPing)
             {
-                currentDataPing = data;
-                usePing = false;
+                _currentMotus1RawDataPing = data;
+                _useMotus1RawDataPing = false;
             }
             else
             {
-                currentDataPong = data;
-                usePing = true;
+                _currentMotus1RawDataPong = data;
+                _useMotus1RawDataPing = true;
             }
         }
 
-        public static byte[] GetCurrentData()
+        public static Motus_1_RawDataPacket GetCurrentMotus1RawData()
         {
-            if (usePing)
-                return currentDataPong;
+            if (_useMotus1RawDataPing)
+                return _currentMotus1RawDataPong;
             else
-                return currentDataPing;
+                return _currentMotus1RawDataPing;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace VMUV_TCP_UnitTests
             byte[] txData = new byte[] { 0x69, 0x02, 0x45, 0x89 };
             for (int j = 0; j < 10; j++)
             {
-                server.ServerSetTxData(txData, PacketTypes.test);
+                server.ServerSetTxData(txData, 0);
                 client.ClientStartRead();
 
                 Assert.AreEqual(false, client.HasTraceMessages());
@@ -39,6 +39,8 @@ namespace VMUV_TCP_UnitTests
 
                 byte[] rxData = client.ClientGetRxData();
                 Assert.AreEqual(txData.Length, rxData.Length);
+                byte type = client.ClientGetRxType();
+                Assert.AreEqual(0, type);
                 for (int i = 0; i < txData.Length; i++)
                     Assert.AreEqual(txData[i], rxData[i]);
 
