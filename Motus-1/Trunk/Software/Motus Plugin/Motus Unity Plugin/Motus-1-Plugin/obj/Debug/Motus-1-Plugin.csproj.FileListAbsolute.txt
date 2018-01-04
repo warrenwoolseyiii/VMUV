@@ -1,0 +1,12 @@
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\obj\Debug\Motus-1-Plugin.csprojResolveAssemblyReference.cache
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Comms Protocol CSharp.dll
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Trace Logger CSharp.dll
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\VMUV TCP CSharp.dll
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Comms Protocol CSharp.pdb
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\VMUV TCP CSharp.pdb
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Trace Logger CSharp.pdb
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Motus_Unity_Plugin.dll.config
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Motus_Unity_Plugin.dll
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\bin\Debug\Motus_Unity_Plugin.pdb
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\obj\Debug\Motus_Unity_Plugin.dll
+C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus-1-Plugin\Motus-1-Plugin\obj\Debug\Motus_Unity_Plugin.pdb
