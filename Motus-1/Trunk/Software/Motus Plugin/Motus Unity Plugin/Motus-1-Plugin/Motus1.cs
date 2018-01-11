@@ -9,7 +9,7 @@ namespace Motus_Unity_Plugin
     public static class Motus1
     {
         private static bool _isInitalized = false;
-        private static string _versionInfo = "2.0.0";
+        private static string _versionInfo = "2.0.1";
 
         public static void Initialize(bool rawDataLog = false)
         {
@@ -23,6 +23,26 @@ namespace Motus_Unity_Plugin
                 Logger.LogMessage("Client side TCP v" + SocketWrapper.version);
 
                 _isInitalized = true;
+            }
+
+            ServerApp appLauncher = new ServerApp();
+            if (!appLauncher.IsProcessOpen(ServerApp.appName))
+            {
+                Logger.LogMessage("Server process not found, launching..");
+                appLauncher.LaunchProcess(ServerApp.fname);
+            }
+            else
+                Logger.LogMessage("Server already running!");
+
+            if (appLauncher.HasTraceLoggerMessages())
+            {
+                TraceLoggerMessage[] msgs = appLauncher.GetTraceLoggerMessages();
+                string[] strMsg = new string[msgs.Length];
+
+                for (int i = 0; i < msgs.Length; i++)
+                    strMsg[i] = TraceLogger.TraceLoggerMessageToString(msgs[i]);
+
+                Logger.LogMessage(strMsg);
             }
         }
 

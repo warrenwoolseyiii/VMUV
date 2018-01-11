@@ -9,23 +9,41 @@ namespace Server_App_CSharp
 {
     class Program
     {
-        private static string version = "1.0.6";
+        private static string version = "1.0.7";
         private static HardwareStates hwState = HardwareStates.find_device;
         private static SocketWrapper tcpServer = new SocketWrapper(Configuration.server);
         private static int devicePollCounter = 0;
 
         static void Main(string[] args)
         {
-            Initialize();
-            tcpServer.StartServer();
-
-            while (true)
+            Mutex mutex = null;
+            try
             {
-                Motus1HardwareMain();
-                Motus_1_RawDataPacket packet = DataStorageTable.GetCurrentMotus1RawData();
-                tcpServer.ServerSetTxData(packet.Payload, (byte)packet.Type);
-                ServiceLoggingRequests();
-                Thread.Sleep(2);
+                mutex = new Mutex(false, "3fb63999603824ebd0b416f74e96505023cfcd41");
+                if (mutex.WaitOne(0, false))
+                {
+                    Initialize();
+                    tcpServer.StartServer();
+
+                    while (true)
+                    {
+                        Motus1HardwareMain();
+                        Motus_1_RawDataPacket packet = DataStorageTable.GetCurrentMotus1RawData();
+                        tcpServer.ServerSetTxData(packet.Payload, (byte)packet.Type);
+                        ServiceLoggingRequests();
+                        Thread.Sleep(2);
+                    }
+                }       
+            }
+            catch (Exception)
+            { }
+            finally
+            {
+                if (mutex != null)
+                {
+                    mutex.Close();
+                    mutex = null;
+                }
             }
         }
 

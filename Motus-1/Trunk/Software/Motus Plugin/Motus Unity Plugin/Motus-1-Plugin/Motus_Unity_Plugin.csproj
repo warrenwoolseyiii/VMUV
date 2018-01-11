@@ -51,6 +51,7 @@
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Motus1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerApp.cs" />
     <Compile Include="TCP\Client.cs" />
     <Compile Include="VMUV_Hardware\Motus_1\Motus_1_Platform.cs" />
     <Compile Include="VMUV_Hardware\Motus_1\SensorArray.cs" />

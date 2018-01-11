@@ -16,32 +16,32 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_22C16D2F57EE7330D21FAF4E65BF3668"
-        "OwnerKey" = "8:_8494FE2BC5B84909AA3C6B1407107210"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8494FE2BC5B84909AA3C6B1407107210"
+        "MsmKey" = "8:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
+        "MsmKey" = "8:_22C16D2F57EE7330D21FAF4E65BF3668"
+        "OwnerKey" = "8:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9946DC48F88A4072DE601B01FEF91DE6"
-        "OwnerKey" = "8:_8494FE2BC5B84909AA3C6B1407107210"
+        "OwnerKey" = "8:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A85DB78D36F7ED827759BCEFD80226D4"
-        "OwnerKey" = "8:_8494FE2BC5B84909AA3C6B1407107210"
+        "OwnerKey" = "8:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_B3B19DE553D86657170F50DE1E268791"
-        "OwnerKey" = "8:_8494FE2BC5B84909AA3C6B1407107210"
+        "OwnerKey" = "8:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -59,7 +59,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8494FE2BC5B84909AA3C6B1407107210"
+        "OwnerKey" = "8:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -111,6 +111,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
         "Release"
@@ -135,6 +143,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
     }
@@ -165,6 +181,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_02211D1EF5C64AE7801AC4FA9FC7A3F5"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Server App CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_02211D1EF5C64AE7801AC4FA9FC7A3F5"
+                    {
+                    "Name" = "8:Server App CSharp.exe"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\Server App CSharp\\bin\\Release\\Server App CSharp.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_9054A16376734F098B9D1D7DB645C7D3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_22C16D2F57EE7330D21FAF4E65BF3668"
             {
             "AssemblyRegister" = "3:1"
@@ -194,37 +241,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8494FE2BC5B84909AA3C6B1407107210"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Server App CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_8494FE2BC5B84909AA3C6B1407107210"
-                    {
-                    "Name" = "8:Server App CSharp.exe"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:..\\Server App CSharp\\bin\\Release\\Server App CSharp.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_9054A16376734F098B9D1D7DB645C7D3"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9946DC48F88A4072DE601B01FEF91DE6"
@@ -377,7 +393,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Motus"
         "ProductCode" = "8:{E0307EC7-6AE0-417F-8A6F-CEBF069CA657}"
-        "PackageCode" = "8:{43063A3A-CC16-4315-8A40-7DD3F54B1605}"
+        "PackageCode" = "8:{122E1D70-53CE-44C6-9AB9-69DF3400010F}"
         "UpgradeCode" = "8:{9E247822-7903-4C11-A41E-CD3D656B5FF3}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
