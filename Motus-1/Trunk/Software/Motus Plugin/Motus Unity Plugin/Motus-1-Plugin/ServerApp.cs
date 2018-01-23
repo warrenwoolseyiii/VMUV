@@ -11,32 +11,6 @@ namespace Motus_Unity_Plugin
         private TraceLogger _traceLogger = new TraceLogger();
         private string _moduleName = "ServerApp";
 
-        public bool IsProcessOpen(string name)
-        {
-            bool rtn = false;
-            string methodName = "IsProcessOpen";
-            try
-            {
-                Process[] pname = Process.GetProcessesByName(name);
-                if (pname.Length > 0)
-                    rtn = true;
-            }
-            catch (InvalidOperationException e0)
-            {
-                _traceLogger.QueueMessage(_traceLogger.BuildMessage(_moduleName, methodName, e0.Message));
-            }
-            catch (PlatformNotSupportedException e1)
-            {
-                _traceLogger.QueueMessage(_traceLogger.BuildMessage(_moduleName, methodName, e1.Message));
-            }
-            catch (ArgumentException e2)
-            {
-                _traceLogger.QueueMessage(_traceLogger.BuildMessage(_moduleName, methodName, e2.Message));
-            }
-            
-            return rtn;
-        }
-
         public void LaunchProcess(string name)
         {
             string methodName = "LaunchProcess";

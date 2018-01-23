@@ -1,2 +1,0 @@
-C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus Unity Plugin\Motus-1-Plugin\bin\Release\Comms Protocol CSharp.pdb
-C:\Users\warre\Repositories\VMUV\VMUV\Motus-1\Trunk\Software\Motus Plugin\Motus Unity Plugin\Motus-1-Plugin\bin\Release\VMUV TCP CSharp.pdb

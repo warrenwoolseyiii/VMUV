@@ -9,7 +9,7 @@ namespace Motus_Unity_Plugin
     public static class Motus1
     {
         private static bool _isInitalized = false;
-        private static string _versionInfo = "2.0.1";
+        private static string _versionInfo = "2.0.2";
 
         public static void Initialize(bool rawDataLog = false)
         {
@@ -26,13 +26,7 @@ namespace Motus_Unity_Plugin
             }
 
             ServerApp appLauncher = new ServerApp();
-            if (!appLauncher.IsProcessOpen(ServerApp.appName))
-            {
-                Logger.LogMessage("Server process not found, launching..");
-                appLauncher.LaunchProcess(ServerApp.fname);
-            }
-            else
-                Logger.LogMessage("Server already running!");
+            appLauncher.LaunchProcess(ServerApp.fname);
 
             if (appLauncher.HasTraceLoggerMessages())
             {

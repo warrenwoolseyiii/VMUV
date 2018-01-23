@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿// un-comment this to use Steam VR tracked objects.
+#define USING_STEAM_VR
+using UnityEngine;
 
+#if USING_STEAM_VR
 public class SteamVRTrackedObjectRotationTracker : MonoBehaviour {
 
     public SteamVR_TrackedObject _steamTrackedObject;
@@ -17,3 +20,4 @@ public class SteamVRTrackedObjectRotationTracker : MonoBehaviour {
         RotationTracker.UpdateRotation(_steamTrackedObject.transform.rotation);
     }
 }
+#endif
