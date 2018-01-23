@@ -36,5 +36,7 @@ public class ExampleBasicCameraScript : MonoBehaviour {
 
         // Apply the translation to the camera object
         transform.Translate(trans * Time.deltaTime);
+        // un-comment this if your character is rolling over
+        transform.localRotation = new Quaternion(0, 0, 0, 1);
     }
 }
